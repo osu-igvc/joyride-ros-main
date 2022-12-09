@@ -1,0 +1,11 @@
+# Request
+bool set_enabled
+---
+
+# Result
+
+bool new_enable_status
+---
+
+# Feedback
+

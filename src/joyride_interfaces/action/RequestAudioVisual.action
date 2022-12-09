@@ -1,0 +1,12 @@
+# Request
+bool toggle_front_left_blinker
+bool toggle_front_right_blinker
+bool activate_buzzer
+---
+
+# Result
+
+---
+
+# Feedback
+
