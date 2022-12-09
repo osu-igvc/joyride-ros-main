@@ -1,0 +1,15 @@
+/perception/lane_detection_node:
+  ros__parameters:
+    image_stream_topic: '/cameras/front_raw'
+    output_topic: '/perception/front_lane_detected'
+
+/perception/pedestrian_detector_node:
+  ros__parameters:
+    image_stream_topic: '/cameras/front_raw'
+    output_topic: '/perception/image_front_pedestrian'
+    hue_upper: 40
+    hue_lower: 30
+    sat_upper: 255
+    sat_lower: 125
+    val_upper: 255
+    sat_lower: 125

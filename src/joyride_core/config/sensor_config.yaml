@@ -1,0 +1,5 @@
+/sensors/cameras/front_camera_pub_node:
+  ros__parameters:
+    image_source: 'video0'
+    image_topic: '/cameras/front_raw'
+    
