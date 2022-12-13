@@ -10,9 +10,6 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
-    #util_dir = get_package_share_directory('joyride_hmi')
-
-
     return LaunchDescription([
 
         # ----------- Publish Joystick Info ----------- #

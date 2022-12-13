@@ -6,6 +6,8 @@ from ament_index_python.packages import get_package_share_directory
 # ROS
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 #from launch.action import DeclareLaunchArgument
 #from launch.substitutions import TextSubstitution
 
@@ -18,6 +20,16 @@ def generate_launch_description():
         'vision_config.yaml'
     )
 
+
+    # ----------- Launch Cameras ----------- #
+    sensor_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('joyride_core'), 'launch'),
+            '/core_full_sensor_bringup.launch.py'
+        ])
+    )
+
+
     return LaunchDescription([
 
         # ----------- Create Pedestrian (Orange blob) Detector ----------- #
@@ -29,6 +41,15 @@ def generate_launch_description():
             parameters=[vision_config]
         ),
 
-        # ----------- Publish Lidar Streams ----------- #
+         # ----------- White Lane Detector ----------- #
+        Node(
+            package='joyride_perception',
+            namespace='perception',
+            executable='lane_detector',
+            name='lane_detection_node',
+            parameters=[vision_config]
+        ),
 
+        # ----------- Launch Cameras ----------- #
+        sensor_launch
     ])

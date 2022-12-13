@@ -18,7 +18,7 @@ class JoystickPub(Node):
         # Initilize the connected joystick
         self.stick.init()          
         # Creating timer that updates every 0.05 seconds
-        self.timer = self.create_timer(0.05, self.update)       
+        self.timer = self.create_timer(0.05, self.update)
         
         # Creating publisher that publishes standard Joy messages (imported from std_mssgs), the topic is /joy_input, 
         # and queued messages limit (if subscriber is not fast enough) is 1:
