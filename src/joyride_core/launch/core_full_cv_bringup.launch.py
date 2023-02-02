@@ -25,7 +25,7 @@ def generate_launch_description():
     sensor_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('joyride_core'), 'launch'),
-            '/core_full_sensor_bringup.launch.py'
+            '/sensor_bringup.launch.py'
         ])
     )
 
