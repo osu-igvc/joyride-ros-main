@@ -3,4 +3,4 @@
 	url = git@github.com:Hokuyo-aut/urg_node2.git
 [submodule "src/joyride_ros2_socketcan"]
 	path = src/joyride_ros2_socketcan
-	url = https://githubcom/osu-igvc/joyride_ros2_socketcan.git
+	url = https://github.com/osu-igvc/joyride_ros2_socketcan
