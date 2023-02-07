@@ -1,3 +1,6 @@
 [submodule "src/joyride_sensors/urg_node2"]
 	path = src/joyride_sensors/urg_node2
 	url = git@github.com:Hokuyo-aut/urg_node2.git
+[submodule "src/joyride_ros2_socketcan"]
+	path = src/joyride_ros2_socketcan
+	url = https://githubcom/osu-igvc/joyride_ros2_socketcan.git
