@@ -32,21 +32,21 @@ def generate_launch_description():
     return LaunchDescription([
 
         # ----------- Publish Raw Blackfly Camera Streams ----------- #
-        Node(
-            package='joyride_blackfly_gige',
-            namespace='sensors/cameras',
-            executable='blackfly_gige',
-            name='lane_camera_img_pub',
-            parameters=[blackfly_config]
-        ),
+        # Node(
+        #     package='joyride_blackfly_gige',
+        #     namespace='sensors/cameras',
+        #     executable='blackfly_gige',
+        #     name='lane_camera_img_pub',
+        #     parameters=[blackfly_config]
+        # ),
 
-        Node(
-            package='joyride_blackfly_gige',
-            namespace='sensors/cameras',
-            executable='blackfly_gige',
-            name='left_sign_camera_img_pub',
-            parameters=[blackfly_config]
-        ),
+        # Node(
+        #     package='joyride_blackfly_gige',
+        #     namespace='sensors/cameras',
+        #     executable='blackfly_gige',
+        #     name='left_sign_camera_img_pub',
+        #     parameters=[blackfly_config]
+        # ),
 
         Node(
             package='joyride_blackfly_gige',

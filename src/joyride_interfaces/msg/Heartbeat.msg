@@ -1,4 +1,4 @@
 builtin_interfaces/Time stamp
+bool healthy
 
-int64 count
-string source
+string description

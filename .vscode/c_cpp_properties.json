@@ -1,0 +1,30 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/joyride-obc/joyride-ros-main/install/vectornav/include/**",
+        "/home/joyride-obc/joyride-ros-main/install/vectornav_msgs/include/**",
+        "/home/joyride-obc/joyride-ros-main/install/joyride_interfaces/include/**",
+        "/home/joyride-obc/joyride-ros-main/install/image_meta_msgs_ros2/include/**",
+        "/home/joyride-obc/joyride-ros-main/install/flir_spinnaker_common/include/**",
+        "/home/joyride-obc/joyride-ros-main/install/camera_control_msgs_ros2/include/**",
+        "/opt/ros/foxy/include/**",
+        "/home/joyride-obc/joyride-ros-main/src/joyride_ros2_socketcan/include/**",
+        "/home/joyride-obc/joyride-ros-main/src/joyride_sensors/flir_spinnaker_common/include/**",
+        "/home/joyride-obc/joyride-ros-main/src/joyride_sensors/flir_spinnaker_ros2/include/**",
+        "/home/joyride-obc/joyride-ros-main/src/joyride_sensors/urg_node2/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
