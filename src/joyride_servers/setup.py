@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'dbw_usb_link_node = joyride_servers.dbw_usb_link_node:main'
+            'dbw_usb_link_node = joyride_servers.dbw_usb_link_node:main',
+            'joyride_static_tf_broadcaster = joyride_servers.joyride_static_tf_broadcaster:main'
         ],
     },
 )
