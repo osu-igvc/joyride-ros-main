@@ -28,6 +28,13 @@ Holds "servers" that manage system-wide operation. For example, the *usb-link-no
 
 Sensor driver nodes. LIDAR, GPS, cameras, and more. Launch files to bringup the sensors with proper transforms.
 
+### Vectornav VN300 GPS/IMU
+
+Can provide IMU data at up to 400Hz. Requires some careful configuration within the vectornav node's YAML. Namely, minimize data being transferred.
+- rateDivisor = 1 (send at frequency of 400Hz/1Hz = 400Hz)
+- commonField = 0x0ff0 (only send specific data types)
+- asyncMode = 1 (only send to serial 1)
+
 ## Joyride_Perception
 
 Perception systems - computer vision, SLAM nodes, estimation, etc.
