@@ -1,11 +1,11 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 package_name = 'joyride_sensors_generic'
 
 setup(
     name=package_name,
     version='0.0.0',
-    packages=find_packages(exclude=['test'])
+    packages=find_packages(exclude=['test']),
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),

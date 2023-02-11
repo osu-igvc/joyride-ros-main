@@ -22,7 +22,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 
-add_executable(odometryNode src/odometry.cpp)
+add_executable(odometryNode src/joyride_ackermann_odom.cpp)
 ament_target_dependencies(odometryNode 
   rclcpp 
   std_msgs 
