@@ -175,7 +175,8 @@ class BlobDetector(Node):
         finalFrame = cv2.bitwise_or(obj_extract, ped_blob)
 
        
-        cv2.imshow("init", ped_blob)
+        cv2.imshow("init_frame", frame_resize)
+        cv2.imshow("init", im_Canny)
         cv2.imshow("FRAME", finalFrame)
 
 
