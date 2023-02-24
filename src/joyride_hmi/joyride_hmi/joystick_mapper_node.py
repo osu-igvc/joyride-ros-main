@@ -9,6 +9,7 @@ from requests import request
 import rclpy
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import TwistStamped
+from std_msgs.msg import Float32
 from std_msgs.msg import Bool
 from rclpy.node import Node
 from rclpy.action import ActionClient
@@ -49,6 +50,9 @@ class JoystickSub(Node):
         self.cmd_vel_publisher = self.create_publisher(TwistStamped, '/cmd_vel', 1)
         self.cmd_vel = TwistStamped()
 
+        self.fb_wheelspeed_pub = self.create_publisher(Float32, '/joy/wheelspeed', 1)
+        self.fb_steerangle_pub = self.create_publisher(Float32, '/joy/steer_angle', 1)
+
         # Publish new commands at 100Hz
         self.publishTimer = self.create_timer(1.0/100.0, self.publishCMDVel)
 
@@ -76,10 +80,10 @@ class JoystickSub(Node):
         self.vel_lin_prev = 0
 
 
-        self.VEL_ANG_MAX = pi
-        self.VEL_ANG_MIN = -pi
+        self.VEL_ANG_MAX = 0.585 # (2.3m/s)/(1.75m wheelbase) * tan(24deg max wheel angle) = angZ
+        self.VEL_ANG_MIN = -0.585 
         self.VEL_ANG_LPF_ALPHA = 0.3
-        self.VEL_ANG_DEADZONE = 0.1
+        self.VEL_ANG_DEADZONE = 0.05
         self.vel_ang_prev = 0
 
         # +V is down on analog stick. -V is up.
@@ -109,8 +113,18 @@ class JoystickSub(Node):
         enable_msg.set_enabled = not self._systemEnableStatus
         self.enable_server_client.send_goal_async(enable_msg)
 
+           
+
     def publishCMDVel(self):
         self.cmd_vel_publisher.publish(self.cmd_vel)
+        
+        fb_wheelspeed = Float32()
+        fb_wheelspeed.data = self.cmd_vel.twist.linear.x
+        self.fb_wheelspeed_pub.publish(fb_wheelspeed)
+
+        fb_steer = Float32()
+        fb_steer.data = 0.0
+        self.fb_steerangle_pub.publish(fb_steer)
 
     def updateCMDVel(self, linearX: float, angularZ: float):
         self.cmd_vel.twist.linear.x = float(linearX)

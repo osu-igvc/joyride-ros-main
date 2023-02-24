@@ -4,28 +4,28 @@
   ros__parameters:
     frames:
       - 'imu'
-      - 'bfly_lane'
-      - 'bfly_right'
-      - 'blfy_left'
-      - 'wheelFR'
-      - 'wheelFL'
-      - 'wheelBR'
-      - 'wheelBL'
+      - 'bfly_center'
+      #- 'bfly_right'
+      #- 'blfy_left'
+      #- 'wheelFR'
+      #- 'wheelFL'
+      #- 'wheelBR'
+      #- 'wheelBL'
 
     imu:
-      frame_id: "/base_link"
-      child_frame_id: "/vn300"
+      frame_id: "base_link"
+      child_frame_id: "vectornav"
       translation.x: 0.25
       translation.y: 0.0
       translation.z: 1.4
-      rotation.x: 0.0
+      rotation.x: 0.9979
       rotation.y: 0.0
-      rotation.z: 0.0
-      rotation.w: 1.0
+      rotation.z: -0.0440
+      rotation.w: 0.0481
 
     bfly_center:
-      frame_id: "/base_link"
-      child_frame_id: "/bfly_center"
+      frame_id: "base_link"
+      child_frame_id: "bfly_center"
       translation.x: 1.0
       translation.y: 0.0
       translation.z: 1.4224
@@ -35,8 +35,8 @@
       rotation.w: 1.0
 
     bfly_right:
-      frame_id: "/base_link"
-      child_frame_id: "/bfly_right"
+      frame_id: "base_link"
+      child_frame_id: "bfly_right"
       translation.x: 1.0
       translation.y: -0.4
       translation.z: 1.4224
@@ -46,8 +46,8 @@
       rotation.w: 1.0
 
     blfy_left:
-      frame_id: "/base_link"
-      child_frame_id: "/blfy_left"
+      frame_id: "base_link"
+      child_frame_id: "blfy_left"
       translation.x: 1.0
       translation.y: 0.4
       translation.z: 1.4224
@@ -57,8 +57,8 @@
       rotation.w: 1.0
 
     wheelFR:
-      frame_id: "/base_link"
-      child_frame_id: "/wheel_fr"
+      frame_id: "base_link"
+      child_frame_id: "wheel_fr"
       translation.x: 1.7526
       translation.y: -0.6096
       translation.z: 0
@@ -68,8 +68,8 @@
       rotation.w: 1.0
 
     wheelFL:
-      frame_id: "/base_link"
-      child_frame_id: "/wheel_fl"
+      frame_id: "base_link"
+      child_frame_id: "wheel_fl"
       translation.x: 1.7526
       translation.y: 0.6096
       translation.z: 0
@@ -79,8 +79,8 @@
       rotation.w: 1.0
 
     wheelBR:
-      frame_id: "/base_link"
-      child_frame_id: "/wheel_br"
+      frame_id: "base_link"
+      child_frame_id: "wheel_br"
       translation.x: 0.0
       translation.y: -0.6096
       translation.z: 0
@@ -90,8 +90,8 @@
       rotation.w: 1.0
 
     wheelBL:
-      frame_id: "/base_link"
-      child_frame_id: "/wheel_bl"
+      frame_id: "base_link"
+      child_frame_id: "wheel_bl"
       translation.x: 0.0
       translation.y: 0.6096
       translation.z: 0

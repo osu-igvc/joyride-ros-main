@@ -30,12 +30,13 @@ class StaticTransformNode(Node):
     def create_transform_list(self):
 
         self.declare_parameters(namespace='',parameters=[('frames',[])])
-        frames = self.get_parameter('frames').value
+        config_frames = self.get_parameter('frames').value
+        #self.get_logger().warn('All frames:' + str(self.frames))
 
-        for f in frames:
+        for f in config_frames:
             self.declare_parameters(namespace='',parameters = [(f+a,[]) for a in self.transform_attr])
             params = self.get_parameters([f+a for a in self.transform_attr])
-
+            
             F = TransformStamped()
             F.header.frame_id           = params[0].get_parameter_value().string_value
             F.child_frame_id            = params[1].get_parameter_value().string_value
@@ -46,8 +47,11 @@ class StaticTransformNode(Node):
             F.transform.rotation.y      = params[6].get_parameter_value().double_value
             F.transform.rotation.z      = params[7].get_parameter_value().double_value
             F.transform.rotation.w      = params[8].get_parameter_value().double_value
+            #self.get_logger().warn('frame:' + str(f) + ', header: '+F.header.frame_id)
 
             self.frames.append(F)
+        
+        #self.get_logger().warn('All frames:' + str(self.frames))
 
     def broadcast_timer_callback(self):
         t = self.get_clock().now().to_msg()

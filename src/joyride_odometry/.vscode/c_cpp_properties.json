@@ -1,0 +1,29 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/joyride-obc/joyride-ros-main/install/vectornav/include/**",
+        "/home/joyride-obc/joyride-ros-main/install/vectornav_msgs/include/**",
+        "/home/joyride-obc/joyride-ros-main/install/realsense2_camera/include/**",
+        "/home/joyride-obc/joyride-ros-main/install/realsense2_camera_msgs/include/**",
+        "/home/joyride-obc/joyride-ros-main/install/joyride_vectornav_vn300/include/**",
+        "/home/joyride-obc/joyride-ros-main/install/joyride_interfaces/include/**",
+        "/opt/ros/foxy/include/**",
+        "/home/joyride-obc/joyride-ros-main/src/joyride_odometry/include/**",
+        "/home/joyride-obc/joyride-ros-main/src/joyride_sensors/realsense-ros/realsense2_camera/include/**",
+        "/home/joyride-obc/joyride-ros-main/src/joyride_sensors/urg_node2/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

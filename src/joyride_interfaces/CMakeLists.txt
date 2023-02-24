@@ -27,6 +27,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "action/RequestAudioVisual.action"
   "msg/Health.msg"
   "msg/SystemHealth.msg"
+  "msg/TorqueFeedbackEPS.msg"
   DEPENDENCIES std_msgs
 )
 

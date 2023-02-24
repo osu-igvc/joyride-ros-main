@@ -1,8 +1,6 @@
 from setuptools import setup
-import os
-from glob import glob
 
-package_name = 'joyride_core'
+package_name = 'joyride_control'
 
 setup(
     name=package_name,
@@ -11,21 +9,18 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
-        (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
         ('share/' + package_name, ['package.xml']),
-        (os.path.join('share', package_name, 'launch'), glob('launch/*launch.[pxy][yma]*'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='igvcsp2022',
-    maintainer_email='max.desantis@okstate.edu',
+    maintainer='joyride-obc',
+    maintainer_email='joyride-obc@todo.todo',
     description='TODO: Package description',
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'clock_bag_repub = joyride_core.bag_clock_replay:main',
-            'imu_tf_pub = joyride_core.imu_tf_test:main'
+            'vel_preprocess_node = joyride_control.vel_preprocessor:main'
         ],
     },
 )
