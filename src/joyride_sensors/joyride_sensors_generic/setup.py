@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'raw_image_publisher = joyride_sensors_generic.raw_image_publisher:main',
+            'raw_image_publisher = joyride_sensors_generic.raw_image_publisher:main'
         ],
     },
 )

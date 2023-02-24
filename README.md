@@ -18,7 +18,7 @@ The repository is organized in the following manner:
 
 ## Joyride_Interfaces
 
-Holds ROS message and action definitions. Used to maintain consistency accross packages.
+Holds ROS message and action definitions. Used to maintain consistency across packages.
 
 ## Joyride_Servers
 
