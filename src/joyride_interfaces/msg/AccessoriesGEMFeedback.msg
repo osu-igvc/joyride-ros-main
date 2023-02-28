@@ -16,4 +16,4 @@ byte FORWARD=1
 byte REVERSE=2
 byte UNKNOWN=3
 
-uint8 gear_status
+byte gear_status
