@@ -19,24 +19,72 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(geographic_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
-add_executable(odometryNode src/joyride_ackermann_odom.cpp)
-ament_target_dependencies(odometryNode 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "/usr/share/cmake/geographiclib/")
+find_package(GeographicLib REQUIRED)
+
+
+include_directories(SYSTEM ${Eigen_INCLUDE_DIRS})
+include_directories(include
+  ${EIGEN3_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
+)
+
+add_executable(ackermann_odom src/joyride_ackermann_odom.cpp)
+add_executable(navsat_odom src/joyride_navsat_odom_node.cpp src/joyride_navsat_odom.cpp)
+
+
+
+ament_target_dependencies(ackermann_odom 
   rclcpp 
   std_msgs 
   geometry_msgs
+  sensor_msgs
+  tf2
+  tf2_ros
   nav_msgs 
   tf2_geometry_msgs)
 
-target_include_directories(odometryNode PUBLIC
+ament_target_dependencies(navsat_odom
+  rclcpp
+  std_msgs
+  geometry_msgs
+  nav_msgs
+  geographic_msgs
+  sensor_msgs
+  tf2
+  tf2_ros
+  tf2_geometry_msgs)
+
+
+target_link_libraries(navsat_odom
+  ${Boost_LIBRARIES}
+  ${GeographicLib_LIBRARIES}
+)
+
+target_include_directories(ackermann_odom PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+target_include_directories(navsat_odom PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
 install(TARGETS 
-  odometryNode
+  ackermann_odom
+  navsat_odom
   DESTINATION lib/${PROJECT_NAME})
+
+install(DIRECTORY
+  include/
+  DESTINATION include/${PROJECT_NAME}
+)
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -48,5 +96,7 @@ if(BUILD_TESTING)
   #set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+ament_export_include_directories(include)
 
 ament_package()
