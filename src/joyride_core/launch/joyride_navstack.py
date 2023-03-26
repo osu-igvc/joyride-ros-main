@@ -96,12 +96,6 @@ def generate_launch_description():
             'map_subscribe_transient_local', default_value='false',
             description='Whether to set the map subscriber QoS to transient local'),
 
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('joyride_core'), 'launch'),
-            '/navsat_localization.launch.py'
-        ])
-        ),
         Node(
             package='nav2_controller',
             executable='controller_server',

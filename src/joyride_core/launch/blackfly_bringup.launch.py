@@ -40,39 +40,19 @@ def generate_launch_description():
             parameters=[blackfly_config]
         ),
 
-        # Node(
-        #     package='joyride_blackfly_gige',
-        #     namespace='sensors/cameras',
-        #     executable='blackfly_gige',
-        #     name='left_sign_camera_img_pub',
-        #     parameters=[blackfly_config]
-        # ),
+        Node(
+            package='joyride_blackfly_gige',
+            namespace='sensors/cameras',
+            executable='blackfly_gige',
+            name='left_sign_camera_img_pub',
+            parameters=[blackfly_config]
+        ),
 
-        # Node(
-        #     package='joyride_blackfly_gige',
-        #     namespace='sensors/cameras',
-        #     executable='blackfly_gige',
-        #     name='right_sign_camera_img_pub',
-        #     parameters=[blackfly_config]
-        # ),
-
-        # ----------- Blackfly Static Transforms ----------- #
-
-
-        
-        # EVENTUALLY PUT IN URDF
-
-
-        # Node(
-        #     package='tf2_ros',
-        #     executable='static_transform_publisher',
-        #     name='camera_link_tf_publisher',
-        #     arguments=['0', '0.1016', '0.127', '0', '0', '0', 'base_link', 'camera_link']
-        # ),
-        # Node(
-        #     package='tf2_ros',
-        #     executable='static_transform_publisher',
-        #     name='vectornav_tf_publisher',
-        #     arguments=['-0.4826', '-0.1651', '0.1143', '0', '0', '0', 'base_link', 'vectornav']
-        # ),
+        Node(
+            package='joyride_blackfly_gige',
+            namespace='sensors/cameras',
+            executable='blackfly_gige',
+            name='right_sign_camera_img_pub',
+            parameters=[blackfly_config]
+        ),
     ])

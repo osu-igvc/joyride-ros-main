@@ -5,13 +5,13 @@
     frames:
       - 'imu'
       - 'map_odom'
-      # - 'bfly_center'
-      #- 'bfly_right'
-      #- 'blfy_left'
-      #- 'wheelFR'
-      #- 'wheelFL'
-      #- 'wheelBR'
-      #- 'wheelBL'
+      - 'bfly_center'
+      - 'bfly_right'
+      - 'blfy_left'
+      - 'wheelFR'
+      - 'wheelFL'
+      - 'wheelBR'
+      - 'wheelBL'
 
     imu:
       frame_id: "base_link"
@@ -19,10 +19,10 @@
       translation.x: 0.25
       translation.y: 0.0
       translation.z: 1.4
-      rotation.x: 0.9979
-      rotation.y: 0.0
-      rotation.z: -0.0440
-      rotation.w: 0.0481
+      rotation.x: -0.7943
+      rotation.y: 0.0056
+      rotation.z: 0.0
+      rotation.w: 0.6076
     
     map_odom:
       frame_id: "map"
