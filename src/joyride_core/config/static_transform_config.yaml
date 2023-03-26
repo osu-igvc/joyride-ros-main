@@ -4,7 +4,8 @@
   ros__parameters:
     frames:
       - 'imu'
-      - 'bfly_center'
+      - 'map_odom'
+      # - 'bfly_center'
       #- 'bfly_right'
       #- 'blfy_left'
       #- 'wheelFR'
@@ -22,6 +23,17 @@
       rotation.y: 0.0
       rotation.z: -0.0440
       rotation.w: 0.0481
+    
+    map_odom:
+      frame_id: "map"
+      child_frame_id: "odom"
+      translation.x: 0.0
+      translation.y: 0.0
+      translation.z: 0.0
+      rotation.x: 0.0
+      rotation.y: 0.0
+      rotation.z: 0.0
+      rotation.w: 1.0
 
     bfly_center:
       frame_id: "base_link"

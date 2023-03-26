@@ -27,7 +27,7 @@ class TrafficSignDetector(Node):
         self.detections_output_topic = self.declare_parameter('detection_output','/perception/sign_predictions').get_parameter_value().string_value
 
 
-        self.weights = self.declare_parameter('weights_path', 'yolov5s.pt')
+        self.weights = self.declare_parameter('weights_path', 'best.pt')
         
         # YOLO Model using PyTorch Hub
 
@@ -35,7 +35,7 @@ class TrafficSignDetector(Node):
         self.path_hubconfig = self.declare_parameter('model_repo_path', '/home/joyride-obc/joyride-ros-main/src/yolov5').get_parameter_value().string_value
 
         # - absolute path to best.pt
-        self.path_trained_model = self.declare_parameter('model_weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/yolov5s.pt').get_parameter_value().string_value
+        self.path_trained_model = self.declare_parameter('model_weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best.pt').get_parameter_value().string_value
         self.model = torch.hub.load(self.path_hubconfig, 'custom', path=self.path_trained_model, source='local', force_reload=False)
 
         # ROS pubs

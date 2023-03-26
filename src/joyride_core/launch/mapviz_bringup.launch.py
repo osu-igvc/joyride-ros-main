@@ -27,5 +27,11 @@ def generate_launch_description():
             executable="static_transform_publisher",
             name="swri_transform",
             arguments=["0", "0", "0", "0", "0", "0", "map", "origin"]
+        ),
+        launch_ros.actions.Node(
+            package="tf2_ros",
+            executable="static_transform_publisher",
+            name="map_odom_tf",
+            arguments=["0", "0", "0", "0", "0", "0", "map", "odom"]
         )
     ])
