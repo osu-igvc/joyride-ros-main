@@ -1,0 +1,14 @@
+# Allows any node to request the system enables autonomy.
+
+string sender_name
+# True, if client wants to enable autonomy.
+# False, if client wants to disable autonomy.
+bool set_auto_enabled
+
+---
+byte REQUEST_MADE=0
+byte STATUS_TIMEOUT=1
+byte SYSTEM_UNHEALTHY=2
+byte ALREADY_IN_STATE=3
+
+byte response

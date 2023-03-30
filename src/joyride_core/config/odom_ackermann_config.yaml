@@ -2,7 +2,8 @@
   ros__parameters:
     steering_angle_fb_topic: '/feedback/steer_angle'
     wheelspeed_fb_topic: '/feedback/wheelspeed'
-    output_topic: '/odometry/wheel'
+    output_topic: '/odom'
     parent_frame: 'odom'
     child_frame: 'base_link'
-    use_sim_time: true
+    use_sim_time: false
+    publish_odom_tf: true

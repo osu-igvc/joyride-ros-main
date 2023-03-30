@@ -9,6 +9,7 @@
 #include "Eigen/Dense"
 
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp/time.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/imu.hpp"
@@ -31,9 +32,13 @@ public:
    */
   ~NavSatOdom();
 
+void cmdVelCallback();
+
 private:
   void gpsFixCallback(const sensor_msgs::msg::NavSatFix::SharedPtr msg);
   void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
+  void fakeOdomTimerCallback();
+  void cmdVelCallback(const geometry_msgs::msg::Twist::SharedPtr msg);
 
   geometry_msgs::msg::TransformStamped buildOdomTF(double x, double y, double z,
                                                    geometry_msgs::msg::Quaternion orientation, std::string frame_id,
@@ -45,9 +50,13 @@ private:
   // Subscribers
   rclcpp::Subscription<sensor_msgs::msg::NavSatFix>::SharedPtr navSatSub_;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imuSub_;
-
+  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmdVelSub_;
   // Publishers
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odomPub_;
+
+  // TImers
+  rclcpp::TimerBase::SharedPtr fakeOdomTimer_;
+
 
   // Parameters
   std::string base_link_frame_id_;
@@ -58,6 +67,13 @@ private:
 
   bool broadcast_cartesian_tf_;
   bool broadcast_odom_;
+  bool use_fake_odom_;
+
+  double fake_pos_x;
+  double fake_pos_y;
+  double fake_yaw_;
+  double last_cmd_linx_;
+  double last_cmd_angz_;
 
   // State
   sensor_msgs::msg::NavSatFix initialLLA_fix_ = sensor_msgs::msg::NavSatFix();

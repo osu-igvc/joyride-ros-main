@@ -24,13 +24,14 @@ using namespace std::chrono_literals;
 // - Speed feedback
 // - Publish topic
 
-OdometryNode::OdometryNode(): Node("joyride_odometry_publisher"){
+OdometryNode::OdometryNode(): Node("joyride_odometry_publisher"), odom_broadcaster_(*this) {
 
     this->declare_parameter("steering_angle_fb_topic", "/feedback/steer_angle");
     this->declare_parameter("wheelspeed_fb_topic", "/feedback/wheelspeed");
     this->declare_parameter("output_topic", "/odom/ackermann");
     this->declare_parameter("child_frame", "odom");
     this->declare_parameter("parent_frame", "base_link");
+    this->declare_parameter("publish_odom_tf", true);
     //this->declare_parameter("use_sim_time", false);
 
     this->angle_fb_topic = this->get_parameter("steering_angle_fb_topic").get_parameter_value().get<std::string>();
@@ -39,8 +40,9 @@ OdometryNode::OdometryNode(): Node("joyride_odometry_publisher"){
     this->child_frame_id = this->get_parameter("child_frame").get_parameter_value().get<std::string>();
     this->parent_frame_id = this->get_parameter("parent_frame").get_parameter_value().get<std::string>();
     this->sim_time = this->get_parameter("use_sim_time").get_parameter_value().get<bool>();
+    this->publish_odom_tf_ = this->get_parameter("publish_odom_tf").get_parameter_value().get<bool>();
 
-    poseTimer_ = this->create_wall_timer(10ms, std::bind(&OdometryNode::poseTimerCB, this));
+    poseTimer_ = this->create_wall_timer(50ms, std::bind(&OdometryNode::poseTimerCB, this));
 
     velocitySub_ = this->create_subscription<std_msgs::msg::Float32>(this->wheelspeed_fb_topic, 10,
                     std::bind(&OdometryNode::velocityCB, this, std::placeholders::_1));
@@ -93,17 +95,21 @@ void OdometryNode::poseTimerCB(){
     this->time[0] = this->time[1];
 
     t.header.stamp = T;
-    t.header.frame_id = "odom";
-    t.child_frame_id = "base_link";
+    t.header.frame_id = this->parent_frame_id;
+    t.child_frame_id = this->child_frame_id;
 
-    t.transform.rotation.x = 0; //q.x();
-    t.transform.rotation.y = 0; //q.y();
-    t.transform.rotation.z = std::sin(theta/2); //q.z();
-    t.transform.rotation.w = 0;// q.w();
+    t.transform.rotation.x = q.x();
+    t.transform.rotation.y = q.y();
+    t.transform.rotation.z = q.z();
+    t.transform.rotation.w = q.w();
 
     t.transform.translation.x = this->x;
     t.transform.translation.y = this->y;
     t.transform.translation.z = this->z;
+
+    if(this->publish_odom_tf_) {
+      this->odom_broadcaster_.sendTransform(t);
+    }
 
     o.header.stamp = T;
     o.header.frame_id = this->parent_frame_id;
@@ -140,6 +146,22 @@ void OdometryNode::poseTimerCB(){
 
     //tf_broadcaster_->sendTransform(t);
     odomPub_->publish(o);
+
+    // if(this->publish_odom_tf_) {
+    //   geometry_msgs::msg::TransformStamped odomTF;
+
+    //   odomTF.header.frame_id = this->parent_frame_id;
+    //   odomTF.child_frame_id = this->child_frame_id;
+    //   odomTF.header.stamp = this->get_clock()->now();
+
+      
+    //   odomTF.transform.translation.x = o.pose.pose.position.x;
+    //   odomTF.transform.translation.y = o.pose.pose.position.y;
+    //   odomTF.transform.translation.z = o.pose.pose.position.z;
+    //   odomTF.transform.rotation = o.pose.pose.orientation;
+
+    //   this->odom_broadcaster_.sendTransform(odomTF);
+    // }
 }
 
 int main(int argc, char * argv[])

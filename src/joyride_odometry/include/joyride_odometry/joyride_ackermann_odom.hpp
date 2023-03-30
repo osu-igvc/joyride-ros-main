@@ -12,6 +12,8 @@
 #include "rclcpp/rclcpp.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
+#include "tf2_ros/transform_listener.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 
 using namespace std::chrono_literals;
 
@@ -26,6 +28,7 @@ class OdometryNode : public rclcpp::Node{
     const float STEER_ANGLE_TO_WHEEL_ANGLE = 1.0/25.59;
     const float STEER_BIAS = 0.345;
     bool sim_time = false;
+    bool publish_odom_tf_;
     rclcpp::Time latest_time;
     double time[2];
 
@@ -40,8 +43,9 @@ class OdometryNode : public rclcpp::Node{
     rclcpp::Subscription<rosgraph_msgs::msg::Clock>::SharedPtr timeSub_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odomPub_;
     
-
-    std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+    std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+    std::unique_ptr<tf2_ros::TransformListener> tf_listener_;
+    tf2_ros::TransformBroadcaster odom_broadcaster_;
 
     rclcpp::TimerBase::SharedPtr poseTimer_;
 

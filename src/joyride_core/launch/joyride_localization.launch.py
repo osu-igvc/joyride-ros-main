@@ -24,7 +24,8 @@ def generate_launch_description():
         package='joyride_odometry',
         executable='navsat_odom',
         name='navsat_odom_node',
-        output='screen'
+        output='screen',
+        parameters=[parameters_file_path]
     ),
 
     launch_ros.actions.Node(
@@ -33,7 +34,7 @@ def generate_launch_description():
             name='navsat_transform',
 	        output='screen',
             parameters=[parameters_file_path],
-            remappings=[('imu', 'vectornav/imu'),           # Input. From sensor.
+            remappings=[('imu', 'vectornav/imu'),# Input. From sensor.
                         ('gps/fix', 'vectornav/gnss'),      # Input. From sensor.
                         ('gps/filtered', 'gps/filtered'),   # Output (optional). Convert to GPS coords.
                         ('odometry/gps', 'odometry/gps'),   # Output. coords transformed into world frame.

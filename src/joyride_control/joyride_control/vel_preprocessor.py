@@ -7,7 +7,7 @@ import rclpy
 from rclpy.node import Node
 
 # Message imports
-from geometry_msgs.msg import TwistStamped
+from geometry_msgs.msg import Twist
 from ackermann_msgs.msg import AckermannDriveStamped
 from std_msgs.msg import Float32
 
@@ -20,7 +20,7 @@ class VelocityPreprocessor(Node):
         self.WHEEL_BASE = 1.75 # meters
     
 
-        self.cmdvel_sub = self.create_subscription(TwistStamped, '/cmd_vel', self.cmdvel_callback, 1)
+        self.cmdvel_sub = self.create_subscription(Twist, '/cmd_vel', self.cmdvel_callback, 1)
         self.cmdack_pub = self.create_publisher(AckermannDriveStamped, '/cmd_ack', 1)
 
         self.fbsteerangle_sub = self.create_subscription(Float32, '/feedback/steer_angle', self.steer_angle_fb_callback, 1)
@@ -42,9 +42,9 @@ class VelocityPreprocessor(Node):
 
         self.cmdack_pub.publish(ackMsg)
     
-    def cmdvel_callback(self, msg:TwistStamped):
+    def cmdvel_callback(self, msg:Twist):
         
-        ackSpeed, ackAngle = self.computeAckermann(msg.twist.linear.x, msg.twist.angular.z)
+        ackSpeed, ackAngle = self.computeAckermann(msg.linear.x, msg.angular.z)
         ackSteerVel = self.steeringPControl(ackAngle, self.steer_angle_measured)
 
         self.publishAckermannDrive(ackSpeed, ackAngle, ackSteerVel)
@@ -67,6 +67,12 @@ class VelocityPreprocessor(Node):
         if abs(linearX) < 0.01:
             return 0.0, 0.0
         else:
+
+            # This is a temporary change before a bettery velocity controller is implemented
+
+            if linearX > 0.1 and linearX < 1.5:
+                linearX = 1.5
+
             phi = math.atan(angularZ * self.WHEEL_BASE / linearX)
             
             steer_ang = phi * 25.49
@@ -75,6 +81,8 @@ class VelocityPreprocessor(Node):
 
             steer_ang = self.STEER_LPF_ALPHA * steer_ang + (1 - self.STEER_LPF_ALPHA) * self.prev_steer_angle
             self.prev_steer_angle = steer_ang
+
+            
 
             return linearX, steer_ang
 

@@ -55,6 +55,24 @@ class FrameListener(Node):
         imu_msg.linear_acceleration_covariance
         imu_msg.header.frame_id = 'vectornav'
 
+        try:
+            t = self.tf_buffer.lookup_transform(
+                'base_link',
+                'vectornav',
+                rclpy.time.Time())
+            
+            tfed_imu = t.transform.rotation.rotate_vector(cb_msg.linear_acceleration)
+            imu_msg = Imu()
+            imu_msg.linear_acceleration = tfed_imu
+            imu_msg.header.frame_id = 'base_link'
+            self.imu_pub.publish(imu_msg)
+            # t.rotation
+            # old_vec = Vector3
+            # new_grav = rotate_vector(cb_msg.linear_acceleration.)
+
+        except TransformException as ex:
+            pass
+
         self.publisher.publish(imu_msg)
         self.get_logger().warn('testing 123')
         

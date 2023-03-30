@@ -56,27 +56,48 @@ controller_server:
       xy_goal_tolerance: 0.25
       yaw_goal_tolerance: 0.25
       stateful: false
+    # FollowPath:
+    #   plugin: "teb_local_planner::TebLocalPlannerROS"
+    #   footprint_model.type: circular
+    #   footprint_model.radius: 0.17
+    #   min_obstacle_dist: 0.1
+    #   inflation_dist: 0.1
+    #   costmap_converter_plugin: "costmap_converter::CostmapToPolygonsDBSMCCH"
+    #   costmap_converter_spin_thread: True
+    #   costmap_converter_rate: 15
+    #   enable_homotopy_class_planning: True
+    #   enable_multithreading: True
+    #   optimization_verbose: False
+    #   teb_autoresize: True
+    #   min_samples: 3
+    #   max_samples: 20
+    #   max_global_plan_lookahead_dist: 1.0
+    #   visualize_hc_graph: True
+    #   max_vel_x: 4.0
+    #   max_vel_theta: 1.0
+    #   acc_lim_x: 2.5
+    #   acc_lim_theta: 3.2
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 3.0
+      desired_linear_vel: 2.0
       lookahead_dist: 2.5
       min_lookahead_dist: 0.9
-      max_lookahead_dist: 3.5
+      max_lookahead_dist: 15.0
       lookahead_time: 1.5
       rotate_to_heading_angular_vel: 1.8
       transform_tolerance: 0.1
       use_velocity_scaled_lookahead_dist: false
-      min_approach_linear_velocity: 0.05
+      min_approach_linear_velocity: 2.0
       approach_velocity_scaling_dist: 1.0
-      use_collision_detection: true
+      use_collision_detection: false
       max_allowed_time_to_collision_up_to_carrot: 1.0
-      use_regulated_linear_velocity_scaling: true
+      use_regulated_linear_velocity_scaling: false
       use_cost_regulated_linear_velocity_scaling: false
       regulated_linear_scaling_min_radius: 0.9
-      regulated_linear_scaling_min_speed: 0.25
+      regulated_linear_scaling_min_speed: 3.0
       use_fixed_curvature_lookahead: false
       curvature_lookahead_dist: 1.0
-      use_rotate_to_heading: true
+      use_rotate_to_heading: false        # Don't use for ackermann! Can't rotate in place!
       rotate_to_heading_min_angle: 0.785
       max_angular_accel: 3.2
       max_robot_pose_search_dist: 10.0

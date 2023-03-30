@@ -1,0 +1,16 @@
+automode_manager_server:
+  ros__parameters:
+
+    tracked_nodes: [automode, roscan, static_tf]
+    automode:
+      name: /servers/automode_manager
+      id: 01
+      require: True
+    roscan:
+      name: /servers/roscan_interface
+      id: 02
+      require: True
+    static_tf:
+      name: /servers/static_broadcaster
+      id: 03
+      require: True

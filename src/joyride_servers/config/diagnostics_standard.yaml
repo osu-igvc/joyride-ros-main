@@ -1,0 +1,23 @@
+diagnostic_analyzers:
+  ros__parameters:
+    path: system
+    
+    servers:
+      type: diagnostic_aggregator/GenericAnalyzer
+      path: servers
+      startswith: ['/servers']
+
+    sensors:
+      type: diagnostic_aggregator/GenericAnalyzer
+      path: sensors
+      startswith: ['/sensors']
+
+    algorithms:
+      type: diagnostic_aggregator/GenericAnalyzer
+      path: algorithms
+      startswith: ['/algorithms']
+
+    utility:
+      type: diagnostic_aggregator/GenericAnalyzer
+      path: utility
+      startswith: ['/utility']

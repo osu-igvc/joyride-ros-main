@@ -15,6 +15,8 @@ from nav2_common.launch import RewrittenYaml
 
 def generate_launch_description():
 
+    params_path = os.path.join(get_package_share_directory('joyride_core'), 'config', 'nav_config.yaml')
+
     # -------------------- Common -------------------- #
 
     roscan_server_launch = IncludeLaunchDescription(
@@ -62,6 +64,13 @@ def generate_launch_description():
         '/joyride_localization.launch.py'
     ]))
 
+    odom_ackermann = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+        get_package_share_directory('joyride_core'), 'launch'),
+        '/odom_bringup.launch.py'
+    ])
+    )
+
 
     # -------------------- Nav 2 -------------------- #
 
@@ -69,6 +78,9 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([os.path.join(
         get_package_share_directory('joyride_core'), 'launch'),
         '/joyride_navstack.launch.py']),
+        launch_arguments={
+            'params_file': params_path,
+        }.items()
     )
 
 
@@ -81,13 +93,10 @@ def generate_launch_description():
         ),
 
         static_tf_launch,
-        rosbagger_launch,
         roscan_server_launch,
-        
-        vectornav_launch,
-        blackfly_launch,
 
-        localizer_launch,
+        #localizer_launch,
+        odom_ackermann,
 
         navstack_launch
     ])

@@ -29,6 +29,10 @@
 // Credit - Largely based off of robot_localization's navsat_transform_node
 
 #include "joyride_odometry/joyride_navsat_odom.hpp"
+#include "rclcpp/time.hpp"
+
+using namespace std::chrono_literals;
+
 
 namespace joyride_odometry
 {
@@ -42,23 +46,51 @@ NavSatOdom::NavSatOdom(const rclcpp::NodeOptions & options) : Node("navsat_odom_
     odom_pub_topic_("/odom"),
     odom_broadcaster_(*this)
 {
+    this->declare_parameter("use_fake_odom", false);
+    this->use_fake_odom_ = this->get_parameter("use_fake_odom").get_parameter_value().get<bool>();
+    
     tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
     tf_listener_ = std::make_unique<tf2_ros::TransformListener>(*tf_buffer_);
 
     // Setup odom publisher
     odomPub_ = this->create_publisher<nav_msgs::msg::Odometry>(this->odom_pub_topic_, 10);
 
-    // Subscribe to navsatfix topic
-    navSatSub_ = this->create_subscription<sensor_msgs::msg::NavSatFix>(this->navsat_sub_topic_, 10,
-        std::bind(&NavSatOdom::gpsFixCallback, this, std::placeholders::_1));
+    if(use_fake_odom_) {
+        fakeOdomTimer_ = this->create_wall_timer(10ms, std::bind(&NavSatOdom::fakeOdomTimerCallback, this));
+        // cmdVelSub_ = this->create_subscription<geometry_msgs::msg::Twist>("/cmd_vel", 10,
+        //     std::bind(&NavSatOdom::cmdVelCallback, this, std::placeholders::_1));
+    }
+    else {
 
-    imuSub_ = this->create_subscription<sensor_msgs::msg::Imu>(this->imu_sub_topic_, 10,
-        std::bind(&NavSatOdom::imuCallback, this, std::placeholders::_1));
+
+        // Subscribe to navsatfix topic
+        navSatSub_ = this->create_subscription<sensor_msgs::msg::NavSatFix>(this->navsat_sub_topic_, 10,
+            std::bind(&NavSatOdom::gpsFixCallback, this, std::placeholders::_1));
+
+        imuSub_ = this->create_subscription<sensor_msgs::msg::Imu>(this->imu_sub_topic_, 10,
+            std::bind(&NavSatOdom::imuCallback, this, std::placeholders::_1));
+    }
 }
 
 NavSatOdom::~NavSatOdom()
 {
 
+}
+
+void NavSatOdom::cmdVelCallback(const geometry_msgs::msg::Twist::SharedPtr msg)
+{
+    this->last_cmd_angz_ = msg->angular.z;
+    this->last_cmd_linx_ = msg->linear.x;
+}
+
+void NavSatOdom::fakeOdomTimerCallback()
+{
+    tf2::Quaternion yawQuat;
+    yawQuat.setRPY(0, 0, 0);
+    geometry_msgs::msg::Quaternion orientation = tf2::toMsg(yawQuat);
+
+    odom_broadcaster_.sendTransform(buildOdomTF(0, 0, 0, orientation, "odom", "base_link"));
+    odomPub_->publish(buildOdomMsg(0, 0, 0, orientation, "odom", "base_link"));
 }
 
 void NavSatOdom::gpsFixCallback(const sensor_msgs::msg::NavSatFix::SharedPtr msg)

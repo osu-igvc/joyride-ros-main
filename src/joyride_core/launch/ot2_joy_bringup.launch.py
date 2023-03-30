@@ -30,36 +30,36 @@ def generate_launch_description():
         ])
     )
 
-    static_tf_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-        get_package_share_directory('joyride_core'), 'launch'),
-        '/static_transforms.launch.py'
-        ])
-    ),
+    # static_tf_launch = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource([os.path.join(
+    #     get_package_share_directory('joyride_core'), 'launch'),
+    #     '/static_transforms.launch.py'
+    #     ])
+    # ),
 
-    # -------------------- Sensors -------------------- #
+    # # -------------------- Sensors -------------------- #
 
-    vectornav_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-        get_package_share_directory('vectornav'), 'launch'),
-        '/vectornav.launch.py'
-        ])
-    )
+    # vectornav_launch = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource([os.path.join(
+    #     get_package_share_directory('vectornav'), 'launch'),
+    #     '/vectornav.launch.py'
+    #     ])
+    # )
 
-    blackfly_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-        get_package_share_directory('joyride_core'), 'launch'),
-        '/blackfly_bringup.launch.py'
-        ])
-    )
+    # blackfly_launch = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource([os.path.join(
+    #     get_package_share_directory('joyride_core'), 'launch'),
+    #     '/blackfly_bringup.launch.py'
+    #     ])
+    # )
 
-    # -------------------- Localization -------------------- #
+    # # -------------------- Localization -------------------- #
 
     localizer_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
         get_package_share_directory('joyride_core'), 'launch'),
         '/joyride_localization.launch.py'
-    ])),
+    ]))
 
 
     # -------------------- Joystick -------------------- #
@@ -79,14 +79,14 @@ def generate_launch_description():
             name='vel_node',
         ),
 
-        static_tf_launch,
+        #static_tf_launch,
         rosbagger_launch,
         roscan_server_launch,
         
-        vectornav_launch,
-        blackfly_launch,
+        #vectornav_launch,
+        #blackfly_launch,
 
-        localizer_launch,
+        #localizer_launch,
 
         joy_launch
     ])

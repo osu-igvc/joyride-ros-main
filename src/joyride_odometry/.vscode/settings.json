@@ -80,5 +80,20 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "bit": "cpp"
-    }
+    },
+    "python.analysis.extraPaths": [
+        "/home/joyride-obc/joyride-ros-main/install/vectornav_msgs/lib/python3.8/site-packages",
+        "/home/joyride-obc/joyride-ros-main/install/slam_toolbox/lib/python3.8/site-packages",
+        "/home/joyride-obc/joyride-ros-main/install/realsense2_camera_msgs/lib/python3.8/site-packages",
+        "/home/joyride-obc/joyride-ros-main/install/joyride_servers/lib/python3.8/site-packages",
+        "/home/joyride-obc/joyride-ros-main/install/joyride_sensors_generic/lib/python3.8/site-packages",
+        "/home/joyride-obc/joyride-ros-main/install/joyride_ros2_socketcan/lib/python3.8/site-packages",
+        "/home/joyride-obc/joyride-ros-main/install/joyride_perception/lib/python3.8/site-packages",
+        "/home/joyride-obc/joyride-ros-main/install/joyride_hmi/lib/python3.8/site-packages",
+        "/home/joyride-obc/joyride-ros-main/install/joyride_control/lib/python3.8/site-packages",
+        "/home/joyride-obc/joyride-ros-main/install/joyride_blackfly_gige/lib/python3.8/site-packages",
+        "/home/joyride-obc/joyride-ros-main/install/joyride_interfaces/lib/python3.8/site-packages",
+        "/home/joyride-obc/joyride-ros-main/install/joyride_core/lib/python3.8/site-packages",
+        "/opt/ros/foxy/lib/python3.8/site-packages"
+    ]
 }

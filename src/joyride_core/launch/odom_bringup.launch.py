@@ -34,7 +34,7 @@ def generate_launch_description():
         Node(
             package='joyride_odometry',
             namespace='odom',
-            executable='odometryNode',
+            executable='ackermann_odom',
             name='ackermann_node',
             parameters=[odom_config]
         ),

@@ -25,7 +25,8 @@ setup(
     entry_points={
         'console_scripts': [
             'clock_bag_repub = joyride_core.bag_clock_replay:main',
-            'imu_tf_pub = joyride_core.imu_tf_test:main'
+            'imu_tf_pub = joyride_core.imu_tf_test:main',
+            'diag_test = joyride_core.diagnostic_test:main'
         ],
     },
 )
