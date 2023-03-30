@@ -7,17 +7,22 @@ diagnostic_analyzers:
       path: servers
       startswith: ['/servers']
 
-    sensors:
+    dbw:
       type: diagnostic_aggregator/GenericAnalyzer
-      path: sensors
-      startswith: ['/sensors']
+      path: dbw
+      startswith: ['/dbw']
 
-    algorithms:
-      type: diagnostic_aggregator/GenericAnalyzer
-      path: algorithms
-      startswith: ['/algorithms']
+    # sensors:
+    #   type: diagnostic_aggregator/GenericAnalyzer
+    #   path: sensors
+    #   startswith: ['/sensors']
 
-    utility:
-      type: diagnostic_aggregator/GenericAnalyzer
-      path: utility
-      startswith: ['/utility']
+    # algorithms:
+    #   type: diagnostic_aggregator/GenericAnalyzer
+    #   path: algorithms
+    #   startswith: ['/algorithms']
+
+    # utility:
+    #   type: diagnostic_aggregator/GenericAnalyzer
+    #   path: utility
+    #   startswith: ['/utility']

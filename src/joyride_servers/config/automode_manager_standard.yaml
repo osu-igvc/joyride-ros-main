@@ -1,7 +1,17 @@
 automode_manager_server:
   ros__parameters:
 
-    tracked_nodes: [automode, roscan, static_tf]
+    # List all nodes here. Roundabout but required (as far as I know)
+    tracked_nodes:
+      - drive_controller
+      - accessory_controller
+      - power_steering
+      - polaris_gem
+      - automode
+      - roscan
+      - static_tf
+
+    # Describe nodes here
     automode:
       name: /servers/automode_manager
       id: 01
@@ -9,8 +19,24 @@ automode_manager_server:
     roscan:
       name: /servers/roscan_interface
       id: 02
-      require: True
+      require: False
     static_tf:
       name: /servers/static_broadcaster
       id: 03
+      require: False
+    drive_controller:
+      name: /dbw/drive_controller
+      id: 0xc0
+      require: False
+    accessory_controller:
+      name: /dbw/accessory_controller
+      id: 0xc1
+      require: False
+    power_steering:
+      name: /dbw/power_steering
+      id: 0xc2
+      require: True
+    polaris_gem:
+      name: /dbw/polaris_gem
+      id: 0xc3
       require: True

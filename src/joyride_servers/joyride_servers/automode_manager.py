@@ -56,7 +56,14 @@ class AutoModeManagerServerNode(Node):
 
     # ------------- ROS Callbacks ------------- #
     def publishSystemStatus_Timer_Callback(self):
+        # Update system status
+        if self.SYSTEM_STATUS.system_status != SystemDiagnosticSummary.OK:
+            self.SYSTEM_STATUS.auto_software_enabled = False
+        
+        self.SYSTEM_STATUS.stamp = self.get_clock().now().to_msg()
+
         self.system_status_pub.publish(self.SYSTEM_STATUS)
+
         newStatus = DiagnosticArray()
         newStatus.status.append(DiagnosticStatus(level=self.own_status, name='/servers/automode_manager', values=[KeyValue(key='Enabled',
                             value=str(self.SYSTEM_STATUS.auto_software_enabled))]))
@@ -67,9 +74,14 @@ class AutoModeManagerServerNode(Node):
     def handleDiagnosticStatusMsg_Callback(self, msg:DiagnosticArray):
         presentMsgs_ids = []
         supplementalDiag = DiagnosticArray()
+        newStatus = SystemDiagnosticSummary.OK
 
         for status in msg.status:
             presentMsgs_ids.append(status.hardware_id)
+            # Update if not OK
+            if newStatus < status.level:
+                newStatus = status.level
+        self.SYSTEM_STATUS.system_status = newStatus
         
         for node in self.nodeList:
             # node[2] checks to see if diag is required for that node for enabling.
@@ -77,9 +89,9 @@ class AutoModeManagerServerNode(Node):
             if node[2] and presentMsgs_ids.count(node[1]) < 1:
                 # ID is not present, so add it to list of statues to publish
                 supplementalDiag.status.append(DiagnosticStatus(level=DiagnosticStatus.STALE, name=node[0], hardware_id=str(node[1]), message='MISSING'))
+
         
         supplementalDiag.header.stamp = self.get_clock().now().to_msg()
-
         self.diagnostic_pub.publish(supplementalDiag)
 
     def requestAutoEnableDisable_Callback(self, request, response):
@@ -89,12 +101,14 @@ class AutoModeManagerServerNode(Node):
         if self.get_clock().now().nanoseconds - self.get_clock().now().from_msg(self.SYSTEM_STATUS.stamp).nanoseconds > self.status_valid_timeout * 1E9: # time in nano
             self.get_logger().warn('Request set enable: {}, received by {}. Ignoring - system status is out of date.'.format(request.set_auto_enabled, request.sender_name))
             response.response = RequestAutoEnableDisable.Response.STATUS_TIMEOUT
+            self.SYSTEM_STATUS.auto_software_enabled = False
             return response
         
         # Ensure system is healthy
         if self.SYSTEM_STATUS.system_status != SystemDiagnosticSummary.OK:
             self.get_logger().warn('Request set enable: {}, received by {}. Ignoring - system is unhealthy.'.format(request.set_auto_enabled, request.sender_name))
             response.response = RequestAutoEnableDisable.Response.SYSTEM_UNHEALTHY
+            self.SYSTEM_STATUS.auto_software_enabled = False
             return response
         
         # Check new status is different
@@ -107,6 +121,7 @@ class AutoModeManagerServerNode(Node):
         self.makeAutoRequest(request.set_auto_enabled)
         self.get_logger().warn('Request set enable: {}, received by {}. Obeying.'.format(request.set_auto_enabled, request.sender_name))
         response.response = RequestAutoEnableDisable.Response.REQUEST_MADE
+        self.SYSTEM_STATUS.auto_software_enabled = request.set_auto_enabled
         return response
     
 
