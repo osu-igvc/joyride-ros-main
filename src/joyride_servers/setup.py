@@ -27,7 +27,7 @@ setup(
             'dbw_usb_link_node = joyride_servers.dbw_usb_link_node:main',
             'joyride_static_tf_broadcaster = joyride_servers.joyride_static_tf_broadcaster:main',
             'automode_manager = joyride_servers.automode_manager:main',
-            'computer_monitor = joyride_servers.computer_status_monitor:main'
+            'computer_monitor = joyride_servers.computer_monitor:main'
         ],
     },
 )

@@ -1,0 +1,12 @@
+computer_monitor_server:
+  ros__parameters:
+    frequency: 1.0
+    diagnostic_topic: /diagnostics
+
+    cpu_warning_percentage: 90
+    cpu_diagnostic_name: /utility/cpu
+    cpu_hardware_id: 0xf0
+
+    ram_warning_percentage: 90
+    ram_diagnostic_name: /utility/ram
+    ram_hardware_id: 0xf1

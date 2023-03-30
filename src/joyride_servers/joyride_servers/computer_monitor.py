@@ -12,17 +12,24 @@ class ComputerStatusMonitor(Node):
     def __init__(self):
         super().__init__('computer_status_monitor_node')
 
-        self.cpu_warning_percentage = self.declare_parameter('cpu_warning_percentage', 90).get_parameter_value().integer_value
-        self.diagnostic_topic = self.declare_parameter('diagnostic_topic', '/diagnostics').get_parameter_value().string_value
-        self.cpu_diagnostic_name = self.declare_parameter('cpu_diagnostic_name', '/utility/cpu').get_parameter_value().string_value
-        self.cpu_hardware_id = str(self.declare_parameter('cpu_hardware_id', 0xf0).get_parameter_value().integer_value)
         self.frequency = self.declare_parameter('frequency', 1.0).get_parameter_value().double_value
         self.period = 1.0 / self.frequency
+        self.diagnostic_topic = self.declare_parameter('diagnostic_topic', '/diagnostics').get_parameter_value().string_value
+
+
+        self.cpu_warning_percentage = self.declare_parameter('cpu_warning_percentage', 90).get_parameter_value().integer_value
+        self.cpu_diagnostic_name = self.declare_parameter('cpu_diagnostic_name', '/utility/cpu').get_parameter_value().string_value
+        self.cpu_hardware_id = str(self.declare_parameter('cpu_hardware_id', 0xf0).get_parameter_value().integer_value)
+
+        self.ram_warning_percentage = self.declare_parameter('ram_warning_percentage', 90).get_parameter_value().integer_value
+        self.ram_diagnostic_name = self.declare_parameter('ram_diagnostic_name', '/utility/ram').get_parameter_value().string_value
+        self.ram_hardware_id = str(self.declare_parameter('ram_hardware_id', 0xf1).get_parameter_value().integer_value)
 
         self.update_timer = self.create_timer(self.period, self.publishDiagnostics_Callback)
         self.diagnostic_pub = self.create_publisher(DiagnosticArray, self.diagnostic_topic, 1)
 
         self.cpu_readings = collections.deque(maxlen=1)
+        self.ram_readings = collections.deque(maxlen=1)
 
         self.cpuStatus = None
     
@@ -35,6 +42,7 @@ class ComputerStatusMonitor(Node):
     
     def updateStatuses(self):
         self.updateCPUStatus()
+        self.updateRAMStatus()
 
     def updateCPUStatus(self):
         self.cpu_readings.append(psutil.cpu_percent(percpu=True))
@@ -59,6 +67,23 @@ class ComputerStatusMonitor(Node):
             cpuStatus.message = 'CPU Average {:.2f} percent'.format(cpu_average)
 
         self.cpuStatus = cpuStatus
+
+    def updateRAMStatus(self):
+        self.ram_readings.append(psutil.virtual_memory().percent)
+        ram_average = sum(self.ram_readings) / len(self.ram_readings)
+
+        newRAMStatus = DiagnosticStatus(name=self.ram_diagnostic_name, hardware_id=self.ram_hardware_id)
+
+        newRAMStatus.values.append(KeyValue(key='RAM Load Average', value='{:.2f}'.format(ram_average)))
+
+        if ram_average > self.ram_warning_percentage:
+            newRAMStatus.level = DiagnosticStatus.WARN
+            newRAMStatus.message = 'RAM Average exceeds {:d} percent'.format(self.ram_warning_percentage)
+        else:
+            newRAMStatus.level = DiagnosticStatus.OK
+            newRAMStatus.message = 'RAM Average {:.2f} percent'.format(ram_average)
+
+        self.ramStatus = newRAMStatus
     
     def publishDiagnostics_Callback(self):
         
@@ -67,6 +92,10 @@ class ComputerStatusMonitor(Node):
         
         if self.cpuStatus is not None:
             diagArray.status.append(self.cpuStatus)
+        
+        if self.ramStatus is not None:
+            diagArray.status.append(self.ramStatus)
+
         diagArray.header.stamp = self.get_clock().now().to_msg()
 
         self.diagnostic_pub.publish(diagArray)
