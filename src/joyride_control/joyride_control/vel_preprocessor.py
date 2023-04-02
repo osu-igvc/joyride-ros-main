@@ -11,6 +11,8 @@ from geometry_msgs.msg import Twist
 from ackermann_msgs.msg import AckermannDriveStamped
 from std_msgs.msg import Float32
 
+from joyride_interfaces.msg import EPSPositionVelocityFeedback
+
 
 class VelocityPreprocessor(Node):
     
@@ -23,13 +25,17 @@ class VelocityPreprocessor(Node):
         self.cmdvel_sub = self.create_subscription(Twist, '/cmd_vel', self.cmdvel_callback, 1)
         self.cmdack_pub = self.create_publisher(AckermannDriveStamped, '/cmd_ack', 1)
 
-        self.fbsteerangle_sub = self.create_subscription(Float32, '/feedback/steer_angle', self.steer_angle_fb_callback, 1)
+        self.fbsteerangle_sub = self.create_subscription(EPSPositionVelocityFeedback, '/feedback/steer_angle', self.steer_angle_fb_callback, 1)
 
         self.prev_steer_angle = 0.0
+        self.prev_control = 0.0
         self.STEER_LPF_ALPHA = 0.7
         self.STEER_KP = 1.0
 
         self.steer_angle_measured = 0.0
+        self.STEER_ANGLE_ACC_MAX = 0.016
+
+        self.WHEEL_BASE_ANGLE_STEERING_WHEEL_ANGLE = 25.49
 
     # -------------- ROS -------------- #
     def publishAckermannDrive(self, speed, steer_angle, steer_velocity):
@@ -46,11 +52,12 @@ class VelocityPreprocessor(Node):
         
         ackSpeed, ackAngle = self.computeAckermann(msg.linear.x, msg.angular.z)
         ackSteerVel = self.steeringPControl(ackAngle, self.steer_angle_measured)
+        self.prev_control = ackSteerVel
 
         self.publishAckermannDrive(ackSpeed, ackAngle, ackSteerVel)
 
-    def steer_angle_fb_callback(self, msg:Float32):
-        self.steer_angle_measured = msg.data
+    def steer_angle_fb_callback(self, msg:EPSPositionVelocityFeedback):
+        self.steer_angle_measured = msg.position_radians / self.WHEEL_BASE_ANGLE_STEERING_WHEEL_ANGLE
 
     # -------------- Utility -------------- #
 
@@ -61,6 +68,12 @@ class VelocityPreprocessor(Node):
 
         control = max(-5.0, min(control, 5.0))
 
+        self.get_logger().error('CTRL: {}, PREV: {}'.format(control, self.prev_control))
+        if control - self.prev_control > self.STEER_ANGLE_ACC_MAX:
+            control = self.prev_control + self.STEER_ANGLE_ACC_MAX
+        elif control - self.prev_control < -self.STEER_ANGLE_ACC_MAX:
+            control = self.prev_control - self.STEER_ANGLE_ACC_MAX
+
         return control
 
     def computeAckermann(self, linearX:float, angularZ:float) -> float:
@@ -68,16 +81,11 @@ class VelocityPreprocessor(Node):
             return 0.0, 0.0
         else:
 
-            # This is a temporary change before a bettery velocity controller is implemented
-
-            if linearX > 0.1 and linearX < 1.5:
-                linearX = 1.5
-
             phi = math.atan(angularZ * self.WHEEL_BASE / linearX)
             
-            steer_ang = phi * 25.49
+            steer_ang = phi
 
-            steer_ang = max(-8.0, min(steer_ang, 8.0))
+            steer_ang = max(-8.0 / self.WHEEL_BASE_ANGLE_STEERING_WHEEL_ANGLE, min(steer_ang, 8.0 / self.WHEEL_BASE_ANGLE_STEERING_WHEEL_ANGLE))
 
             steer_ang = self.STEER_LPF_ALPHA * steer_ang + (1 - self.STEER_LPF_ALPHA) * self.prev_steer_angle
             self.prev_steer_angle = steer_ang

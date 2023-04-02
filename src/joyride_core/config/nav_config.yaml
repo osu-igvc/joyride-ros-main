@@ -80,14 +80,14 @@ controller_server:
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
       desired_linear_vel: 2.0
-      lookahead_dist: 2.5
+      lookahead_dist: 4.5
       min_lookahead_dist: 0.9
       max_lookahead_dist: 15.0
       lookahead_time: 1.5
       rotate_to_heading_angular_vel: 1.8
       transform_tolerance: 0.1
-      use_velocity_scaled_lookahead_dist: false
-      min_approach_linear_velocity: 2.0
+      use_velocity_scaled_lookahead_dist: true
+      min_approach_linear_velocity: 1.0
       approach_velocity_scaling_dist: 1.0
       use_collision_detection: false
       max_allowed_time_to_collision_up_to_carrot: 1.0
@@ -99,7 +99,7 @@ controller_server:
       curvature_lookahead_dist: 1.0
       use_rotate_to_heading: false        # Don't use for ackermann! Can't rotate in place!
       rotate_to_heading_min_angle: 0.785
-      max_angular_accel: 3.2
+      max_angular_accel: 0.5
       max_robot_pose_search_dist: 10.0
       use_interpolation: false
       cost_scaling_dist: 0.3

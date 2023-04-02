@@ -26,13 +26,6 @@ def generate_launch_description():
         ])
     )
 
-    rosbagger_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-        get_package_share_directory('joyride_core'), 'launch'),
-        '/data_log_bringup.launch.py'
-        ])
-    )
-
     static_tf_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
         get_package_share_directory('joyride_core'), 'launch'),
@@ -40,29 +33,7 @@ def generate_launch_description():
         ])
     )
 
-    # -------------------- Sensors -------------------- #
-
-    vectornav_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-        get_package_share_directory('vectornav'), 'launch'),
-        '/vectornav.launch.py'
-        ])
-    )
-
-    blackfly_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-        get_package_share_directory('joyride_core'), 'launch'),
-        '/blackfly_bringup.launch.py'
-        ])
-    )
-
     # -------------------- Localization -------------------- #
-
-    localizer_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-        get_package_share_directory('joyride_core'), 'launch'),
-        '/joyride_localization.launch.py'
-    ]))
 
     odom_ackermann = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(

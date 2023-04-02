@@ -15,6 +15,8 @@
 #include "tf2_ros/transform_listener.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 
+#include "joyride_interfaces/msg/eps_position_velocity_feedback.hpp"
+
 using namespace std::chrono_literals;
 
 class OdometryNode : public rclcpp::Node{
@@ -26,7 +28,7 @@ class OdometryNode : public rclcpp::Node{
     const float L = 1.75; // Wheelbase in meters
     const float z = 0.2794;
     const float STEER_ANGLE_TO_WHEEL_ANGLE = 1.0/25.59;
-    const float STEER_BIAS = 0.345;
+    const float STEER_BIAS = 0.0;
     bool sim_time = false;
     bool publish_odom_tf_;
     rclcpp::Time latest_time;
@@ -39,7 +41,7 @@ class OdometryNode : public rclcpp::Node{
     std::string parent_frame_id;
 
     rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr velocitySub_;
-    rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr steeringSub_;
+    rclcpp::Subscription<joyride_interfaces::msg::EPSPositionVelocityFeedback>::SharedPtr steeringSub_;
     rclcpp::Subscription<rosgraph_msgs::msg::Clock>::SharedPtr timeSub_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odomPub_;
     
@@ -51,7 +53,7 @@ class OdometryNode : public rclcpp::Node{
 
     void velocityCB(const std::shared_ptr<std_msgs::msg::Float32> msg){this->v = msg->data;}
 
-    void steeringCB(const std::shared_ptr<std_msgs::msg::Float32> msg){this->phi = msg->data;}
+    void steeringCB(const std::shared_ptr<joyride_interfaces::msg::EPSPositionVelocityFeedback> msg){this->phi = msg->position_radians;}
 
     void poseTimerCB();
 

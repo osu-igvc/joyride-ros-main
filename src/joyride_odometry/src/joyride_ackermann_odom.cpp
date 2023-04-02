@@ -16,7 +16,7 @@
 #include "tf2_ros/transform_broadcaster.h"
 
 #include "joyride_odometry/joyride_ackermann_odom.hpp"
-
+#include "joyride_interfaces/msg/eps_position_velocity_feedback.hpp"
 using namespace std::chrono_literals;
 
 // Parameters
@@ -47,7 +47,7 @@ OdometryNode::OdometryNode(): Node("joyride_odometry_publisher"), odom_broadcast
     velocitySub_ = this->create_subscription<std_msgs::msg::Float32>(this->wheelspeed_fb_topic, 10,
                     std::bind(&OdometryNode::velocityCB, this, std::placeholders::_1));
 
-    steeringSub_ = this->create_subscription<std_msgs::msg::Float32>(this->angle_fb_topic, 10,
+    steeringSub_ = this->create_subscription<joyride_interfaces::msg::EPSPositionVelocityFeedback>(this->angle_fb_topic, 10,
                     std::bind(&OdometryNode::steeringCB, this, std::placeholders::_1));
 
     odomPub_ = this->create_publisher<nav_msgs::msg::Odometry>(this->output_topic,10);
@@ -82,7 +82,7 @@ void OdometryNode::poseTimerCB(){
 
     this->time[1] = T.seconds();
 
-    float omega = this->v*tan((-this->phi + this->STEER_BIAS) * this->STEER_ANGLE_TO_WHEEL_ANGLE)/this->L;
+    float omega = this->v*tan((this->phi + this->STEER_BIAS) * this->STEER_ANGLE_TO_WHEEL_ANGLE)/this->L;
 
     this->x     += this->v*std::cos(this->theta)*(this->time[1]-this->time[0]);
     this->y     += this->v*std::sin(this->theta)*(this->time[1]-this->time[0]);

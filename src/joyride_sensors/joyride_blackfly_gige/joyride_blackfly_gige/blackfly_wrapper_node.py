@@ -9,6 +9,8 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
+from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
+
 # ROS Camera Driver Stuff
 from sensor_msgs.msg import CameraInfo
 
@@ -44,7 +46,8 @@ class BlackflyNode(Node):
         self.launchCamera()
 
     def launchCamera(self):
-
+        
+        
         # Need error handling
         with Camera(self.serial_no) as camera:
             camera.init()
@@ -56,6 +59,8 @@ class BlackflyNode(Node):
                 img = cv2.cvtColor(camera.get_array(), cv2.COLOR_RGB2BGR)
                 img_msg = self.cv_bridge.cv2_to_imgmsg(img, 'bgr8')
                 self.img_pub.publish(img_msg)
+
+    
 
 def main():
     rclpy.init()

@@ -8,7 +8,7 @@ from requests import request
 # ROS
 import rclpy
 from sensor_msgs.msg import Joy
-from geometry_msgs.msg import TwistStamped
+from geometry_msgs.msg import Twist
 from std_msgs.msg import Float32
 from std_msgs.msg import Bool
 from rclpy.node import Node
@@ -47,8 +47,8 @@ class JoystickSub(Node):
         # Creating a subscriber that outputs joystick messages from publisher into /joy_input using the listener function. 
         # The limit for queued messgaes is still 1 
         self.subscription = self.create_subscription(Joy, '/joystick_raw', self.map_input_cb, 1)
-        self.cmd_vel_publisher = self.create_publisher(TwistStamped, '/cmd_vel', 1)
-        self.cmd_vel = TwistStamped()
+        self.cmd_vel_publisher = self.create_publisher(Twist, '/cmd_vel', 1)
+        self.cmd_vel = Twist()
 
         self.fb_wheelspeed_pub = self.create_publisher(Float32, '/joy/wheelspeed', 1)
         self.fb_steerangle_pub = self.create_publisher(Float32, '/joy/steer_angle', 1)
@@ -73,8 +73,8 @@ class JoystickSub(Node):
         self.front_right_blinker_state = False
 
         # Mapping Constants
-        self.VEL_LIN_MAX = 5.5
-        self.VEL_LIN_MIN = 1.0
+        self.VEL_LIN_MAX = 2.0
+        self.VEL_LIN_MIN = 0.0
         self.VEL_LPF_ALPHA = 0.3
         self.VEL_DEADZONE = 0.15
         self.vel_lin_prev = 0
@@ -119,7 +119,7 @@ class JoystickSub(Node):
         self.cmd_vel_publisher.publish(self.cmd_vel)
         
         fb_wheelspeed = Float32()
-        fb_wheelspeed.data = self.cmd_vel.twist.linear.x
+        fb_wheelspeed.data = self.cmd_vel.linear.x
         self.fb_wheelspeed_pub.publish(fb_wheelspeed)
 
         fb_steer = Float32()
@@ -127,11 +127,11 @@ class JoystickSub(Node):
         self.fb_steerangle_pub.publish(fb_steer)
 
     def updateCMDVel(self, linearX: float, angularZ: float):
-        self.cmd_vel.twist.linear.x = float(linearX)
-        self.cmd_vel.twist.angular.z = float(angularZ)
+        self.cmd_vel.linear.x = float(linearX)
+        self.cmd_vel.angular.z = float(angularZ)
 
-        self.cmd_vel.header.stamp = self.get_clock().now().to_msg()
-        self.cmd_vel.header.frame_id = 'base_link'
+        #self.cmd_vel.header.stamp = self.get_clock().now().to_msg()
+        #self.cmd_vel.header.frame_id = 'base_link'
 
 
     def map_input_cb(self, msg: Joy):
