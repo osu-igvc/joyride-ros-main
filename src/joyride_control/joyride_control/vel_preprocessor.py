@@ -29,11 +29,22 @@ class VelocityPreprocessor(Node):
 
         self.prev_steer_angle = 0.0
         self.prev_control = 0.0
-        self.STEER_LPF_ALPHA = 0.7
+        self.STEER_LPF_ALPHA = 0.2
         self.STEER_KP = 1.0
+        self.STEER_KD = 0.05
+        self.CMD_ANG_Z_LPF = 0.1
+        self.prev_ang_z = 0.0
+        self.prevError = 0.0
+        self.tPrev = self.get_clock().now().nanoseconds
 
         self.steer_angle_measured = 0.0
-        self.STEER_ANGLE_ACC_MAX = 0.016
+        self.previous_ang_acceleration = 0.0
+        self.STEER_ANGLE_ACC_MAX = 0.03
+        self.STEER_ANGLE_JERK_MAX = 0.01
+        
+        self.linear_x_lpf_alpha = 0.3
+        self.prev_linear_x = 0.0
+        self.LIN_X_ACC_MAX = 0.03
 
         self.WHEEL_BASE_ANGLE_STEERING_WHEEL_ANGLE = 25.49
 
@@ -50,9 +61,22 @@ class VelocityPreprocessor(Node):
     
     def cmdvel_callback(self, msg:Twist):
         
-        ackSpeed, ackAngle = self.computeAckermann(msg.linear.x, msg.angular.z)
+        filteredAngZ = self.CMD_ANG_Z_LPF*msg.angular.z + (1-self.CMD_ANG_Z_LPF)*self.prev_ang_z
+
+        linX_diff = msg.linear.x - self.prev_linear_x
+        linX = msg.linear.x
+        if linX_diff > self.LIN_X_ACC_MAX:
+            linX = self.prev_linear_x + self.LIN_X_ACC_MAX
+        elif linX_diff < -self.LIN_X_ACC_MAX:
+            linX = self.prev_linear_x - self.LIN_X_ACC_MAX
+
+        filteredLinX = self.linear_x_lpf_alpha*linX + (1-self.linear_x_lpf_alpha)*linX
+
+        self.prev_linear_x = filteredLinX
+        self.prev_ang_z = filteredAngZ
+
+        ackSpeed, ackAngle = self.computeAckermann(filteredLinX, filteredAngZ)
         ackSteerVel = self.steeringPControl(ackAngle, self.steer_angle_measured)
-        self.prev_control = ackSteerVel
 
         self.publishAckermannDrive(ackSpeed, ackAngle, ackSteerVel)
 
@@ -64,16 +88,31 @@ class VelocityPreprocessor(Node):
     def steeringPControl(self, desiredAngle:float, measuredAngle:float):
         error = desiredAngle - measuredAngle
 
-        control = error * self.STEER_KP
+        tNow = self.get_clock().now().nanoseconds
+        deriv = (error - self.prevError) / (tNow/1.0e9 - self.tPrev/1.0e9)
+        self.prevError = error
+        self.tPrev = tNow
+        control = error * self.STEER_KP #+ deriv * self.STEER_KD
 
         control = max(-5.0, min(control, 5.0))
 
-        self.get_logger().error('CTRL: {}, PREV: {}'.format(control, self.prev_control))
-        if control - self.prev_control > self.STEER_ANGLE_ACC_MAX:
+        newAngularAcceleration = control - self.prev_control #diff in velocity commands
+        angAccDiff = newAngularAcceleration - self.previous_ang_acceleration
+
+        if angAccDiff > self.STEER_ANGLE_JERK_MAX:
+            newAngularAcceleration = self.previous_ang_acceleration + self.STEER_ANGLE_JERK_MAX
+        elif angAccDiff < -self.STEER_ANGLE_JERK_MAX:
+            newAngularAcceleration = self.previous_ang_acceleration - self.STEER_ANGLE_JERK_MAX
+
+        control = self.prev_control + newAngularAcceleration
+        controlDiff = control - self.prev_control
+        if controlDiff > self.STEER_ANGLE_ACC_MAX:
             control = self.prev_control + self.STEER_ANGLE_ACC_MAX
-        elif control - self.prev_control < -self.STEER_ANGLE_ACC_MAX:
+        elif controlDiff < -self.STEER_ANGLE_ACC_MAX:
             control = self.prev_control - self.STEER_ANGLE_ACC_MAX
 
+        self.previous_ang_acceleration = newAngularAcceleration
+        self.prev_control = control
         return control
 
     def computeAckermann(self, linearX:float, angularZ:float) -> float:
