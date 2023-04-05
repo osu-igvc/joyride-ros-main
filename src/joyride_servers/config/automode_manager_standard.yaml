@@ -40,3 +40,11 @@ automode_manager_server:
       name: /dbw/polaris_gem
       id: 0xc3
       require: True
+    cpu:
+      name: /utility/cpu
+      id: 0xf0
+      require: True
+    ram:
+      name: /utility/ram
+      id: 0xf1
+      require: True

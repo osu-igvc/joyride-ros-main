@@ -1,2 +1,2 @@
 float32 position_radians
-float32 velocity_revolutions_per_second
+float32 velocity_radians_per_second
