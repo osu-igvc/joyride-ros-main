@@ -25,7 +25,8 @@ setup(
             'lane_detector = joyride_perception.lane_detector:main',
             'pinhole_test = joyride_perception.pinhole_test:main',
             'optical_transform_calibrator = joyride_perception.camera_transform_calibrator:main',
-            'sign_detector = joyride_perception.traffic_sign_detector:main'
+            'sign_detector = joyride_perception.traffic_sign_detector:main',
+            'obstacle_detector = joyride_perception.obstacle_detector:main',
         ],
     },
 )

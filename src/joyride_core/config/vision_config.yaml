@@ -7,9 +7,19 @@
   ros__parameters:
     image_source_topic: '/cameras/front_raw'
     image_output_topic: '/perception/image_front_pedestrian'
-    hue_upper: 15
-    hue_lower: 5
-    sat_upper: 230
-    sat_lower: 110
-    val_upper: 230
-    val_lower: 70
+    hue_upper: 84
+    hue_lower: 8
+    sat_upper: 255
+    sat_lower: 105
+    val_upper: 255
+    val_lower: 192
+
+
+/perception/obstacle_detector_node:
+  ros__parameters:
+    image_source_topic: '/cameras/front_raw'
+    image_output_topic: '/perception/image_front_pedestrian'
+    edge_threshold1: 230
+    edge_threshold2: 255
+    object_area_lower: 3000
+    object_area_upper: 40000

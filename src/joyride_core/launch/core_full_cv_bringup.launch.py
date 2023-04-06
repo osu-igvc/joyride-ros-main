@@ -41,6 +41,15 @@ def generate_launch_description():
             parameters=[vision_config]
         ),
 
+        Node(
+            package='joyride_perception',
+            namespace='perception',
+            executable='obstacle_detector',
+            name='obstacle_detector_node',
+            parameters=[vision_config]
+
+        ),
+
          # ----------- White Lane Detector ----------- #
         Node(
             package='joyride_perception',
