@@ -33,6 +33,8 @@ class ObstacleDetector(Node):
         self.declare_parameter('object_area_upper', 40000)
 
         # --- Get parameters
+        self.topic_name = self.get_parameter('image_source_topic').get_parameter_value().string_value
+        self.output_topic_name = self.get_parameter('image_output_topic').get_parameter_value().string_value
         self.MASK_EDGE_THRESHOLD1 = self.get_parameter('edge_threshold1').get_parameter_value().integer_value
         self.MASK_EDGE_THRESHOLD2 = self.get_parameter('edge_threshold2').get_parameter_value().integer_value
         self.MASK_AREA_LOWER = self.get_parameter('object_area_lower').get_parameter_value().integer_value
