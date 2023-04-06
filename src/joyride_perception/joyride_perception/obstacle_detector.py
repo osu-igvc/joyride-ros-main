@@ -27,6 +27,8 @@ class ObstacleDetector(Node):
         # Setup heartbeat timer
 
         # ROS Interconnection
+        self.declare_parameter('image_source_topic', '/cameras/unknown_raw')
+        self.declare_parameter('image_output_topic', '/perception/blob_detected')
         self.declare_parameter('edge_threshold1', 230)
         self.declare_parameter('edge_threshold2', 255)
         self.declare_parameter('object_area_lower', 3000)
