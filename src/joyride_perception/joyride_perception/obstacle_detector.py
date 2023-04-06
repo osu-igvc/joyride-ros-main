@@ -27,10 +27,10 @@ class ObstacleDetector(Node):
         # Setup heartbeat timer
 
         # ROS Interconnection
-        self.declare_parameter('edge_threshold1', 255)
-        self.declare_parameter('edge_threshold2', 25)
-        self.declare_parameter('object_area_lower', 5000)
-        self.declare_parameter('object_area_upper', 41000)
+        self.declare_parameter('edge_threshold1', 230)
+        self.declare_parameter('edge_threshold2', 255)
+        self.declare_parameter('object_area_lower', 3000)
+        self.declare_parameter('object_area_upper', 40000)
 
         # --- Get parameters
         self.MASK_EDGE_THRESHOLD1 = self.get_parameter('edge_threshold1').get_parameter_value().integer_value
@@ -68,6 +68,7 @@ class ObstacleDetector(Node):
         return count
 
 
+    # For future Kalman Filter integration
     # Find the center point of a bounding box around a detected obstacle
     def center(points):
         x = np.float32(
@@ -89,8 +90,6 @@ class ObstacleDetector(Node):
         
         im_blurred = cv2.GaussianBlur(frame_resize, (self.MASK_BLUR_KERNEL_SIZE, self.MASK_BLUR_KERNEL_SIZE), 0) # Parameterize
 
-        im_hsv = cv2.cvtColor(im_blurred, cv2.COLOR_BGR2HSV)
-
         gray_frame = cv2.cvtColor(im_blurred, cv2.COLOR_BGR2GRAY)
     
 
@@ -108,11 +107,11 @@ class ObstacleDetector(Node):
         cv2.fillPoly(imgCanny, roi_crop, (255,255,255))
 
         kernel = np.ones((self.MASK_BLUR_KERNEL_SIZE, self.MASK_BLUR_KERNEL_SIZE), np.uint8)
-        dilation = cv2.dilate(imgCanny, kernel=kernel, iterations=self.MASK_DILATE_ITERATIONS)
+        imgCanny = cv2.dilate(imgCanny, kernel=kernel, iterations=self.MASK_DILATE_ITERATIONS)
 
         # Object Extraction
         ground_masker = np.zeros_like(frame_resize)
-        num_objects = self.detectContours(dilation, ground_masker)
+        num_objects = self.detectContours(imgCanny, ground_masker)
         obj_extract = cv2.bitwise_and(frame_resize, ground_masker)
 
 
