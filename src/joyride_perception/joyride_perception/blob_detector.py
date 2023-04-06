@@ -123,7 +123,7 @@ class BlobDetector(Node):
         gray_frame = cv2.cvtColor(im_blurred, cv2.COLOR_BGR2GRAY)
 
         # HOG Pedestrian Detector 
-        rois, weights = hog.detectMultiScale(gray_frame, hitThreshold=1.3, winStride=(4,4), padding=(4.4), scale=1.05)
+        rois, weights = hog.detectMultiScale(gray_frame, hitThreshold=1.3, winStride=(4,4), padding=(4,4), scale=1.05)
             # ROIS Coordinates where person is detected inside
             # Weights - confidence values [0, ~3]
 
