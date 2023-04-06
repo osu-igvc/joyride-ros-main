@@ -151,8 +151,6 @@ def main():
 
     rclpy.spin(detector)
 
-    cv2.destroyAllWindows()
-
     detector.destroy_node()
 
     rclpy.shutdown()
