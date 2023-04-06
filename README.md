@@ -7,6 +7,7 @@ This repository is the primary software entry point for Oklahoma State Universit
 The repository is organized in the following manner:
 
 **joyride-ros-main**
+- joyride
 - joyride_interfaces
 - joyride_servers
 - joyride_sensors
@@ -15,6 +16,8 @@ The repository is organized in the following manner:
 - joyride_hmi
 - joyride_util
 
+## joyride
+A metapackage describing the overall system's dependencies.
 
 ## Joyride_Interfaces
 

@@ -13,7 +13,7 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
 #include "tf2_ros/transform_listener.h"
-#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 
 #include "joyride_interfaces/msg/eps_position_velocity_feedback.hpp"
 
@@ -45,7 +45,6 @@ class OdometryNode : public rclcpp::Node{
     rclcpp::Subscription<rosgraph_msgs::msg::Clock>::SharedPtr timeSub_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odomPub_;
     
-    std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
     std::unique_ptr<tf2_ros::TransformListener> tf_listener_;
     tf2_ros::TransformBroadcaster odom_broadcaster_;
 
