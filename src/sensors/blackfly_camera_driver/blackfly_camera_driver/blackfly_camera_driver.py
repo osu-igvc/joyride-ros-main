@@ -25,6 +25,7 @@ from rclpy.timer import Timer
 
 from sensor_msgs.msg import Image, CompressedImage
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
+import diagnostic_updater
 
 import cv2
 from simple_pyspin import Camera
@@ -42,11 +43,7 @@ class LifecycleBlackflyCameraDriver(Node):
         self.image_publisher_timer: Optional[Timer] = None
         self.image_compressed_publisher: Optional[Publisher] = None
 
-        self.diagnostic_publisher: Optional[Publisher] = None
-        self.diagnostic_publisher_timer: Optional[Timer] = None
-
         self.cv_bridge = CvBridge()
-
 
         super().__init__(node_name, **kwargs)
 
@@ -63,23 +60,24 @@ class LifecycleBlackflyCameraDriver(Node):
                     msg.data = np.array(cv2.imencode('.jpg', img)[1]).tostring()
                     self.image_compressed_publisher.publish(msg)
                 self.status.level = DiagnosticStatus.OK
+                self.status.message = ''
 
         except:
-            self.get_logger().error(f'Camera {self.serial_no} encounted an error when grabbing frame.')
             self.status.level = DiagnosticStatus.ERROR
+            self.status.message = 'Error getting frame'
 
 
-    def new_diagnostics(self):
-        msg = DiagnosticArray()
-        msg.header.stamp = self.get_clock().now().to_msg()
-        msg.status.append(self.status)
-        self.diagnostic_publisher.publish(msg)
+    def new_diagnostics(self, stat):
+        stat.summary(self.status.level, self.status.message)
+        return stat
+
+    def set_updater(self, updater):
+        self.updater = updater
 
     # --------------------- Lifecycle Management --------------------- #
 
     def on_configure(self, state: State) -> TransitionCallbackReturn:
 
-        self.get_logger().info(f'Configuring camera...')
 
         # Parameters
         self.serial_no = self.declare_parameter('serial_no', '18295828').get_parameter_value().string_value
@@ -89,24 +87,18 @@ class LifecycleBlackflyCameraDriver(Node):
         self.frequency = self.declare_parameter('frequency', 100.0).get_parameter_value().double_value
         self.compress_image = self.declare_parameter('compress_image', False).get_parameter_value().bool_value
 
-        self.diagnostics_publish_topic = '/diagnostics'
 
-        self.get_logger().info(f'T camera...')
-        self.get_logger().info(f'Compress: {self.compress_image}')
         # Pub/Sub/Timers
         self.image_publisher = self.create_lifecycle_publisher(Image, self.image_raw_publish_topic, 10)
-        self.get_logger().info(f'Test camera: {self.serial_no}')
 
         if self.compress_image:
-            self.get_logger().info('COMPRESSING')
             self.image_compressed_publisher = self.create_lifecycle_publisher(CompressedImage, f'{self.image_raw_publish_topic}/compressed', 10)
 
+        self.status = DiagnosticStatus()
+        self.status.level = DiagnosticStatus.STALE
+        self.updater.setHardwareID(self.serial_no)
 
         try:
-            self.diagnostic_publisher = self.create_lifecycle_publisher(DiagnosticArray, self.diagnostics_publish_topic, 10)
-            self.diagnostic_publisher_timer = self.create_timer(1.0, self.new_diagnostics)
-            self.status = DiagnosticStatus(name=self.get_name())
-            self.status.level = DiagnosticStatus.OK
 
             self.get_logger().info(f'Opening camera: {self.serial_no}')
 
@@ -125,6 +117,7 @@ class LifecycleBlackflyCameraDriver(Node):
             return TransitionCallbackReturn.SUCCESS
         except:
             self.get_logger().error(f'Unable to open camera: {self.serial_no}')
+            self.status.level = DiagnosticStatus.ERROR
             return TransitionCallbackReturn.FAILURE
 
     def on_activate(self, state: State) -> TransitionCallbackReturn:
@@ -172,6 +165,11 @@ def main():
     bfly_driver_node = LifecycleBlackflyCameraDriver('bfly_driver')
 
     executor.add_node(bfly_driver_node)
+
+    updater = diagnostic_updater.Updater(bfly_driver_node)
+    updater.setHardwareID('none')
+    bfly_driver_node.set_updater(updater)
+    updater.add('', bfly_driver_node.new_diagnostics)
 
     try:
         executor.spin()
