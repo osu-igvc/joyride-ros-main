@@ -4,3 +4,5 @@ log/*
 joyride-ros-main.code-workspace
 *.db3
 *.vscode
+.vscode/c_cpp_properties.json
+.vscode/settings.json

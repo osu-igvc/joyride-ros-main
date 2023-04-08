@@ -14,6 +14,7 @@ bool driver_seatbelt_on
 byte NEUTRAL=0
 byte FORWARD=1
 byte REVERSE=2
-byte UNKNOWN=3
+byte CHARGING=3
+byte UNKNOWN=4
 
 byte gear_status
