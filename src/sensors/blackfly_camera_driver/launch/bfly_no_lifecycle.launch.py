@@ -8,9 +8,6 @@ import os
 
 def generate_launch_description():
 
-    lifecycle_nodes = [ '/sensors/cameras/bfly_center','/sensors/cameras/bfly_left', '/sensors/cameras/bfly_right']
-    autostart = True
-
     camera_params = os.path.join(get_package_share_directory('blackfly_camera_driver'), 'config', 'bfly_lifecycle_config.yaml')
 
     return LaunchDescription([
@@ -41,13 +38,4 @@ def generate_launch_description():
             parameters=[camera_params]
         ),
 
-
-        # Lifecycle
-        Node(
-            package='nav2_lifecycle_manager',
-            executable='lifecycle_manager',
-            name='lifecycle_manager_bfly',
-            output='screen',
-            parameters=[{'autostart': autostart}, {'node_names':lifecycle_nodes}, {'bond_timeout':0.0}]
-        )
     ])
