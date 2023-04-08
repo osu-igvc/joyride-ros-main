@@ -118,12 +118,12 @@ double NavSatOdom::llDistance(double lat1, double lon1, double lat2, double lon2
     lat2 = lat2*deg2rad;
     lon1 = lon1*deg2rad;
     lon2 = lon2*deg2rad;
-    double R = 6371;
+    double R = 6371; // Earth's radius
     double dLat = lat2-lat1;
     double dLon = lon2-lon1;
     double temp = sin(dLat/2)*sin(dLat/2) + cos(lat1) * cos(lat2) * sin(dLon/2) * sin(dLon/2);
     temp = 2 * atan2(sqrt(temp), sqrt(1-temp));
-    return R * temp;
+    return R * temp * 1609.34; //1609.34 miles to meters conversion
 }
 
 void NavSatOdom::gpsFixCallback(const sensor_msgs::msg::NavSatFix::SharedPtr msg)
