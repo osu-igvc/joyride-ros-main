@@ -8,7 +8,7 @@ import os
 
 def generate_launch_description():
 
-    camera_params = os.path.join(get_package_share_directory('blackfly_camera_driver'), 'config', 'bfly_lifecycle_config.yaml')
+    camera_params = os.path.join(get_package_share_directory('blackfly_camera_driver'), 'config', 'bfly_no_lifecycle_config.yaml')
 
     return LaunchDescription([
         LifecycleNode(

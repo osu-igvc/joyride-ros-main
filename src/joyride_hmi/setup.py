@@ -20,14 +20,13 @@ setup(
         (os.path.join('share', package_name, 'launch'), glob('launch/*launch.[pxy][yma]*'))],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='OSU Team Joyride',
+    maintainer='Max DeSantis',
     maintainer_email='max.desantis@okstate.edu',
-    description='Human-Machine Interfaces for Joyride Autonomous Car',
-    license='TODO: License declaration',
+    description='Human-Machine Interface nodes for Joyride self-driving vehicle.',
+    license='LGPL',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'dashboard_node = joyride_hmi.dashboard_node:main',
             'joystick_pub_node = joyride_hmi.joystick_pub_node:main',
             'joystick_mapper_node = joyride_hmi.joystick_mapper_node:main',
             'tts_node = joyride_hmi.tts_node:main'

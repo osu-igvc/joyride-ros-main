@@ -2,10 +2,10 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>joyride_servers</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="max.desantis@okstate.edu">igvcsp2022</maintainer>
-  <license>TODO: License declaration</license>
+  <version>1.0.0</version>
+  <description>Servers and service providers for Joyride self-driving vehicle.</description>
+  <maintainer email="max.desantis@okstate.edu">Max DeSantis</maintainer>
+  <license>LGPL</license>
 
   <depend>std_msgs</depend>
   <depend>action_msgs</depend>

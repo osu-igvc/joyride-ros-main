@@ -1,0 +1,9 @@
+/perception/pedestrian_detector:
+  ros__parameters:
+    image_source_topic: '/sensors/cameras/center/image'
+    image_output_topic: '/perception/pedestrians/image'
+
+/perception/obstacle_detector:
+  ros__parameters:
+    image_source_topic: '/sensors/cameras/center/image'
+    image_output_topic: '/perception/obstacles/image'

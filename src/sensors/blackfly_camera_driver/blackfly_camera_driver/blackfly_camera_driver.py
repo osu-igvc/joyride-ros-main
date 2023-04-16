@@ -38,6 +38,7 @@ class LifecycleBlackflyCameraDriver(Node):
     def __init__(self, node_name, **kwargs):
         
         self.bfly_camera: Optional[Camera] = None
+        self.status = DiagnosticStatus()
 
         self.image_publisher: Optional[Publisher] = None
         self.image_publisher_timer: Optional[Timer] = None
@@ -94,7 +95,6 @@ class LifecycleBlackflyCameraDriver(Node):
         if self.compress_image:
             self.image_compressed_publisher = self.create_lifecycle_publisher(CompressedImage, f'{self.image_raw_publish_topic}/compressed', 10)
 
-        self.status = DiagnosticStatus()
         self.status.level = DiagnosticStatus.STALE
         self.updater.setHardwareID(self.serial_no)
 

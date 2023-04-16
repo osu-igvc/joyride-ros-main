@@ -7,9 +7,9 @@
 
 /sensors/cameras/lane_camera_img_pub:
   ros__parameters:
-    serial_no: 18295818
+    serial_no:  '18295828' #18295818
     pixel_format: 'RGB8Packed'
-    video_mode: 'Mode1'
+    video_mode: 'Mode2'
     img_pub_topic: '/sensors/cameras/lane/image_raw'
 
 /sensors/cameras/left_sign_camera_img_pub:

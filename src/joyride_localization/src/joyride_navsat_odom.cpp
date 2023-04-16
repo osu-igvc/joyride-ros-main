@@ -51,7 +51,7 @@ NavSatOdom::NavSatOdom(const rclcpp::NodeOptions & options) : Node("navsat_odom_
     this->declare_parameter("tf_frequency", 50.0);
     this->declare_parameter("expected_lat", 36.1156);
     this->declare_parameter("expected_lon", -97.0584);
-    this->declare_parameter("initial_ll_radius", 1.0);
+    this->declare_parameter("initial_ll_radius", 10000.0);
 
     this->expected_lat_ = this->get_parameter("expected_lat").get_parameter_value().get<double>();
     this->expected_lon_ = this->get_parameter("expected_lon").get_parameter_value().get<double>();

@@ -4,7 +4,7 @@ import rclpy
 from rclpy.node import Node
 
 from tf2_ros import TransformBroadcaster
-
+from rcl_interfaces.msg import ParameterDescriptor
 
 class StaticTransformNode(Node):
 
@@ -29,12 +29,12 @@ class StaticTransformNode(Node):
 
     def create_transform_list(self):
 
-        self.declare_parameters(namespace='',parameters=[('frames',[])])
+        self.declare_parameters(namespace='',parameters=[('frames', rclpy.Parameter.Type.STRING_ARRAY)], )
         config_frames = self.get_parameter('frames').value
         #self.get_logger().warn('All frames:' + str(self.frames))
 
         for f in config_frames:
-            self.declare_parameters(namespace='',parameters = [(f+a,[]) for a in self.transform_attr])
+            self.declare_parameters(namespace='',parameters = [(f+a,[], ParameterDescriptor(dynamic_typing=True)) for a in self.transform_attr])
             params = self.get_parameters([f+a for a in self.transform_attr])
             
             F = TransformStamped()

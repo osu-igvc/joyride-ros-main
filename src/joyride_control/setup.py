@@ -13,10 +13,10 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='joyride-obc',
-    maintainer_email='joyride-obc@todo.todo',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    maintainer='Max DeSantis',
+    maintainer_email='max.desantis@okstate.edu',
+    description='Actuator control nodes for Joyride self-driving vehicle.',
+    license='LGPL',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [

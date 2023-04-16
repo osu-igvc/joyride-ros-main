@@ -14,10 +14,10 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='igvcsp2022',
+    maintainer='Max DeSantis',
     maintainer_email='max.desantis@okstate.edu',
-    description='OSU Team Joyride perception modules for Joyride Autonomous Car',
-    license='TODO: License declaration',
+    description='Perception algorithms for Joyride self-driving vehicle.',
+    license='LGPL',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [

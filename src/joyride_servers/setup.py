@@ -17,17 +17,18 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='igvcsp2022',
+    maintainer='Max DeSantis',
     maintainer_email='max.desantis@okstate.edu',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='Servers and service providers for Joyride self-driving vehicle.',
+    license='LGPL',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
             'dbw_usb_link_node = joyride_servers.dbw_usb_link_node:main',
             'joyride_static_tf_broadcaster = joyride_servers.joyride_static_tf_broadcaster:main',
             'automode_manager = joyride_servers.automode_manager:main',
-            'computer_monitor = joyride_servers.computer_monitor:main'
+            'computer_monitor = joyride_servers.computer_monitor:main',
+            'serial_link = joyride_servers.serial_link:main'
         ],
     },
 )

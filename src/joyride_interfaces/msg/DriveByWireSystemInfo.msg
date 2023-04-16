@@ -9,3 +9,5 @@ bool auto_button_pressed
 
 float32 temperature
 float32 drive_controller_voltage
+
+float32 wheelspeed

@@ -21,7 +21,7 @@ def generate_launch_description():
     return LaunchDescription([
 
     launch_ros.actions.Node(
-        package='joyride_odometry',
+        package='joyride_localization',
         executable='navsat_odom',
         name='navsat_odom_node',
         output='screen',
