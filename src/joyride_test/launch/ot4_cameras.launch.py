@@ -31,7 +31,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory('blackfly_camera_driver'), 'launch'),
-                '/bfly_center_lifecycle.launch.py'
+                '/bfly_lifecycle.launch.py'
         ])
         )
     ])

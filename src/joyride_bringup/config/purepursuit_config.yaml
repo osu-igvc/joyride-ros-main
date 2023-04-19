@@ -90,8 +90,8 @@ controller_server:
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
       desired_linear_vel: 0.5
-      lookahead_dist: 4.5
-      min_lookahead_dist: 3.0
+      lookahead_dist: 10.0
+      min_lookahead_dist: 5.0
       max_lookahead_dist: 15.0
       lookahead_time: 5.0
       rotate_to_heading_angular_vel: 0.2
@@ -106,7 +106,7 @@ controller_server:
       regulated_linear_scaling_min_radius: 0.9
       regulated_linear_scaling_min_speed: 3.0
       use_fixed_curvature_lookahead: false
-      curvature_lookahead_dist: 1.0
+      curvature_lookahead_dist: 0.5
       use_rotate_to_heading: false        # Don't use for ackermann! Can't rotate in place!
       rotate_to_heading_min_angle: 0.785
       max_angular_accel: 0.1

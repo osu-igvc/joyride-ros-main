@@ -1,7 +1,7 @@
 
 /sensors/cameras/bfly_center:
   ros__parameters:
-    serial_no: '18295828' # '18295827'
+    serial_no: '18295827' # '18295827'
     pixel_format: 'RGB8Packed'
     video_mode: 'Mode1'
     raw_image_topic: '/sensors/cameras/center/image'

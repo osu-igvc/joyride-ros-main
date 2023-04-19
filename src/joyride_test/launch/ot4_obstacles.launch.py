@@ -33,6 +33,13 @@ def generate_launch_description():
         launch_arguments={'bag_name': bag_name}.items()
         ),
 
+         # CAN
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('joyride_bringup'), 'launch'),
+            '/CAN.launch.py'
+            ])
+        ),
 
         # Cameras
         IncludeLaunchDescription(

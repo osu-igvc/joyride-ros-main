@@ -1,5 +1,4 @@
 
-
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -15,35 +14,32 @@ from nav2_common.launch import RewrittenYaml
 
 def generate_launch_description():
 
-    controller_type = LaunchConfiguration('controller_type')
-    nav_params = LaunchConfiguration('nav_params')
-
-    declare_controller_type_cmd = DeclareLaunchArgument(
-        'controller_type',
-        default_value='purepursuit_config.yaml'
-    )
-
-    final_nav_params_path = DeclareLaunchArgument(
-        'nav_params',
-        default_value=[get_package_share_directory('joyride_bringup'), '/config/',LaunchConfiguration('controller_type')])
+    bag_name = 'localization'
 
     return LaunchDescription([
-        declare_controller_type_cmd,
-        final_nav_params_path,
+
+        # ROSBAGGER
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('joyride_bringup'), 'launch'),
+            '/data_log_bringup.launch.py'
+            ]),
+            launch_arguments={'bag_name':bag_name}.items()
+        ),
+
+                # Transforms
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('joyride_core'), 'launch'),
+            '/static_transforms.launch.py'
+            ])
+        ),
 
         # CAN
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('joyride_bringup'), 'launch'),
             '/CAN.launch.py'
-            ])
-        ),
-
-        # Transforms
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('joyride_core'), 'launch'),
-            '/static_transforms.launch.py'
             ])
         ),
 
@@ -55,25 +51,11 @@ def generate_launch_description():
         ])
         ),
 
-        # Control
-        Node(
-            package='joyride_control',
-            executable='vel_preprocess_node',
-            name='vel_node',
-        ),
-
         # Localization
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('joyride_bringup'), 'launch'),
-            '/localization.launch.py']),
-        ),
-
-        # Navstack
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('joyride_bringup'), 'launch'),
-            '/navstack.launch.py']),
-            launch_arguments={'params_file':nav_params}.items()
-        )
+            '/localization.launch.py'
+        ])
+    )
     ])
