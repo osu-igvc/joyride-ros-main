@@ -15,6 +15,7 @@ find_package(nav_msgs REQUIRED)
 find_package(geographic_msgs REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(joyride_interfaces REQUIRED)
+find_package(vectornav_msgs REQUIRED)
 
 find_package(rosidl_default_generators REQUIRED)
 
@@ -40,6 +41,7 @@ ament_target_dependencies(ackermann_odom
   tf2_ros
   nav_msgs
   joyride_interfaces
+  vectornav_msgs
   tf2_geometry_msgs)
 
 ament_target_dependencies(navsat_odom
@@ -51,6 +53,7 @@ ament_target_dependencies(navsat_odom
   sensor_msgs
   tf2
   tf2_ros
+  vectornav_msgs
   tf2_geometry_msgs)
 
 
