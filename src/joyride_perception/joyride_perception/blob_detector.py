@@ -144,13 +144,9 @@ class BlobDetector(Node):
 
 def main():
     rclpy.init()
-
     detector = BlobDetector()
-
     rclpy.spin(detector)
-
     detector.destroy_node()
-
     rclpy.shutdown()
 
 if __name__ == '__main__':
