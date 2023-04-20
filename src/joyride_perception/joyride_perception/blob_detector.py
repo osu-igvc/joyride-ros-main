@@ -24,10 +24,9 @@ class BlobDetector(Node):
         #self.heartbeat = HeartbeatManager(self, HeartbeatManager.Type.publisher)
         self.bridge = CvBridge()
 
-        # Setup heartbeat timer
 
         # ROS Interconnection
-        self.declare_parameter('image_source_topic', '/cameras/unknown_raw')
+        self.declare_parameter('image_source_topic', '/sensors/cameras/image_raw')
         self.declare_parameter('image_output_topic', '/perception/blob_detected')
         self.declare_parameter('hue_upper', 84)
         self.declare_parameter('hue_lower', 8)
@@ -55,7 +54,6 @@ class BlobDetector(Node):
 
         self.MASK_ERODE_ITERATIONS = 1
         self.MASK_DILATE_ITERATIONS = 1
-
         self.MASK_BLUR_KERNEL_SIZE = 5
 
     def imageCallback(self, img_msg):
