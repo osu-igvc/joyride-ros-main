@@ -34,6 +34,8 @@ class BlobDetector(Node):
         self.declare_parameter('sat_lower', 105)
         self.declare_parameter('val_upper', 255)
         self.declare_parameter('val_lower', 192)
+        self.declare_parameter('hit_threshold', 1.3) 
+            #1.3 still provides some false positives, increment by 0.1 until satisfactory
 
         # --- Get parameters
         self.topic_name = self.get_parameter('image_source_topic').get_parameter_value().string_value
@@ -46,6 +48,8 @@ class BlobDetector(Node):
 
         self.MASK_VAL_LOWER = self.get_parameter('val_lower').get_parameter_value().integer_value
         self.MASK_VAL_UPPER = self.get_parameter('val_upper').get_parameter_value().integer_value
+
+        self.HIT_THRESHOLD = self.get_parameter('hit_threshold').get_parameter_value().double_value
 
         # --- Setup pub/sub
         self.image_sub = self.create_subscription(Image, self.topic_name, self.imageCallback, 10)
@@ -121,7 +125,7 @@ class BlobDetector(Node):
         gray_frame = cv2.cvtColor(im_blurred, cv2.COLOR_BGR2GRAY)
 
         # HOG Pedestrian Detector 
-        rois, weights = hog.detectMultiScale(gray_frame, hitThreshold=1.3, winStride=(4,4), padding=(4,4), scale=1.05)
+        rois, weights = hog.detectMultiScale(gray_frame, hitThreshold=self.HIT_THRESHOLD, winStride=(4,4), padding=(4,4), scale=1.05)
             # ROIS Coordinates where person is detected inside
             # Weights - confidence values [0, ~3]
 
@@ -137,8 +141,6 @@ class BlobDetector(Node):
 
         blob = cv2.bitwise_and(ped_extract, ped_extract, orange_mask)
         
-
-
         self.contour_pub.publish(self.bridge.cv2_to_imgmsg(blob, 'bgr8'))
 
 
