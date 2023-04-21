@@ -31,10 +31,12 @@ public:
   // Setup
   explicit NavSatOdom(const rclcpp::NodeOptions&);
   ~NavSatOdom();
-  void initializeParameters();
-  void initializeROS();
+
 
 private:
+
+  void initializeParameters();
+  void initializeROS();
 
   // Callbacks
   void gpsCommonCallback(const vectornav_msgs::msg::CommonGroup::SharedPtr msg);

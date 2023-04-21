@@ -25,9 +25,6 @@
 // - base frame id
 // - publish_static_map_transform - whether or not to publish an odom = map transform
 
-
-// Credit - Largely based off of robot_localization's navsat_transform_node
-
 #include "joyride_localization/joyride_navsat_odom.hpp"
 #include <cmath>
 #include "rclcpp/time.hpp"
@@ -69,7 +66,6 @@ void NavSatOdom::initializeParameters()
     this->declare_parameter("world_frame_id", "odom");
     this->declare_parameter("base_frame_id", "base_link");
 
-
     this->expected_lat_ = this->get_parameter("expected_lat").get_parameter_value().get<double>();
     this->expected_lon_ = this->get_parameter("expected_lon").get_parameter_value().get<double>();
     this->initial_ll_radius_ = this->get_parameter("initial_ll_radius").get_parameter_value().get<double>();
@@ -91,19 +87,14 @@ void NavSatOdom::initializeROS()
 
     // Setup odom publisher
     this->odomPub_ = this->create_publisher<nav_msgs::msg::Odometry>(this->odom_pub_topic_, 10);
-    this->publishOdometryTimer_ = this->create_wall_timer(10ms, std::bind(&NavSatOdom::publishOdometryCallback, this));
+    this->publishOdometryTimer_ = this->create_wall_timer(std::chrono::milliseconds(int(1000 * tf_period_)), std::bind(&NavSatOdom::publishOdometryCallback, this));
 
     if(!this->use_fake_odom_) {
 
         // Setup GPS Common subscriber
         this->gpsCommonSub_ = this->create_subscription<vectornav_msgs::msg::CommonGroup>(this->gps_common_topic_, 10,
             std::bind(&NavSatOdom::gpsCommonCallback, this, std::placeholders::_1));
-        // // Subscribe to navsatfix topic
-        // this->navSatSub_ = this->create_subscription<sensor_msgs::msg::NavSatFix>(this->navsat_sub_topic_, 10,
-        //     std::bind(&NavSatOdom::gpsFixCallback, this, std::placeholders::_1));
 
-        // this->imuSub_ = this->create_subscription<sensor_msgs::msg::Imu>(this->imu_sub_topic_, 10,
-        //     std::bind(&NavSatOdom::imuCallback, this, std::placeholders::_1));
     }
 }
 
@@ -162,20 +153,6 @@ void NavSatOdom::updateTransform(const vectornav_msgs::msg::CommonGroup::SharedP
     this->last_position_->y = newY;
     this->last_position_->z = newZ;
 
-    // Update orientation
-    // - Transform msg orientation from vectornav to base_link
-    
-    // geometry_msgs::msg::Quaternion baselinkOrientation = this->tf_buffer_->transform(msg->orientation, this->base_link_frame_id_, tf2::durationFromSec(0.1)).transform.rotation;
-
-    // double yaw, pitch, roll;
-
-    // tf2::getEulerYPR(baselinkOrientation, yaw, pitch, roll);
-
-    // tf2::Quaternion yawQuat;
-    // yawQuat.setRPY(0, 0, yaw);
-    // this->last_orientation_ = tf2::toMsg(yawQuat);
-
-
     // Update yaw (in odom frame)
     double yaw = msg->yawpitchroll.x;
     tf2::Quaternion yawQuat;
@@ -232,15 +209,10 @@ geometry_msgs::msg::TransformStamped NavSatOdom::buildOdometryTransform(const ge
 // publishOdomTimerCallback
 void NavSatOdom::publishOdometryCallback()
 {
-    if(this->use_fake_odom_) {
-        // tf2::Quaternion yawQuat;
-        // yawQuat.setRPY(0, 0, 0);
-        // geometry_msgs::msg::Quaternion orientation = tf2::toMsg(yawQuat);
 
-        // odom_broadcaster_.sendTransform(buildOdomTF(0, 0, 0, orientation, "odom", "base_link"));
-        // odomPub_->publish(buildOdomMsg(0, 0, 0, 0, 0, 0, 0, orientation, "odom", "base_link"));
-    }
-    else if(this->valid_fix_obtained_) {
+    //TODO Reimplement fake odom
+
+    if(this->valid_fix_obtained_) {
         // Publish new odom and TF
         geometry_msgs::msg::TransformStamped odomTF = buildOdometryTransform(this->last_position_, this->last_orientation_, this->world_frame_id_, this->base_link_frame_id_);
         nav_msgs::msg::Odometry odomMsg = buildOdometryMessage(this->last_position_, this->last_orientation_, this->last_velocity_, this->world_frame_id_, this->base_link_frame_id_);
@@ -249,53 +221,6 @@ void NavSatOdom::publishOdometryCallback()
         odomPub_->publish(odomMsg);
     }
 }
-
-// // buildOdomTransform
-// geometry_msgs::msg::TransformStamped NavSatOdom::buildOdomTF(double x, double y, double z, geometry_msgs::msg::Quaternion orientation, std::string frame_id, std::string child_frame_id)
-// {
-//     geometry_msgs::msg::TransformStamped newOdom_tf;
-
-//     newOdom_tf.header.stamp = this->get_clock()->now();
-//     newOdom_tf.header.frame_id = frame_id;
-//     newOdom_tf.child_frame_id = child_frame_id;
-
-//     newOdom_tf.transform.translation.x = x;
-//     newOdom_tf.transform.translation.y = y;
-//     newOdom_tf.transform.translation.z = z;
-
-//     newOdom_tf.transform.rotation = orientation;
-
-//     return newOdom_tf;
-// }
-// // buildOdomMessage
-
-// nav_msgs::msg::Odometry NavSatOdom::buildOdomMsg(double x, double y, double z, double v_x, double v_y, double v_z, double angular_z, geometry_msgs::msg::Quaternion orientation, std::string frame_id, std::string child_frame_id)
-// {
-//     nav_msgs::msg::Odometry newOdom_msg;
-//     newOdom_msg.header.stamp = this->get_clock()->now();
-//     newOdom_msg.header.frame_id = frame_id;
-//     newOdom_msg.child_frame_id = child_frame_id;
-
-
-
-//     // newOdom_msg.header.stamp = this->get_clock()->now();
-//     // newOdom_msg.header.frame_id = frame_id;
-//     // newOdom_msg.child_frame_id = child_frame_id;
-
-//     // newOdom_msg.pose.pose.position.x = x;
-//     // newOdom_msg.pose.pose.position.y = y;
-//     // newOdom_msg.pose.pose.position.z = z;
-//     // newOdom_msg.pose.pose.orientation = orientation;
-
-//     // newOdom_msg.twist.twist.linear.x = v_x;
-//     // newOdom_msg.twist.twist.linear.y = v_y;
-//     // newOdom_msg.twist.twist.linear.z = v_z;
-//     // newOdom_msg.twist.twist.angular.z = angular_z;
-
-//     return newOdom_msg;
-// }
-
-// convertLLToCartesian
 
 double NavSatOdom::llDistance(double lat1, double lon1, double lat2, double lon2)
 {
@@ -311,33 +236,5 @@ double NavSatOdom::llDistance(double lat1, double lon1, double lat2, double lon2
     temp = 2 * atan2(sqrt(temp), sqrt(1-temp));
     return R * temp * 1609.34; //1609.34 miles to meters conversion
 }
-
-
-
-
-
-
-
-
-
-// void NavSatOdom::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
-// {
-
-//     // IMU Messages defined as having orientation with respect to due east.
-//     // - Therefore, we will not perform any transform.
-
-//     tf2::Quaternion orientation;
-//     tf2::fromMsg(msg->orientation, orientation);
-
-//     tf2::Matrix3x3 m(orientation);
-//     double roll, pitch, yaw;
-//     m.getRPY(roll, pitch, yaw);
-//     previousYawAngleRadians_ = yaw;
-// }
-
-
-
-
-
 
 }
