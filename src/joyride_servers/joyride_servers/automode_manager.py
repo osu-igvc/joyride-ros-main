@@ -21,7 +21,7 @@ class AutoModeManagerServerNode(Node):
         self.auto_enable_disable_topic = self.declare_parameter('auto_enable_disable_topic', 'requestAutoEnableDisable').get_parameter_value().string_value
         self.status_valid_timeout = self.declare_parameter('status_valid_timeout', 1.5).get_parameter_value().double_value
         self.diagnostic_topic = self.declare_parameter('diagnostic_msg_topic', '/diagnostics_agg').get_parameter_value().string_value
-        self.declare_parameter('tracked_nodes')
+        self.declare_parameter('tracked_nodes', value=rclpy.Parameter.Type.STRING_ARRAY)
         self.tracked_nodes = self.get_parameter('tracked_nodes').value
 
         # Get params into tuple
@@ -142,9 +142,10 @@ class AutoModeManagerServerNode(Node):
 
         self.nodeList = []
         for item in self.tracked_nodes:
-            name = self.declare_parameter(item+'.name').get_parameter_value().string_value
-            id = self.declare_parameter(item+'.id').get_parameter_value().integer_value
-            require = self.declare_parameter(item+'.require').get_parameter_value().bool_value
+
+            name = self.declare_parameter(item+'.name', value=rclpy.Parameter.Type.STRING).get_parameter_value().string_value
+            id = self.declare_parameter(item+'.id', value=rclpy.Parameter.Type.INTEGER).get_parameter_value().integer_value
+            require = self.declare_parameter(item+'.require', value=rclpy.Parameter.Type.BOOL).get_parameter_value().bool_value
 
             self.nodeList.append( (name, id, require) )
 

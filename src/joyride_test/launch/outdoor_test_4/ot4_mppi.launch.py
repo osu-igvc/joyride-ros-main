@@ -18,7 +18,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('joyride_bringup'), 'launch'),
-            '/data_log_bringup.launch.py'
+            '/rosbag_recorder.launch.py'
             ]),
             launch_arguments={'bag_name':bag_name}.items()
         ),

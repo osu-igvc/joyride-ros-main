@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 
     diagnostic_updater::Updater updater(navsat_odom_node);
     updater.setHardwareID("navsat_odom");
-    updater.add("navsat_odom", navsat_odom_node.get(), &joyride_odometry::NavSatOdom::diagnosticCallback);
+    updater.add("/sensors/gps_odom", navsat_odom_node.get(), &joyride_odometry::NavSatOdom::diagnosticCallback);
 
 
     rclcpp::spin(navsat_odom_node->get_node_base_interface());

@@ -52,16 +52,9 @@ class ComputerStatusMonitor(Node):
 
         cpuStatus.values.append(KeyValue(key='CPU Load Average', value='{:.2f}'.format(cpu_average)))
 
-        warn = False
-        for idx, val in enumerate(cpu_percents):
-            cpuStatus.values.append(KeyValue(key='CPU {} Load'.format(idx), value='{:.2f}'.format(val)))
-                                    
-            if val > self.cpu_warning_percentage:
-                warn = True
-
-        if warn:
+        if cpu_average > self.cpu_warning_percentage:
             cpuStatus.level = DiagnosticStatus.WARN
-            cpuStatus.message = 'At least one CPU exceeds {:d} percent'.format(self.cpu_warning_percentage)
+            cpuStatus.message = 'CPU usage exceeds {:d} percent'.format(self.cpu_warning_percentage)
         else:
             cpuStatus.level = DiagnosticStatus.OK
             cpuStatus.message = 'CPU Average {:.2f} percent'.format(cpu_average)
