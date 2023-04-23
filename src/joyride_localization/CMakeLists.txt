@@ -16,7 +16,8 @@ find_package(geographic_msgs REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(joyride_interfaces REQUIRED)
 find_package(vectornav_msgs REQUIRED)
-
+find_package(diagnostic_msgs REQUIRED)
+find_package(diagnostic_updater REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "/usr/share/cmake/geographiclib/")
@@ -54,6 +55,8 @@ ament_target_dependencies(navsat_odom
   tf2
   tf2_ros
   vectornav_msgs
+  diagnostic_msgs
+  diagnostic_updater
   tf2_geometry_msgs)
 
 

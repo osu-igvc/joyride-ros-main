@@ -17,6 +17,7 @@
 #include "tf2_ros/transform_listener.h"
 #include "tf2_ros/transform_broadcaster.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
+#include "diagnostic_updater/diagnostic_updater.hpp"
 #include "tf2_ros/buffer.h"
 #include "vectornav_msgs/msg/common_group.hpp"
 #include "geometry_msgs/msg/point.hpp"
@@ -32,6 +33,7 @@ public:
   explicit NavSatOdom(const rclcpp::NodeOptions&);
   ~NavSatOdom();
 
+  void diagnosticCallback(diagnostic_updater::DiagnosticStatusWrapper &stat);
 
 private:
 
