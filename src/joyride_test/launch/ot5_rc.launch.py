@@ -16,22 +16,39 @@ def generate_launch_description():
 
     bag_name = 'remote_control'
 
+
     return LaunchDescription([
 
         # ROSBAGGER
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('joyride_bringup'), 'launch'),
-            '/data_log_bringup.launch.py'
+            '/rosbag_recorder.launch.py'
             ]),
             launch_arguments={'bag_name':bag_name}.items()
+        ),
+
+        # Minimal
+        IncludeLaunchDescription(
+            
+            PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('joyride_bringup'), 'launch'),
+            '/joyride_minimal.launch.py'
+            ])
+        ),
+
+        # Vel Preprocess
+        Node(
+            package='joyride_control',
+            executable='velocity_preprocessor',
+            name='vel_node',
         ),
 
         # Joystick
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('joyride_bringup'), 'launch'),
-            '/joystick.launch.py'
+            get_package_share_directory('joyride_hmi'), 'launch'),
+            '/joystick_bringup.launch.py'
         ])
     )
     ])

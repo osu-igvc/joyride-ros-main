@@ -10,7 +10,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
 
-    bag_name = 'teb_test'
+    bag_name = 'purepursuit_test'
 
     return LaunchDescription([
         
@@ -18,7 +18,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('joyride_bringup'), 'launch'),
-            '/data_log_bringup.launch.py'
+            '/rosbag_recorder.launch.py'
             ]),
             launch_arguments={'bag_name':bag_name}.items()
         ),
@@ -28,6 +28,7 @@ def generate_launch_description():
             PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('joyride_bringup'), 'launch'),
             '/navigation.launch.py']),
-            launch_arguments={'controller_type':'teb_config.yaml'}.items()
+        launch_arguments={'controller_type':'purepursuit_config.yaml'}.items()
+
         )
     ])
