@@ -13,6 +13,7 @@ find_package(std_msgs REQUIRED)
 find_package(ackermann_msgs REQUIRED)
 find_package(joyride_interfaces REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(diagnostic_updater REQUIRED)
 
 include_directories(include)
 
@@ -25,6 +26,7 @@ ament_target_dependencies(velocity_preprocessor
   geometry_msgs
   ackermann_msgs
   nav_msgs
+  diagnostic_updater
 )
 
 target_include_directories(velocity_preprocessor PUBLIC

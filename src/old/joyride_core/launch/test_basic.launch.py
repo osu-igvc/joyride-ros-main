@@ -41,7 +41,7 @@ def generate_launch_description():
     rosbagger_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
         get_package_share_directory('joyride_core'), 'launch'),
-        '/data_log_bringup.launch.py'
+        '/rosbag_recorder.launch.py'
         ])
     )
 
