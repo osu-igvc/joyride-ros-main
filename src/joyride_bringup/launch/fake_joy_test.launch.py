@@ -31,7 +31,7 @@ def generate_launch_description():
 
         # Vel Preprocess
         Node(
-            package='joyride_control',
+            package='joyride_control_py',
             executable='velocity_preprocessor',
             name='vel_node',
         ),

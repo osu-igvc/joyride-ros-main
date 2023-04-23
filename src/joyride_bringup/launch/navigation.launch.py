@@ -57,7 +57,7 @@ def generate_launch_description():
 
         # Control
         Node(
-            package='joyride_control',
+            package='joyride_control_py',
             executable='vel_preprocess_node',
             name='vel_node',
         ),
