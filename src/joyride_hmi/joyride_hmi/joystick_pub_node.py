@@ -1,7 +1,10 @@
 import rclpy
 from sensor_msgs.msg import Joy
 from rclpy.node import Node
+from diagnostic_msgs.msg import DiagnosticStatus
+from diagnostic_updater import Updater
 
+import time
 import pygame
 from pygame.locals import *
        
@@ -11,7 +14,12 @@ class JoystickPub(Node):
         super().__init__('joy_pub')     # Initilize the node with proper name (does not have to be the same as the class name)
 
         # Initilizing pygame's joystick module
-        pygame.joystick.init()     
+        pygame.joystick.quit()
+        pygame.joystick.init()
+        self.stick = None
+        if pygame.joystick.get_count() == 0:
+            return
+
         # Connecting to joystick (if there is more than 1 you would change it from 0th). 
         self.stick = pygame.joystick.Joystick(0)    
         
@@ -39,28 +47,55 @@ class JoystickPub(Node):
     
      # Every time an event occurs this loop will determine if it is a button or axis motion 
      # and will assign values according to its state
-    def update(self):      
-        for event in pygame.event.get():
-            if event.type == pygame.JOYBUTTONDOWN:      
-                self.msg.buttons[event.button] = 1
-            elif event.type == pygame.JOYBUTTONUP:
-                self.msg.buttons[event.button] = 0
+    def update(self):
+        if pygame.joystick.get_count() == 0:
+            self.reinitialize_joystick()
+            
+        else:  
+            for event in pygame.event.get():
+                if event.type == pygame.JOYBUTTONDOWN:      
+                    self.msg.buttons[event.button] = 1
+                elif event.type == pygame.JOYBUTTONUP:
+                    self.msg.buttons[event.button] = 0
 
-                if event.button == 9: # options button
-                 self.stick.rumble(0.3, 1.0, 1000)
-
-                    
-            elif event.type == pygame.JOYAXISMOTION:
-                self.msg.axes[event.axis] = event.value
+                    if event.button == 9: # options button
+                        self.stick.rumble(0.3, 1.0, 1000)
+     
+                elif event.type == pygame.JOYAXISMOTION:
+                    self.msg.axes[event.axis] = event.value
 
         self.updateHeader()    #Updates the header each time update runs and outputs 
         self.publisher.publish(self.msg)    # Publishes values each time update runs
+
+    def reinitialize_joystick(self):
+        pygame.joystick.quit()
+        pygame.joystick.init()
+        if pygame.joystick.get_count() > 0:
+            self.stick = pygame.joystick.Joystick(0)
+            self.stick.init()
+            self.msg.axes = [float(0)] * self.stick.get_numaxes()
+            self.msg.buttons = [0] * (self.stick.get_numbuttons())
+    
+    def diagnostic(self, stat):
+        if pygame.joystick.get_count() == 0:
+            stat.summary(DiagnosticStatus.ERROR, "No joystick connected")
+        else:
+            stat.summary(DiagnosticStatus.OK, "Joystick Connected")
+        return stat
 
 
 def main():
     pygame.init()       # Initilize pygame before anything else
     rclpy.init()        # Initilize rclpy 
     joy_pub = JoystickPub()
+    while joy_pub.stick == None:
+        joy_pub = JoystickPub()
+        time.sleep(0.5)
+    
+
+    updater = Updater(joy_pub)
+    updater.setHardwareID("joystick")
+    updater.add("/utility/joystick", joy_pub.diagnostic)
 
     # Spin node; runs node until keyboard interrupts such as crtl + c
     # This section needs to be changed to allow timeouts to shutdown the program 
