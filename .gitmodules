@@ -4,3 +4,6 @@
 [submodule "src/joyride_ros2_socketcan"]
 	path = src/joyride_ros2_socketcan
 	url = https://github.com/osu-igvc/joyride_ros2_socketcan
+[submodule "src/joyride_vectornav"]
+	path = src/joyride_vectornav
+	url = https://github.com/osu-igvc/joyride_vectornav
