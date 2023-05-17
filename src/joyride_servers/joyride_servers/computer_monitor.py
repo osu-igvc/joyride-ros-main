@@ -16,7 +16,7 @@ class ComputerStatusMonitor(Node):
         self.period = 1.0 / self.frequency
         self.diagnostic_topic = self.declare_parameter('diagnostic_topic', '/diagnostics').get_parameter_value().string_value
 
-
+        self.cpu_warning_temperature = self.declare_parameter('cpu_warning_temperature', 80).get_parameter_value().integer_value
         self.cpu_warning_percentage = self.declare_parameter('cpu_warning_percentage', 90).get_parameter_value().integer_value
         self.cpu_diagnostic_name = self.declare_parameter('cpu_diagnostic_name', '/utility/cpu').get_parameter_value().string_value
         self.cpu_hardware_id = str(self.declare_parameter('cpu_hardware_id', 0xf0).get_parameter_value().integer_value)
@@ -40,9 +40,17 @@ class ComputerStatusMonitor(Node):
 
         return [avg(cpu_percentages) for cpu_percentages in zip(*self.cpu_readings)]
     
+    def get_cpu_temperature(self):
+        try:
+            return psutil.sensors_temperatures()['coretemp'][0].current
+        except:
+            self.get_logger().error(str(psutil.sensors_temperatures()))
+            return float('nan')
+    
     def updateStatuses(self):
         self.updateCPUStatus()
         self.updateRAMStatus()
+
 
     def updateCPUStatus(self):
         self.cpu_readings.append(psutil.cpu_percent(percpu=True))
@@ -50,14 +58,20 @@ class ComputerStatusMonitor(Node):
         cpu_average = sum(cpu_percents) / len(cpu_percents)
         cpuStatus = DiagnosticStatus(name=self.cpu_diagnostic_name, hardware_id=self.cpu_hardware_id)
 
+        cpuStatus.values.append(KeyValue(key='CPU Temperature', value='{:.2f}'.format(self.get_cpu_temperature())))
         cpuStatus.values.append(KeyValue(key='CPU Load Average', value='{:.2f}'.format(cpu_average)))
 
         if cpu_average > self.cpu_warning_percentage:
             cpuStatus.level = DiagnosticStatus.WARN
             cpuStatus.message = 'CPU usage exceeds {:d} percent'.format(self.cpu_warning_percentage)
+        
+        elif self.get_cpu_temperature() > self.cpu_warning_temperature:
+            cpuStatus.level = DiagnosticStatus.WARN
+            cpuStatus.message = 'CPU temperature exceeds {:d} degrees'.format(self.cpu_warning_temperature)
+
         else:
             cpuStatus.level = DiagnosticStatus.OK
-            cpuStatus.message = 'CPU Average {:.2f} percent'.format(cpu_average)
+            cpuStatus.message = f"CPU: {cpu_average:.2f}%, {self.get_cpu_temperature():.2f}°C"
 
         self.cpuStatus = cpuStatus
 
