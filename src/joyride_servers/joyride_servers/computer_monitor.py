@@ -1,4 +1,4 @@
-
+import GPUtil
 import psutil
 import collections
 
@@ -25,14 +25,21 @@ class ComputerStatusMonitor(Node):
         self.ram_diagnostic_name = self.declare_parameter('ram_diagnostic_name', '/utility/ram').get_parameter_value().string_value
         self.ram_hardware_id = str(self.declare_parameter('ram_hardware_id', 0xf1).get_parameter_value().integer_value)
 
+        self.gpu_warning_temperature = self.declare_parameter('gpu_warning_temperature', 80).get_parameter_value().integer_value
+        self.gpu_warning_percentage = self.declare_parameter('gpu_warning_percentage', 90).get_parameter_value().integer_value
+        self.gpu_diagnostic_name = self.declare_parameter('gpu_diagnostic_name', '/utility/gpu').get_parameter_value().string_value
+        self.gpu_hardware_id = str(self.declare_parameter('gpu_hardware_id', 0xf2).get_parameter_value().integer_value)
+
         self.update_timer = self.create_timer(self.period, self.publishDiagnostics_Callback)
         self.diagnostic_pub = self.create_publisher(DiagnosticArray, self.diagnostic_topic, 1)
 
         self.cpu_readings = collections.deque(maxlen=1)
         self.ram_readings = collections.deque(maxlen=1)
+        self.gpu_readings = collections.deque(maxlen=1)
 
         self.cpuStatus = None
-    
+        self.gpuStatus = None
+        
     # From diagnostics noetic-devel branch, diagnostics_common
     def get_average_cpu_readings(self):
         def avg(lst):
@@ -44,12 +51,27 @@ class ComputerStatusMonitor(Node):
         try:
             return psutil.sensors_temperatures()['coretemp'][0].current
         except:
-            self.get_logger().error(str(psutil.sensors_temperatures()))
+            # self.get_logger().error(f"CPU Temp: {(psutil.sensors_temperatures())}")
+            return float('nan')
+    
+    def get_gpu_percentage(self):
+        try:
+            return GPUtil.getGPUs()[0].load
+        except:
+            # self.get_logger().error(f"GPU Load: {GPUtil.getGPUs()}")
+            return float('nan')
+    
+    def get_gpu_temperature(self):
+        try:
+            return GPUtil.getGPUs()[0].temperature
+        except:
+            # self.get_logger().error(f"GPU Temp: {GPUtil.getGPUs()}")
             return float('nan')
     
     def updateStatuses(self):
         self.updateCPUStatus()
         self.updateRAMStatus()
+        self.updateGPUStatus()
 
 
     def updateCPUStatus(self):
@@ -92,6 +114,29 @@ class ComputerStatusMonitor(Node):
 
         self.ramStatus = newRAMStatus
     
+    def updateGPUStatus(self):
+        gpu_percentage = self.get_gpu_percentage()
+        gpu_temperature = self.get_gpu_temperature()
+
+        newGPUStatus = DiagnosticStatus(name=self.gpu_diagnostic_name, hardware_id=self.gpu_hardware_id)
+
+        newGPUStatus.values.append(KeyValue(key='GPU Temperature', value='{:.2f}'.format(gpu_temperature)))
+        newGPUStatus.values.append(KeyValue(key='GPU Load Average', value='{:.2f}'.format(gpu_percentage)))
+
+        if gpu_percentage > self.gpu_warning_percentage:
+            newGPUStatus.level = DiagnosticStatus.WARN
+            newGPUStatus.message = 'GPU usage exceeds {:d} percent'.format(self.gpu_warning_percentage)
+        
+        elif gpu_temperature > self.gpu_warning_temperature:
+            newGPUStatus.level = DiagnosticStatus.WARN
+            newGPUStatus.message = 'GPU temperature exceeds {:d} degrees'.format(self.gpu_warning_temperature)
+
+        else:
+            newGPUStatus.level = DiagnosticStatus.OK
+            newGPUStatus.message = f"GPU: {gpu_percentage:.2f}%, {gpu_temperature:.2f}°C"
+
+        self.gpuStatus = newGPUStatus
+    
     def publishDiagnostics_Callback(self):
         
         self.updateStatuses()
@@ -102,6 +147,9 @@ class ComputerStatusMonitor(Node):
         
         if self.ramStatus is not None:
             diagArray.status.append(self.ramStatus)
+
+        if self.gpuStatus is not None:
+            diagArray.status.append(self.gpuStatus)
 
         diagArray.header.stamp = self.get_clock().now().to_msg()
 
