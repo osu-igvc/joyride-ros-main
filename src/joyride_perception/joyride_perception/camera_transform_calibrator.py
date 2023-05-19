@@ -24,6 +24,9 @@ import operator
 # Fit mapping to points
 # - Implement validation step?
 
+def nothing(x):
+    pass
+
 class PointXYZ():
     def __init__(self, x, y, z):
         self.x = x
@@ -71,6 +74,8 @@ def yDistanceFunction(OPTICAL_UV, a, b, c, d, e, f, g):
     return a + b*u + c*v + d*u*v + e*np.power(v, 2) + f*u*np.power(v, 2) + g*np.power(v,3)
 
 class OpticalTransformCalibrator(Node):
+
+    
     def __init__(self):
         super().__init__('optical_transform_calibrator')
         self.world_data_file = self.declare_parameter('data', 'test_xyz_data.csv').get_parameter_value().string_value
@@ -78,13 +83,25 @@ class OpticalTransformCalibrator(Node):
         self.world_data = np.loadtxt(self.world_data_file, delimiter=',', dtype=float)
 
         self.paused = False
-        self.CALIBRATION_OFFSET = [70, 22, -20] # XYZ distance from camera to bottom left point
+        self.CALIBRATION_OFFSET = [99, 43.5, -42.75] # XYZ distance from camera to bottom left point -> Testing:  99, 43.5, -42.75 in
         self.REMOVE_RADIUS = 10
-        self.GRID_WIDTH = 3
-        self.GRID_HEIGHT = 3
-        self.GRID_SPACING = 1 #9*2.54 # cm
+        self.GRID_WIDTH = 8
+        self.GRID_HEIGHT = 8
+        self.GRID_SPACING = 12 # in
 
         self.WORLD_POINTS = []
+
+        self.sliderWindowName = "HSV Slider"
+        self.lowH = cv2.getTrackbarPos('lowH', self.sliderWindowName)
+        self.owS = cv2.getTrackbarPos('lowS', self.sliderWindowName)
+        self.lowV = cv2.getTrackbarPos('lowV', self.sliderWindowName)
+        self.highH = cv2.getTrackbarPos('highH', self.sliderWindowName)
+        self.highS = cv2.getTrackbarPos('highS', self.sliderWindowName)
+        self.highV = cv2.getTrackbarPos('highV', self.sliderWindowName)
+
+        self.minArea = cv2.getTrackbarPos('minArea', self.sliderWindowName)
+        self.point_list = None
+
         
         # for i in range (0, self.GRID_WIDTH):
         #     for j in range(0, self.GRID_HEIGHT):
@@ -96,7 +113,7 @@ class OpticalTransformCalibrator(Node):
 
         print(self.WORLD_POINTS)
 
-        self.image_topic = self.declare_parameter('image', 'image_raw').get_parameter_value().string_value
+        self.image_topic = self.declare_parameter('image', '/sensors/cameras/center/image').get_parameter_value().string_value
         self.subscription = self.create_subscription(Image, self.image_topic, self.handleNewImage, 1)
 
         self.cv_bridge = CvBridge()
@@ -105,24 +122,30 @@ class OpticalTransformCalibrator(Node):
         
 
     def handleNewImage(self, msg:Image):
-            image = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-            image_detect = self.maskYellow(image)
+        #np_arr = np.fromstring(msg.data, np.uint8)
+        #image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+        image = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        image_detect = self.maskYellow(image)
+
+        image_detect = cv2.dilate(image_detect, (1,1), iterations=2)
+        image_detect = cv2.erode(image_detect, (1,1), iterations=2)
+        
+        point_list = self.detectYellowPoints(image_detect)
+        image_marked = self.drawYellowPoints(image, point_list)
+        
+        if self.paused:
+            cv2.imshow("Frame", self.image_marked)
             
-            point_list = self.detectYellowPoints(image_detect)
-            image_marked = self.drawYellowPoints(image, point_list)
-            
-            if self.paused:
-                cv2.imshow("Frame", self.image_marked)
-                
-                if cv2.waitKey(1) == ord(' '):
-                    correlatedPoints = self.correlatePoints()
-                    self.curvefitPoints(correlatedPoints)
-            else:
-                self.image_unmarked = image
-                self.image_marked = image_marked
-                self.point_list = point_list
-                cv2.imshow("Frame", self.image_marked)
-                cv2.waitKey(1)
+            if cv2.waitKey(1) == ord(' '):
+                correlatedPoints = self.correlatePoints()
+                self.curvefitPoints(correlatedPoints)
+        else:
+            self.image_unmarked = image
+            self.image_marked = image_marked
+            self.point_list = point_list
+            cv2.imshow("Frame", self.image_marked)
+            cv2.imshow("Mask", image_detect)
+            cv2.waitKey(1)
 
     # ----------- GUI ----------- #
     def mouseClick(self, event, x, y, flags, params):
@@ -143,6 +166,8 @@ class OpticalTransformCalibrator(Node):
                 self.paused = False
             else:
                 self.paused = True
+        
+            #print('Grid points: {}, Optical points: {}'.format(len(self.WORLD_POINTS), len(self.point_list)))
             
         pass
 
@@ -170,8 +195,10 @@ class OpticalTransformCalibrator(Node):
 
         A = np.transpose([np.ones_like(U), U, U**2, U**3, V, V**2, V**3, U*V, U*V**2, U**2*V])
         res_x = lsq_linear(A, X)
+        print("X HERE:\n")
         print(res_x)
         res_y = lsq_linear(A, Y)
+        print("Y HERE:\n")
         print(res_y)
 
         self.X_params = res_x.x
@@ -189,10 +216,10 @@ class OpticalTransformCalibrator(Node):
             #print(opticalSorted)
 
             groupedPoints = np.array([[p.u, p.v] for p in opticalSorted])
-            #print(groupedPoints)
+            #print(groupedPoints.shape)
 
             # TODO Remove hardcoding here
-            groupedPoints = groupedPoints.reshape(3,3,2)
+            groupedPoints = groupedPoints.reshape(int(np.sqrt(len(self.WORLD_POINTS))), int(np.sqrt(len(self.WORLD_POINTS))),2)
             #print(groupedPoints)
             arrangedPoints = np.array([])
             for row in groupedPoints:
@@ -200,7 +227,7 @@ class OpticalTransformCalibrator(Node):
                 row = row[row[:, 1].argsort()[::-1]]
                 arrangedPoints = np.append(arrangedPoints, row)
             
-            sortedVals = arrangedPoints.reshape(9, 2)
+            sortedVals = arrangedPoints.reshape(len(self.WORLD_POINTS), 2)
             print(sortedVals)
 
             # World is already sorted
@@ -235,9 +262,10 @@ class OpticalTransformCalibrator(Node):
         self.image_marked = self.drawYellowPoints(self.image_unmarked, self.point_list)
     
     def maskYellow(self, frame):
+        self.updateSliderValues()
         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        lower_yellow = np.array([20, 100, 100])
-        upper_yellow = np.array([30, 255, 255])
+        lower_yellow = np.array([self.lowH, self.lowS, self.lowV])
+        upper_yellow = np.array([self.highH, self.highS, self.highV])
         yellow_mask = cv2.inRange(hsv_frame, lower_yellow, upper_yellow)
         return yellow_mask
 
@@ -247,7 +275,7 @@ class OpticalTransformCalibrator(Node):
 
         for contour in contours:
             area = cv2.contourArea(contour)
-            if area > 100:  # set a threshold for minimum blob area
+            if area > self.minArea:  # set a threshold for minimum blob area
                 x, y, w, h = cv2.boundingRect(contour)
                 M = cv2.moments(contour)
                 if M["m00"] != 0:
@@ -257,21 +285,47 @@ class OpticalTransformCalibrator(Node):
                     centers.append(newPoint)
                 else:
                     cX, cY = 0, 0
-        
+        self.point_list = centers
         return centers
 
     def drawYellowPoints(self, image, points):
         new_image = image.copy()
         for p in points:
             cv2.circle(new_image, (p.u, p.v), radius=5, color=(0, 255, 0), thickness = -1)
-            cv2.putText(new_image, "uv:({},{})".format(p.u, p.v), (p.u-20, p.v-20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-
+            #cv2.putText(new_image, "uv:({},{})".format(p.u, p.v), (p.u-20, p.v-20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 2)
+        cv2.putText(new_image, "Num points: {}, {}".format(len(self.WORLD_POINTS), len(points)), (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 2)
         return new_image
+    
+    def uvToXYZ(self, uv):
+        focalLength = 3.04 # in mm need to get from camera
+        sensorWidth = 33 # in mm need to get from camera
+        sensorHeight = 24 # in mm need to get from camera
+        distanceToCamera = 2684.78 # in mm from hypotenuse from getting 97x42 in^2
+        angle = np.tan(42.0/97.0)
 
+    def createSlider(self):
+        cv2.namedWindow(self.sliderWindowName)
+        cv2.createTrackbar('lowH', self.sliderWindowName, 41, 255, nothing)
+        cv2.createTrackbar('lowS', self.sliderWindowName, 38, 255, nothing)
+        cv2.createTrackbar('lowV', self.sliderWindowName, 143, 255, nothing)
+        cv2.createTrackbar('highH', self.sliderWindowName, 80, 255, nothing)
+        cv2.createTrackbar('highS', self.sliderWindowName, 255, 255, nothing)
+        cv2.createTrackbar('highV', self.sliderWindowName, 255, 255, nothing)
+        cv2.createTrackbar('minArea', self.sliderWindowName, 0, 150, nothing)
+
+    def updateSliderValues(self):
+        self.lowH = cv2.getTrackbarPos('lowH', self.sliderWindowName)
+        self.lowS = cv2.getTrackbarPos('lowS', self.sliderWindowName)
+        self.lowV = cv2.getTrackbarPos('lowV', self.sliderWindowName)
+        self.highH = cv2.getTrackbarPos('highH', self.sliderWindowName)
+        self.highS = cv2.getTrackbarPos('highS', self.sliderWindowName)
+        self.highV = cv2.getTrackbarPos('highV', self.sliderWindowName)
+        self.minArea = cv2.getTrackbarPos('minArea', self.sliderWindowName)
 
 def main(args=None):
     rclpy.init(args=args)
     calib = OpticalTransformCalibrator()
+    calib.createSlider()
     rclpy.spin(calib)
     rclpy.shutdown()
 
