@@ -23,6 +23,7 @@
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include "joyride_interfaces/srv/get_odom_origin_ll.hpp"
+#include "std_srvs/srv/trigger.hpp"
 
 namespace joyride_odometry
 {
@@ -64,6 +65,8 @@ private:
   double llDistance(double lat1, double lon1, double lat2, double lon2);
   
   void getInitialLLCallback(const std::shared_ptr<joyride_interfaces::srv::GetOdomOriginLL::Request> request, std::shared_ptr<joyride_interfaces::srv::GetOdomOriginLL::Response> response);
+  void resetOdomCallback(const std::shared_ptr<std_srvs::srv::Trigger::Request> request, std::shared_ptr<std_srvs::srv::Trigger::Response> response);
+
 
   // Last Measured State
   vectornav_msgs::msg::CommonGroup::SharedPtr initialLLA_fix_;
@@ -77,6 +80,7 @@ private:
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odomPub_;
   rclcpp::TimerBase::SharedPtr publishOdometryTimer_;
   rclcpp::Service<joyride_interfaces::srv::GetOdomOriginLL>::SharedPtr getOdomOriginLLService_;
+  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr resetOdomService_;
 
   // TF2
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
@@ -101,69 +105,6 @@ private:
   bool broadcast_cartesian_tf_;
   bool broadcast_odom_;
   bool use_fake_odom_;
-
-  // void gpsFixCallback(const sensor_msgs::msg::NavSatFix::SharedPtr msg);
-  // void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
-  // void odomCallback();
-  // void updateTF(const vectornav_msgs::msg::CommonGroup::SharedPtr msg);
-  // void cmdVelCallback(const geometry_msgs::msg::Twist::SharedPtr msg);
-  // void gpsCommonCallback(const vectornav_msgs::msg::CommonGroup::SharedPtr msg);
-
-
-
-
-
-
-  // // Helpers
-  
-  // double llDistance(double lat1, double lon1, double lat2, double lon2);
-
-
-  // // Variables
-  // geometry_msgs::msg::TransformStamped buildOdomTF(double x, double y, double z,
-  //                                                  geometry_msgs::msg::Quaternion orientation, std::string frame_id,
-  //                                                  std::string child_frame_id);
-
-  // nav_msgs::msg::Odometry buildOdomMsg(double x, double y, double z, double v_x, double v_y, double v_z, double angular_z, geometry_msgs::msg::Quaternion orientation,
-  //                                      std::string frame_id, std::string child_frame_id);
-
-  // // Subscribers
-  // rclcpp::Subscription<sensor_msgs::msg::NavSatFix>::SharedPtr navSatSub_;
-  // rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imuSub_;
-  // rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmdVelSub_;
-  // rclcpp::Subscription<vectornav_msgs::msg::CommonGroup>::SharedPtr gpsCommonSub_;
-
-  // // Publishers
-  // rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odomPub_;
-
-  // // Timers
-  // rclcpp::TimerBase::SharedPtr odomTimer_;
-
-
-  // // Parameters
-  // std::string base_link_frame_id_;
-  // std::string world_frame_id_;
-  // std::string navsat_sub_topic_;
-  // std::string imu_sub_topic_;
-  // std::string odom_pub_topic_;
-
-  // bool broadcast_cartesian_tf_;
-  // bool broadcast_odom_;
-  // bool use_fake_odom_;
-
-  // double fake_pos_x;
-  // double fake_pos_y;
-  // double fake_yaw_;
-  // double last_cmd_linx_;
-  // double last_cmd_angz_;
-  // double tf_frequency_;
-  // double tf_period_;
-
-  // double expected_lat_;
-  // double expected_lon_;
-  // double initial_ll_radius_;
-
-  // State
 
 };
 

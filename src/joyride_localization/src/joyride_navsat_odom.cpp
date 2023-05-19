@@ -121,6 +121,8 @@ void NavSatOdom::initializeROS()
     this->publishOdometryTimer_ = this->create_wall_timer(std::chrono::milliseconds(int(1000 * tf_period_)), std::bind(&NavSatOdom::publishOdometryCallback, this));
 
     this->getOdomOriginLLService_ = this->create_service<joyride_interfaces::srv::GetOdomOriginLL>("getInitialLL", std::bind(&NavSatOdom::getInitialLLCallback, this, std::placeholders::_1, std::placeholders::_2));
+    this->resetOdomService_ = this->create_service<std_srvs::srv::Trigger>("resetOdom", std::bind(&NavSatOdom::resetOdomCallback, this, std::placeholders::_1, std::placeholders::_2));
+    
     // Initialize pointers
     this->last_position_ = std::make_shared<geometry_msgs::msg::Point>();
     this->last_velocity_ = std::make_shared<geometry_msgs::msg::Twist>();
@@ -139,12 +141,16 @@ void NavSatOdom::initializeROS()
             std::bind(&NavSatOdom::gpsCommonCallback, this, std::placeholders::_1));
 
     }
-    //RCLCPP_INFO(this->get_logger(), "End init ROS");
 
 }
 
-// newGPSCommonCallback
-// - Callback for GPS Common message
+void NavSatOdom::resetOdomCallback(const std::shared_ptr<std_srvs::srv::Trigger::Request> request, std::shared_ptr<std_srvs::srv::Trigger::Response> response)
+{
+    // Reset valid fix. This will cause next message to act as if new fix was obtained.
+    this->valid_fix_obtained_ = false;
+    RCLCPP_INFO(this->get_logger(), "Resetting Odometry LTP");
+
+}
 
 void NavSatOdom::gpsCommonCallback(const vectornav_msgs::msg::CommonGroup::SharedPtr msg)
 {
@@ -161,17 +167,13 @@ void NavSatOdom::gpsCommonCallback(const vectornav_msgs::msg::CommonGroup::Share
 
         if(distance <= this->initial_ll_radius_)
         {
-            //RCLCPP_INFO(this->get_logger(), "Valid FIX");
+            RCLCPP_INFO(this->get_logger(), "Valid GPS Fix Obtained");
 
             // Accept initial pose.
             this->initialLLA_fix_ = msg;
-            //RCLCPP_INFO(this->get_logger(), "INterim");
-
             this->local_cartesian_plane_ = GeographicLib::LocalCartesian(initialLLA_fix_->position.x, initialLLA_fix_->position.y, 0.0);
             this->valid_fix_obtained_ = true;
             this->updateTransform(msg);
-            //RCLCPP_INFO(this->get_logger(), "First transform!");
-
         }
     }
     else {
@@ -183,7 +185,6 @@ void NavSatOdom::gpsCommonCallback(const vectornav_msgs::msg::CommonGroup::Share
 // Update measurements 
 void NavSatOdom::updateTransform(const vectornav_msgs::msg::CommonGroup::SharedPtr msg)
 {
-    //RCLCPP_INFO(this->get_logger(), "Updating TF");
 
     // Heads up!
     /*
@@ -194,21 +195,19 @@ void NavSatOdom::updateTransform(const vectornav_msgs::msg::CommonGroup::SharedP
         quaternion: orientation in NED.
         position: position in lat, lon, alt
         velocity: velocity in NED (this is important! ROS wants Odom velocity in body frame)
+        angular rates: in body frame (which is transformed to be equivalent to vehicle frame)
     */
 
     // Update position
     double lat = msg->position.x;
     double lon = msg->position.y;
-    //RCLCPP_INFO(this->get_logger(), "pre forward");
 
     double newX, newY, newZ;
     this->local_cartesian_plane_.Forward(lat, lon, 0.0, newX, newY, newZ);
-    //RCLCPP_INFO(this->get_logger(), "post fowrad");
 
     this->last_position_->x = newX;
     this->last_position_->y = newY;
     this->last_position_->z = newZ;
-    //RCLCPP_INFO(this->get_logger(), "Update mid1");
 
     // Update yaw (in odom frame)
     double yaw = (90.0 - msg->yawpitchroll.x) * M_PI / 180.0; // Respect to East (rather than North), Convert to radians
@@ -239,10 +238,6 @@ void NavSatOdom::updateTransform(const vectornav_msgs::msg::CommonGroup::SharedP
     this->last_orientation_->y = yawQuat.y();
     this->last_orientation_->z = yawQuat.z();
     this->last_orientation_->w = yawQuat.w();
-
-    //RCLCPP_INFO(this->get_logger(), "Updating done");
-
-
 }
 
 void NavSatOdom::diagnosticCallback(diagnostic_updater::DiagnosticStatusWrapper &stat)
@@ -292,8 +287,6 @@ geometry_msgs::msg::TransformStamped NavSatOdom::buildOdometryTransform(const ge
 void NavSatOdom::publishOdometryCallback()
 {
 
-    //TODO Reimplement fake odom
-
     if(this->valid_fix_obtained_) {
         //RCLCPP_INFO(this->get_logger(), "Attempting publish");
 
@@ -303,8 +296,6 @@ void NavSatOdom::publishOdometryCallback()
 
         odom_broadcaster_.sendTransform(odomTF);
         odomPub_->publish(odomMsg);
-        //RCLCPP_INFO(this->get_logger(), "Done publishing");
-
     }
 }
 

@@ -20,6 +20,7 @@ find_package(diagnostic_msgs REQUIRED)
 find_package(diagnostic_updater REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(ackermann_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "/usr/share/cmake/geographiclib/")
 find_package(GeographicLib REQUIRED)
@@ -60,6 +61,7 @@ ament_target_dependencies(navsat_odom
   diagnostic_msgs
   diagnostic_updater
   joyride_interfaces
+  std_srvs
   tf2_geometry_msgs)
 
 ament_target_dependencies(fake_odom
