@@ -44,8 +44,8 @@ def generate_launch_description():
         # Static transforms
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('joyride_core'), 'launch'),
-            '/static_transforms.launch.py'
+            get_package_share_directory('joyride_bringup'), 'launch'),
+            '/joyride_transforms.launch.py'
             ])
         ),
 
