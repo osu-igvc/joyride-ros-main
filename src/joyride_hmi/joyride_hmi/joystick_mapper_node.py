@@ -74,15 +74,15 @@ class JoystickSub(Node):
 
         # Mapping Constants
         self.VEL_LIN_MAX = 1.5
-        self.VEL_LIN_MIN = 0.0
+        self.VEL_LIN_MIN = -1.5
         self.VEL_LPF_ALPHA = 0.3
-        self.VEL_DEADZONE = 0.15
+        self.VEL_DEADZONE = 0.1
         self.vel_lin_prev = 0
 
 
         self.VEL_ANG_MAX = 0.585 # (2.3m/s)/(1.75m wheelbase) * tan(24deg max wheel angle) = angZ
         self.VEL_ANG_MIN = -0.585 
-        self.VEL_ANG_LPF_ALPHA = 0.3
+        self.VEL_ANG_LPF_ALPHA = 0.7
         self.VEL_ANG_DEADZONE = 0.05
         self.vel_ang_prev = 0
 
