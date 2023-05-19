@@ -28,6 +28,7 @@
 #include "joyride_localization/joyride_navsat_odom.hpp"
 #include <cmath>
 #include "rclcpp/time.hpp"
+#include "joyride_interfaces/srv/get_odom_origin_ll.hpp"
 
 
 using namespace std::chrono_literals;
@@ -92,6 +93,22 @@ void NavSatOdom::initializeParameters()
 
 }
 
+void NavSatOdom::getInitialLLCallback(const std::shared_ptr<joyride_interfaces::srv::GetOdomOriginLL::Request> request, std::shared_ptr<joyride_interfaces::srv::GetOdomOriginLL::Response> response)
+{
+    response->is_valid = this->valid_fix_obtained_;
+    
+    if(this->initialLLA_fix_ != nullptr)
+    {
+        response->latitude = this->initialLLA_fix_->position.x;
+        response->longitude = this->initialLLA_fix_->position.y;
+    }
+    else
+    {
+        response->latitude = 0.0;
+        response->longitude = 0.0;
+    }
+}
+
 void NavSatOdom::initializeROS()
 {
     //RCLCPP_INFO(this->get_logger(), "Init ROS");
@@ -103,6 +120,7 @@ void NavSatOdom::initializeROS()
     this->odomPub_ = this->create_publisher<nav_msgs::msg::Odometry>(this->odom_pub_topic_, 10);
     this->publishOdometryTimer_ = this->create_wall_timer(std::chrono::milliseconds(int(1000 * tf_period_)), std::bind(&NavSatOdom::publishOdometryCallback, this));
 
+    this->getOdomOriginLLService_ = this->create_service<joyride_interfaces::srv::GetOdomOriginLL>("getInitialLL", std::bind(&NavSatOdom::getInitialLLCallback, this, std::placeholders::_1, std::placeholders::_2));
     // Initialize pointers
     this->last_position_ = std::make_shared<geometry_msgs::msg::Point>();
     this->last_velocity_ = std::make_shared<geometry_msgs::msg::Twist>();

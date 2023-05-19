@@ -22,6 +22,7 @@
 #include "vectornav_msgs/msg/common_group.hpp"
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/twist.hpp"
+#include "joyride_interfaces/srv/get_odom_origin_ll.hpp"
 
 namespace joyride_odometry
 {
@@ -62,6 +63,7 @@ private:
   // Helpers
   double llDistance(double lat1, double lon1, double lat2, double lon2);
   
+  void getInitialLLCallback(const std::shared_ptr<joyride_interfaces::srv::GetOdomOriginLL::Request> request, std::shared_ptr<joyride_interfaces::srv::GetOdomOriginLL::Response> response);
 
   // Last Measured State
   vectornav_msgs::msg::CommonGroup::SharedPtr initialLLA_fix_;
@@ -74,6 +76,7 @@ private:
   rclcpp::Subscription<vectornav_msgs::msg::CommonGroup>::SharedPtr gpsCommonSub_;
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odomPub_;
   rclcpp::TimerBase::SharedPtr publishOdometryTimer_;
+  rclcpp::Service<joyride_interfaces::srv::GetOdomOriginLL>::SharedPtr getOdomOriginLLService_;
 
   // TF2
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;

@@ -29,6 +29,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   # Health/diagnostic Messages
   "msg/SystemDiagnosticSummary.msg"
   "srv/RequestAutoEnableDisable.srv"
+  "srv/GetOdomOriginLL.srv"
   DEPENDENCIES std_msgs
 )
 

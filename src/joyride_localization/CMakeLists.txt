@@ -59,6 +59,7 @@ ament_target_dependencies(navsat_odom
   vectornav_msgs
   diagnostic_msgs
   diagnostic_updater
+  joyride_interfaces
   tf2_geometry_msgs)
 
 ament_target_dependencies(fake_odom

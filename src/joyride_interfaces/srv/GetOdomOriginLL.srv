@@ -1,0 +1,5 @@
+
+---
+float32 latitude
+float32 longitude
+bool is_valid
