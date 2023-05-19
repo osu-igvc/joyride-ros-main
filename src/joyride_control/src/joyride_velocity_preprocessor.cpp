@@ -3,6 +3,7 @@
 
 using namespace std::chrono_literals;
 using namespace joyride_control;
+using namespace std;
 
 VelocityPreprocessor::VelocityPreprocessor(const rclcpp::NodeOptions &options) : Node("velocity_preprocessor", options)
 {
@@ -16,7 +17,7 @@ void VelocityPreprocessor::initializeParameters()
     this->declare_parameter("max_steering_angle_degrees", 30.0);
     this->declare_parameter("max_steering_angele_rads", 3.1415/6);
     this->declare_parameter("max_steering_velocity", 0.5);
-    this->delcare_parameter("min_steering_velocity", 2);
+    this->declare_parameter("min_steering_velocity", 2);
     this->declare_parameter("max_speed_mps_fow", 1.0);
     this->declare_parameter("max_speed_mps_rev", 0.5);
     this->declare_parameter("max_acceleration_mps2", 0.5);
@@ -150,7 +151,7 @@ void VelocityPreprocessor::newCMDVelCallback(const geometry_msgs::msg::Twist::Sh
     // Coefficiencts for steering speed mapping
     double phi_error_mid = steering_angle_change/2;
     this->COEFFS[0] = min(this->max_steering_velocity_radps_, phi_error_mid/(2*this->max_steering_angle_rads_) + this->min_steering_velocity_radps_);
-    this->COEFFS[1] = -log(this->min_steering_velocity_radps_/this->max_steering_velocity_radps_)/phi_error_mid^2;
+    this->COEFFS[1] = -log(this->min_steering_velocity_radps_/this->max_steering_velocity_radps_)/(phi_error_mid*phi_error_mid);
     this->COEFFS[2] = phi_error_mid;
 }
 

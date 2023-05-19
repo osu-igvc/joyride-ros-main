@@ -69,7 +69,7 @@ private:
     double LINEAR_X_ZERO_THRESHOLD = 0.05;
     double ANGULAR_Z_ZERO_THRESHOLD = 0.05;
     double STEERING_CHANGE_THRESHOLD_RAD = 0.05;
-    doulbe STEERING_LPF_ALPHA = 0.2;
+    double STEERING_LPF_ALPHA = 0.2;
 
 }; // class VelocityPreprocessor
 
