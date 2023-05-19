@@ -24,6 +24,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/AccessoriesGEMFeedback.msg"
   "msg/EPSPositionVelocityFeedback.msg"
   "msg/DriveByWireSystemInfo.msg"
+  "msg/VelocityState.msg"
 
   # Health/diagnostic Messages
   "msg/SystemDiagnosticSummary.msg"

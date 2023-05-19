@@ -78,6 +78,10 @@ class VelocityPreprocessor(Node):
         ackSpeed, ackAngle = self.computeAckermann(filteredLinX, filteredAngZ)
         ackSteerVel = self.steeringPControl(ackAngle, self.steer_angle_measured)
 
+        # Ignore jumps
+        if abs(ackAngle - self.prev_steer_angle) > 0.1 and abs(ackAngle) > 0.1:
+            ackAngle = self.prev_steer_angle
+
         self.publishAckermannDrive(ackSpeed, ackAngle, ackSteerVel)
 
     def steer_angle_fb_callback(self, msg:EPSPositionVelocityFeedback):

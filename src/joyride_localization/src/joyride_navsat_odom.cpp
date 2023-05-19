@@ -193,7 +193,8 @@ void NavSatOdom::updateTransform(const vectornav_msgs::msg::CommonGroup::SharedP
     //RCLCPP_INFO(this->get_logger(), "Update mid1");
 
     // Update yaw (in odom frame)
-    double yaw = (msg->yawpitchroll.x - 90.0) * -M_PI / 180.0; // Respect to East (rather than North), Convert to radians
+    double yaw = (90.0 - msg->yawpitchroll.x) * M_PI / 180.0; // Respect to East (rather than North), Convert to radians
+    
     tf2::Quaternion yawQuat;
     yawQuat.setRPY(0, 0, yaw);
 
@@ -201,8 +202,11 @@ void NavSatOdom::updateTransform(const vectornav_msgs::msg::CommonGroup::SharedP
     // Update linear velocity (body frame)
     double velNED_n = msg->velocity.x;
     double velNED_e = msg->velocity.y;
-    double velBody_x = sqrt(pow(velNED_n, 2) + pow(velNED_e, 2));
-    //RCLCPP_INFO(this->get_logger(), "Update mid2");
+    tf2::Vector3 velNED = tf2::Vector3(velNED_n, velNED_e, 0.0);
+    tf2::Vector3 yawNED = tf2::Vector3(cos(msg->yawpitchroll.x * M_PI/180.0), sin(msg->yawpitchroll.x * M_PI/180.0), 0.0);
+    double angle_diff = velNED.angle(yawNED);
+    double velBody_x = velNED.length();
+    bool dir = abs(angle_diff) > M_PI/2.0; // If angle between vectors greater than pi, we are travelling backwards
 
     
     // Update angular velocity (body frame)
@@ -211,9 +215,9 @@ void NavSatOdom::updateTransform(const vectornav_msgs::msg::CommonGroup::SharedP
     tf2::Vector3 angRateBody = tf2::quatRotate(quat, angRateNED);
     double angRateBody_z = -angRateBody.z(); // Invert yaw rate to match ROS convention
 
-    this->last_velocity_->linear.x = velBody_x;
+    this->last_velocity_->linear.x = dir ? -velBody_x : velBody_x;
     this->last_velocity_->angular.z = angRateBody_z;
-    this->last_orientation_->x = yawQuat.x(); // Probably not the best way to do this.
+    this->last_orientation_->x = yawQuat.x(); // Probably not the simplest way to do this.
     this->last_orientation_->y = yawQuat.y();
     this->last_orientation_->z = yawQuat.z();
     this->last_orientation_->w = yawQuat.w();
