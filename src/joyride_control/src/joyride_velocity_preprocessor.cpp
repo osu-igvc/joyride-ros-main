@@ -14,8 +14,13 @@ void VelocityPreprocessor::initializeParameters()
 {
     this->declare_parameter("pub_ackermann_rate", 10.0);
     this->declare_parameter("max_steering_angle_degrees", 30.0);
-    this->declare_parameter("max_speed_mps", 1.0);
+    this->declare_parameter("max_steering_angele_rads", 3.1415/6);
+    this->declare_parameter("max_steering_velocity", 0.5);
+    this->delcare_parameter("min_steering_velocity", 2);
+    this->declare_parameter("max_speed_mps_fow", 1.0);
+    this->declare_parameter("max_speed_mps_rev", 0.5);
     this->declare_parameter("max_acceleration_mps2", 0.5);
+    this->declare_parameter("max_decceleration_mps2", 0.5);
     this->declare_parameter("wheelbase_meters", 0.33);
     this->declare_parameter("odom_topic", "/odom");
     this->declare_parameter("cmd_vel_topic", "/cmd_vel");
@@ -23,8 +28,13 @@ void VelocityPreprocessor::initializeParameters()
 
     this->pub_ackermann_rate_ = this->get_parameter("pub_ackermann_rate").as_double();
     this->max_steering_angle_degrees_ = this->get_parameter("max_steering_angle_degrees").as_double();
-    this->max_speed_mps_ = this->get_parameter("max_speed_mps").as_double();
+    this->max_steering_angle_rads_ = this->get_parameter("max_steering_angle_rads").as_double();
+    this->max_steering_velocity_radps_ = this->get_parameter("max_steering_velocity").as_double();
+    this->min_steering_velocity_radps_ = this->get_parameter("min_steering_velocity").as_double();
+    this->max_speed_mps_fow_ = this->get_parameter("max_speed_mps_fow").as_double();
+    this->max_speed_mps_rev_ = this->get_parameter("max_speed_mps_rev").as_double();
     this->max_acceleration_mps2_ = this->get_parameter("max_acceleration_mps2").as_double();
+    this->max_decceleration_mps2_ = this->get_parameter("max_decceleration_mps2").as_double();
     this->wheelbase_meters_ = this->get_parameter("wheelbase_meters").as_double();
     this->odom_topic_ = this->get_parameter("odom_topic").as_string();
     this->cmd_vel_topic_ = this->get_parameter("cmd_vel_topic").as_string();
@@ -54,6 +64,13 @@ void VelocityPreprocessor::publishAckermann()
 // Using measurements and targets, compute command values that obey accel, vel limits
 void VelocityPreprocessor::updateAckermann()
 {
+    this->commanded_speed_ = max(min(this->target_speed_, this->current_speed_ + this->max_acceleration_mps2_),this->current_speed_ - this->max_decceleration_mps2_);
+    this->commanded_speed_ = max(min(this->commanded_speed_, this->max_speed_mps_fow_), this->max_speed_mps_rev_);
+
+    this->commanded_steering_angle_ = this->target_steering_angle_;
+    this->commanded_steering_velocity_ = this->COEFFS[0] * exp(-this->COEFFS[1]*pow(this->steering_angle_error_ - this->COEFFS[2],2));
+
+    /*
     // Update steering angle
     this->commanded_steering_angle_ = this->current_steering_angle_;
     this->commanded_steering_velocity_ = this->previous_steering_velocity_;
@@ -106,37 +123,35 @@ void VelocityPreprocessor::updateAckermann()
         {
             this->commanded_speed_ = this->target_speed_;
         }
-    }
+    } */
 }
 
 // Our targets from the motion controller or joystick. Prefiltered by velocity smoother.
 void VelocityPreprocessor::newCMDVelCallback(const geometry_msgs::msg::Twist::SharedPtr msg)
 {
-    if (abs(msg->linear.x) < ZERO_THRESHOLD || abs(msg->angular.z) < ZERO_THRESHOLD)
+    if (abs(msg->linear.x) < LINEAR_X_ZERO_THRESHOLD || abs(msg->angular.z) < ANGULAR_Z_ZERO_THRESHOLD)
     {
         this->target_speed_ = 0.0;
         this->target_steering_angle_ = this->current_steering_angle_; // Keep current steering angle
         return;
     }
 
-    // Limit speed
-    if(abs(msg->linear.x) > this->max_speed_mps_)
-    {
-        msg->linear.x = msg->linear.x > 0 ? this->max_speed_mps_ : -this->max_speed_mps_;
-    }
-
+    // Bound Speed
+    msg->linear.x = min(max(msg->linear.x, this->max_speed_mps_rev_), this->max_speed_mps_fow_);
     this->target_speed_ = msg->linear.x;
 
+    // Bounds and Deadbands on steering
     double new_steering_angle = atan2(this->wheelbase_meters_ * msg->angular.z, msg->linear.x);
+    double steering_angle_change = new_steering_angle - this->current_steering_angle_;
+    this->target_steering_angle_ = abs(steering_angle_change) > STEERING_CHANGE_THRESHOLD_RAD ? new_steering_angle : this->current_steering_angle_;
+    this->target_steering_angle_ = min(max(this->target_steering_angle_, -this->max_steering_angle_rads_), this->max_steering_angle_rads_);
+    this->steering_angle_error_ = this->target_steering_angle_ - this->commanded_steering_angle_;
 
-    // Only update steering angle if it is sufficiently different, to reduce chatter
-    if(abs(new_steering_angle - this->current_steering_angle_) < STEERING_CHANGE_THRESHOLD_RAD)
-    {
-        this->target_steering_angle_ = this->current_steering_angle_;
-    }
-    else {
-        this->target_steering_angle_ = new_steering_angle;
-    }
+    // Coefficiencts for steering speed mapping
+    double phi_error_mid = steering_angle_change/2;
+    this->COEFFS[0] = min(this->max_steering_velocity_radps_, phi_error_mid/(2*this->max_steering_angle_rads_) + this->min_steering_velocity_radps_);
+    this->COEFFS[1] = -log(this->min_steering_velocity_radps_/this->max_steering_velocity_radps_)/phi_error_mid^2;
+    this->COEFFS[2] = phi_error_mid;
 }
 
 // Measures speed and steering angle from GPS
