@@ -81,13 +81,15 @@ class OpticalTransformCalibrator(Node):
         self.world_data_file = self.declare_parameter('data', 'test_xyz_data.csv').get_parameter_value().string_value
 
         self.world_data = np.loadtxt(self.world_data_file, delimiter=',', dtype=float)
+        self.world_data = self.world_data - self.world_data[0]
 
         self.paused = False
-        self.CALIBRATION_OFFSET = [99, 43.5, -42.75] # XYZ distance from camera to bottom left point -> Testing:  99, 43.5, -42.75 in
+        self.CALIBRATION_OFFSET = [116, 50+19, -64.5] # XYZ distance from camera to bottom left point -> Testing:  99, 43.5, -42.75 in  
+        # to camera 64.5 , X: 116in Y: 50 // left/right camera Y: -/+19
         self.REMOVE_RADIUS = 10
-        self.GRID_WIDTH = 8
-        self.GRID_HEIGHT = 8
-        self.GRID_SPACING = 12 # in
+        self.GRID_WIDTH = 8 # along y
+        self.GRID_HEIGHT =  8 # along x
+        # self.GRID_SPACING = 12 # in 
 
         self.WORLD_POINTS = []
 
@@ -113,7 +115,7 @@ class OpticalTransformCalibrator(Node):
 
         print(self.WORLD_POINTS)
 
-        self.image_topic = self.declare_parameter('image', '/sensors/cameras/center/image').get_parameter_value().string_value
+        self.image_topic = self.declare_parameter('image', '/sensors/cameras/right/image').get_parameter_value().string_value
         self.subscription = self.create_subscription(Image, self.image_topic, self.handleNewImage, 1)
 
         self.cv_bridge = CvBridge()
@@ -124,14 +126,6 @@ class OpticalTransformCalibrator(Node):
     def handleNewImage(self, msg:Image):
         #np_arr = np.fromstring(msg.data, np.uint8)
         #image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-        image = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-        image_detect = self.maskYellow(image)
-
-        image_detect = cv2.dilate(image_detect, (1,1), iterations=2)
-        image_detect = cv2.erode(image_detect, (1,1), iterations=2)
-        
-        point_list = self.detectYellowPoints(image_detect)
-        image_marked = self.drawYellowPoints(image, point_list)
         
         if self.paused:
             cv2.imshow("Frame", self.image_marked)
@@ -140,6 +134,16 @@ class OpticalTransformCalibrator(Node):
                 correlatedPoints = self.correlatePoints()
                 self.curvefitPoints(correlatedPoints)
         else:
+            image = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+            image = cv2.flip(image,0)
+            image = cv2.flip(image,1)
+            image_detect = self.maskYellow(image)
+
+            image_detect = cv2.dilate(image_detect, (1,1), iterations=2)
+            image_detect = cv2.erode(image_detect, (1,1), iterations=2)
+            
+            point_list = self.detectYellowPoints(image_detect)
+            image_marked = self.drawYellowPoints(image, point_list)
             self.image_unmarked = image
             self.image_marked = image_marked
             self.point_list = point_list
@@ -204,6 +208,8 @@ class OpticalTransformCalibrator(Node):
         self.X_params = res_x.x
         self.Y_params = res_y.x
 
+        np.savetxt("CurveFitParams.csv",np.array([res_x.x,res_y.x]).T,delimiter=",",header="X_params, Y_params")
+
 
 
     def correlatePoints(self):
@@ -219,7 +225,7 @@ class OpticalTransformCalibrator(Node):
             #print(groupedPoints.shape)
 
             # TODO Remove hardcoding here
-            groupedPoints = groupedPoints.reshape(int(np.sqrt(len(self.WORLD_POINTS))), int(np.sqrt(len(self.WORLD_POINTS))),2)
+            groupedPoints = groupedPoints.reshape(int(self.GRID_WIDTH), int(self.GRID_HEIGHT),2)
             #print(groupedPoints)
             arrangedPoints = np.array([])
             for row in groupedPoints:
@@ -235,7 +241,7 @@ class OpticalTransformCalibrator(Node):
             print(opticalSorted)
 
             correlatedPoints = []
-            cPArray = np.empty((len(self.WORLD_POINTS), 5))
+            cPArray = np.empty((len(self.WORLD_POINTS), 5)) # 5-> u, v , x, y, z
 
             for i in range(0, len(self.WORLD_POINTS)):
                 newPoint = CorrelatedPoint(PointUV(sortedVals[i][0], sortedVals[i][1]), self.WORLD_POINTS[i])
@@ -292,16 +298,16 @@ class OpticalTransformCalibrator(Node):
         new_image = image.copy()
         for p in points:
             cv2.circle(new_image, (p.u, p.v), radius=5, color=(0, 255, 0), thickness = -1)
-            #cv2.putText(new_image, "uv:({},{})".format(p.u, p.v), (p.u-20, p.v-20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 2)
+            cv2.putText(new_image, "uv:({},{})".format(p.u, p.v), (p.u-20, p.v-20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 2)
         cv2.putText(new_image, "Num points: {}, {}".format(len(self.WORLD_POINTS), len(points)), (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 2)
         return new_image
     
-    def uvToXYZ(self, uv):
-        focalLength = 3.04 # in mm need to get from camera
-        sensorWidth = 33 # in mm need to get from camera
-        sensorHeight = 24 # in mm need to get from camera
-        distanceToCamera = 2684.78 # in mm from hypotenuse from getting 97x42 in^2
-        angle = np.tan(42.0/97.0)
+    # def uvToXYZ(self, uv):
+    #     focalLength = 3.04 # in mm need to get from camera
+    #     sensorWidth = 33 # in mm need to get from camera
+    #     sensorHeight = 24 # in mm need to get from camera
+    #     distanceToCamera = 2684.78 # in mm from hypotenuse from getting 97x42 in^2
+        # angle = np.tan(42.0/97.0)
 
     def createSlider(self):
         cv2.namedWindow(self.sliderWindowName)
