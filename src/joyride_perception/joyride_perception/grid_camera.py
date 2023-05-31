@@ -19,7 +19,13 @@ class ImageSubscriber(Node):
         )
         self.subscription  # prevent unused variable warning
         self.bridge = CvBridge()
-        self.coeffs_x, self.coeffs_y = np.loadtxt(filePath, unpack = True, delimiter=",", skiprows=1)
+        #self.coeffs_x, self.coeffs_y = np.loadtxt(filePath, unpack = True, delimiter=",", skiprows=1)
+        cv2.namedWindow("image")
+        cv2.setMouseCallback('image',self.get_coordinates)
+
+    def get_coordinates(self,event, x, y, flags, param):
+        if event == cv2.EVENT_MOUSEMOVE:
+            print('({}, {})'.format(x, y))
 
     def maskYellow(self, frame):
         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -55,17 +61,17 @@ class ImageSubscriber(Node):
         cv_image = cv2.flip(cv_image, 0)
         cv_image = cv2.flip(cv_image, 1)
 
-        masked = self.maskYellow(cv_image)
-        centers = self.detectYellowPoints(masked)
+        # masked = self.maskYellow(cv_image)
+        # centers = self.detectYellowPoints(masked)
 
-        for p in centers:
-            u, v = p[0], p[1]
-            R = np.array([1, u, u**2, u**3, v, v**2, v**3, u*v, u*v**2, u**2*v ])
-            x = np.dot(self.coeffs_x, R)
-            y = np.dot(self.coeffs_y, R)
-            z = 0
-            cv2.circle(cv_image, (u, v), radius=5, color=(0, 255, 0), thickness = -1)
-            cv2.putText(cv_image, f"xyz({x},{y},{z})", (u-20, v-20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 2)
+        # for p in centers:
+        #     u, v = p[0], p[1]
+        #     R = np.array([1, u, u**2, u**3, v, v**2, v**3, u*v, u*v**2, u**2*v ])
+        #     x = np.dot(self.coeffs_x, R)
+        #     y = np.dot(self.coeffs_y, R)
+        #     z = 0
+        #     cv2.circle(cv_image, (u, v), radius=5, color=(0, 255, 0), thickness = -1)
+        #     cv2.putText(cv_image, f"xyz({x},{y},{z})", (u-20, v-20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 2)
             
 
         # # Get height and width of camera space
@@ -87,7 +93,7 @@ class ImageSubscriber(Node):
         # cv2.line(cv_image, (width // 2, 0), (width // 2, height - 1), (0, 255, 0), 2)  # Vertical line
         # cv2.line(cv_image, (0, height // 2), (width - 1, height // 2), (0, 255, 0), 2)  # Horizontal line
 
-        cv2.imshow('Image with Lines', cv_image)
+        cv2.imshow('image', cv_image)
         cv2.waitKey(1)
 
 def main(args=None):

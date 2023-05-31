@@ -1,3 +1,6 @@
 float32 velocity_ms
 uint8 throttle_percent
 uint8 brake_percent
+
+float32 velocity_leftwheel
+float32 velocity_rightwheel

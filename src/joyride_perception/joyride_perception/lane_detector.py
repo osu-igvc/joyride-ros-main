@@ -19,10 +19,9 @@ class LaneDetector(Node):
     def __init__(self) -> None:
         super().__init__('lane_detector')
 
-        self.declare_parameter('image_output_topic', '/cameras/front_lane_markings')
-        self.output_topic = self.get_parameter('image_output_topic',).get_parameter_value().string_value
-        self.declare_parameter('image_source_topic', '/cameras/unknown_raw')
-        self.topic_name = self.get_parameter('image_source_topic').get_parameter_value().string_value
+        
+        self.output_topic = self.declare_parameter('image_output_topic', '/cameras/front_lane_markings').get_parameter_value().string_value
+        self.topic_name = self.declare_parameter('image_source_topic', '/cameras/unknown_raw').get_parameter_value().string_value
 
         self.video_subscriber = self.create_subscription(Image, self.topic_name, self.imageCallback, 10)
         #self.video_subscriber # prevent unused variable

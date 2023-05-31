@@ -22,7 +22,7 @@ class VelocityPreprocessor(Node):
         self.WHEEL_BASE = 1.75 # meters
     
 
-        self.cmdvel_sub = self.create_subscription(Twist, '/cmd_vel', self.cmdvel_callback, 1)
+        self.cmdvel_sub = self.create_subscription(Twist, '/cmd_vel_simple', self.cmdvel_callback, 1)
         self.cmdack_pub = self.create_publisher(AckermannDrive, '/cmd_ack', 1)
 
         self.fbsteerangle_sub = self.create_subscription(EPSPositionVelocityFeedback, '/feedback/steer_angle', self.steer_angle_fb_callback, 1)
@@ -60,7 +60,6 @@ class VelocityPreprocessor(Node):
         self.cmdack_pub.publish(ackMsg)
     
     def cmdvel_callback(self, msg:Twist):
-        
         filteredAngZ = self.CMD_ANG_Z_LPF*msg.angular.z + (1-self.CMD_ANG_Z_LPF)*self.prev_ang_z
 
         linX_diff = msg.linear.x - self.prev_linear_x

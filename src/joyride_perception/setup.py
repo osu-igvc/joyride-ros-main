@@ -27,6 +27,7 @@ setup(
             'optical_transform_calibrator = joyride_perception.camera_transform_calibrator:main',
             'sign_detector = joyride_perception.traffic_sign_detector:main',
             'obstacle_detector = joyride_perception.obstacle_detector:main',
+            'uv_to_pointcloud = joyride_perception.uv_to_pointcloud:main'
         ],
     },
 )

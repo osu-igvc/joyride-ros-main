@@ -79,6 +79,7 @@ class OpticalTransformCalibrator(Node):
     def __init__(self):
         super().__init__('optical_transform_calibrator')
         self.world_data_file = self.declare_parameter('data', 'test_xyz_data.csv').get_parameter_value().string_value
+        self.camera_frame = self.declare_parameter("camera_frame","").get_parameter_value().string_value
 
         self.world_data = np.loadtxt(self.world_data_file, delimiter=',', dtype=float)
         self.world_data = self.world_data - self.world_data[0]
@@ -208,9 +209,7 @@ class OpticalTransformCalibrator(Node):
         self.X_params = res_x.x
         self.Y_params = res_y.x
 
-        np.savetxt("CurveFitParams.csv",np.array([res_x.x,res_y.x]).T,delimiter=",",header="X_params, Y_params")
-
-
+        np.savetxt(f"CurveFitParams_{self.camera_frame}.csv",np.array([res_x.x,res_y.x]).T,delimiter=",",header="X_params, Y_params")
 
     def correlatePoints(self):
 
@@ -249,7 +248,7 @@ class OpticalTransformCalibrator(Node):
                 cPArray[i] = [newPoint.optical.u, newPoint.optical.v, newPoint.world.x, newPoint.world.y, newPoint.world.z]
             
             print(*correlatedPoints, sep='\n')
-            np.savetxt('calibration.csv', cPArray, delimiter=',', header='u, v, x, y, z')
+            np.savetxt(f'{self.camera_frame}_correlated_points.csv', cPArray, delimiter=',', header='u, v, x, y, z')
             return correlatedPoints
 
 

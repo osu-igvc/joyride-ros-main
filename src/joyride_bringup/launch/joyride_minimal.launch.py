@@ -41,6 +41,15 @@ def generate_launch_description():
     return LaunchDescription([
         diagnostic_param_cmd,
 
+                # ROSBAGGER
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('joyride_bringup'), 'launch'),
+            '/rosbag_recorder.launch.py'
+            ]),
+            launch_arguments={'bag_name':'outdoor_navtest'}.items()
+        ),
+
         # Static transforms
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
@@ -80,5 +89,11 @@ def generate_launch_description():
             get_package_share_directory('joyride_bringup'), 'launch'),
             '/gps_localization.launch.py'
             ])
+        ),
+        
+        Node(
+            package='joyride_control_py',
+            executable='velocity_preprocessor',
+            name='vel_node',
         ),
 ])

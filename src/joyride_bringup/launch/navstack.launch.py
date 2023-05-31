@@ -41,11 +41,11 @@ def generate_launch_description():
     log_level = LaunchConfiguration('log_level')
 
     lifecycle_nodes = ['controller_server',
-                       'smoother_server',
                        'planner_server',
-                       'behavior_server',
                        'bt_navigator',
                        'waypoint_follower',
+                       'smoother_server',
+                       'behavior_server',
                        ]
 
     # Map fully qualified names to relative ones so the node's namespace can be prepended.
@@ -117,7 +117,7 @@ def generate_launch_description():
                 respawn_delay=2.0,
                 parameters=[configured_params],
                 arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings + [('cmd_vel', 'cmd_vel')]),
+                remappings=remappings + [('/cmd_vel', '/cmd_vel_cont')]),
             Node(
                 package='nav2_smoother',
                 executable='smoother_server',
@@ -189,7 +189,7 @@ def generate_launch_description():
                 plugin='nav2_controller::ControllerServer',
                 name='controller_server',
                 parameters=[configured_params],
-                remappings=remappings + [('cmd_vel', 'cmd_vel_nav')]),
+                remappings=remappings + [('cmd_vel', 'cmd_vel_cont')]),
             ComposableNode(
                 package='nav2_smoother',
                 plugin='nav2_smoother::SmootherServer',
@@ -226,7 +226,7 @@ def generate_launch_description():
                 name='velocity_smoother',
                 parameters=[configured_params],
                 remappings=remappings +
-                           [('cmd_vel', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'cmd_vel')]),
+                           [('cmd_vel', 'cmd_vel_nav'),]),# ('cmd_vel_smoothed', 'cmd_vel')]),
             ComposableNode(
                 package='nav2_lifecycle_manager',
                 plugin='nav2_lifecycle_manager::LifecycleManager',

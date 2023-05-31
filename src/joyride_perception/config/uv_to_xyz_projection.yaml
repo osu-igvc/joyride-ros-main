@@ -1,0 +1,6 @@
+/perception/uv_to_pointcloud:
+  ros_parameters:
+    camera_frame: "center"
+    data_transformed: "lanes"
+    calibration_file: "calibration.csv"
+    subscriber_topic: "perception/object_to_point_cloud"

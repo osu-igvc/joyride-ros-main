@@ -73,7 +73,7 @@ class JoystickSub(Node):
         self.front_right_blinker_state = False
 
         # Mapping Constants
-        self.VEL_LIN_MAX = 1.5
+        self.VEL_LIN_MAX = 2.2
         self.VEL_LIN_MIN = -1.5
         self.VEL_LPF_ALPHA = 0.3
         self.VEL_DEADZONE = 0.1
