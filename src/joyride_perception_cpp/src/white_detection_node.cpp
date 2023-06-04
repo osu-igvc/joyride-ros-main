@@ -1,6 +1,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
+#include "sensor_msgs/msg/compressed_image.hpp"
 #include "std_msgs/msg/string.hpp"
+#include "std_msgs/msg/int32.hpp"
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <cv_bridge/cv_bridge.h>
@@ -10,45 +12,37 @@
 #include <condition_variable>
 
 #include "lane_mainFunctions.h"
-#include "lane_helperFunctions.h"
-#include "slider.h"
 
 using namespace cv;
 using namespace std;
 
-bool isCompressed = false;
+// Uses compressed image, switch commented code out for testing with non-compressed data
+string topicmsg = "/sensors/cameras/center/image/compressed"; 
 
 class WhiteDetection : public rclcpp::Node
 {
     public:
         WhiteDetection() : Node("white_detection_node"){
 
-            if (isCompressed){
-                // TODO
-            } else{
-                sub_camera_ = this->create_subscription<sensor_msgs::msg::Image>("image", 5,
-                    bind(&WhiteDetection::callback_normal, this, placeholders::_1));
-            }
+            // sub_camera = this->create_subscription<sensor_msgs::msg::Image>(topicmsg, 5, bind(&WhiteDetection::callback, this, placeholders::_1)); // Non-compressed image
+            sub_camera = this->create_subscription<sensor_msgs::msg::CompressedImage>(topicmsg,5, bind(&WhiteDetection::callback, this, placeholders::_1));
 
-            sub_threshhold_values_ = this->create_subscription<std_msgs::msg::String>("perception/lane/slider_values", 5,
+            sub_threshhold_values = this->create_subscription<std_msgs::msg::String>("perception/lane/slider_values", 5,
                 bind(&WhiteDetection::adjustThresholds, this, placeholders::_1));
 
-            pub_lane_overlay_ = this->create_publisher<sensor_msgs::msg::Image>("perception/lane/overlay",10);
+            pub_lane_overlay = this->create_publisher<sensor_msgs::msg::Image>("perception/lane/overlay",10);
             pub_lane_point_msg = this->create_publisher<sensor_msgs::msg::Image>("perception/object_to_point_cloud",10);
+            pub_lane_pixel_distance = this->create_publisher<std_msgs::msg::Int32>("perception/lane/pixel_distance_from_center", 10);
 
-            pub_white_ = this->create_publisher<sensor_msgs::msg::Image>("perception/lane/white",10);
-            pub_white_two = this->create_publisher<sensor_msgs::msg::Image>("perception/lane/white_two",10);
-            pub_edge_ = this->create_publisher<sensor_msgs::msg::Image>("perception/lane/edge",10);
+            pub_white = this->create_publisher<sensor_msgs::msg::Image>("perception/lane/white",10);
+            pub_edge = this->create_publisher<sensor_msgs::msg::Image>("perception/lane/edge",10);
         }
 
     private:
 
-        void callback_compressed(){ // add msg here
-        //     // TODO
-        }
-
-        void callback_normal(const sensor_msgs::msg::Image::SharedPtr msg){
-            Mat image = cv_bridge::toCvShare(msg, "bgr8")->image;
+        void callback(const sensor_msgs::msg::CompressedImage::SharedPtr msg){ //const sensor_msgs::msg::Image::SharedPtr msg //non-compressed
+            // Mat image = cv_bridge::toCvShare(msg, "bgr8")->image; // Non-compressed
+            Mat image = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8) -> image;
             handleImage(image);
         }
 
@@ -70,7 +64,6 @@ class WhiteDetection : public rclcpp::Node
 
             // White detection
             Mat white = getWhiteInFrame(roiImg);
-            Mat whiteTwo = whiteAttemptTwo(roiImg);
 
             // Edge detection
             Mat edge = getLaneEdgesInFrame(white);
@@ -78,16 +71,11 @@ class WhiteDetection : public rclcpp::Node
             // Lanes
             handleLanes(image, edge);
 
-            // Potholes
-            handlePotholes(image, edge);
-
             // Test Publish msgs
             sensor_msgs::msg::Image::SharedPtr white_msg = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", white).toImageMsg();
-            pub_white_->publish(*white_msg);  
-            sensor_msgs::msg::Image::SharedPtr white_msg_two = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", whiteTwo).toImageMsg();
-            pub_white_two->publish(*white_msg_two); 
+            pub_white->publish(*white_msg);
             sensor_msgs::msg::Image::SharedPtr edge_msg = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", edge).toImageMsg();
-            pub_edge_->publish(*edge_msg); 
+            pub_edge->publish(*edge_msg); 
         }
 
         void adjustThresholds(const std_msgs::msg::String::SharedPtr msg) {
@@ -106,119 +94,89 @@ class WhiteDetection : public rclcpp::Node
             /*
                 WHITE_THRESHOLD
                 MIN_WHITE_REGION_SIZE
-                6hsv values
+                6 hsv values
                 HOUGH_THRESHOLD
                 HOUGH_MIN_LINE_LENGTH
                 HOUGH_MAX_LINE_GAP
                 SEP_DISTANCE_BETWEEN_SEGMENTS
                 SEP_DISTANCE_BETWEEN_LANES_Y
-                SEP_DISTANCE_BETWEEN_DASH_X
             */
             WHITE_THRESHOLD = values[0];
             MIN_WHITE_REGION_SIZE = values[1];
-            hlb = values[2];
-            slb = values[3];
-            vlb = values[4];
-            hup = values[5];
-            sup = values[6];
-            vup = values[7];
+            HUE_LOW = values[2];
+            SAT_LOW = values[3];
+            VAL_LOW = values[4];
+            HUE_HIGH = values[5];
+            SAT_HIGH = values[6];
+            VAL_HIGH = values[7];
             HOUGH_THRESHOLD = values[8];
             HOUGH_MIN_LINE_LENGTH = values[9];
-            HOUGH_MAX_LINE_GAP_SOLID = values[10];
+            HOUGH_MAX_LINE_GAP = values[10];
             SEP_DISTANCE_BETWEEN_SEGMENTS = values[11];
             SEP_DISTANCE_BETWEEN_LANES_Y = values[12];
-            SEP_DISTANCE_BETWEEN_DASH_X = values[13];
         }        
 
         void handleLanes(Mat frame, Mat edges) {
-            vector<Vec4i> houghLines = HoughTransformOnEdges(edges, true);
-            vector<vector<Point>> laneLines = LaneLinesFromSegments(houghLines);
+            vector<Vec4i> houghLines = HoughTransformOnEdges(edges);
+            vector<Lane> laneLines = LaneLinesFromSegments(houghLines);
 
             // Apply Lanes to frame
             Mat overlay = overlayLanes(frame, laneLines);
 
             // Display lanes on binary image to convert to pointCloud2
+            // Non-separated
             Mat lanes_binary_img = overlayLanes_binary(frame, laneLines);
+            // Separated
+            pair<Mat, Mat> binary_lanes = overlayLanes_binary_separated(frame, laneLines);
+            Mat binary_solid_lanes = binary_lanes.first;
+            Mat binary_dash_lanes = binary_lanes.second;
+
+            // For using velocity controller gain to stay in center of line
+            int distance_from_center = calculateDistanceFromCenter(laneLines);
 
             // Publish Messages
-            sensor_msgs::msg::Image::SharedPtr overlay_msg = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", overlay).toImageMsg();
-            pub_lane_overlay_->publish(*overlay_msg);  
+            sensor_msgs::msg::Image::SharedPtr overlay_msg = cv_bridge:/:CvImage(std_msgs::msg::Header(), "bgr8", overlay).toImageMsg();
+            pub_lane_overlay->publish(*overlay_msg);  
 
             sensor_msgs::msg::Image::SharedPtr pointcloud_msg = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", lanes_binary_img).toImageMsg();
             pub_lane_point_msg->publish(*pointcloud_msg); 
+            pointcloud_msg = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", binary_solid_lanes).toImageMsg();
+            pub_lane_point_msg->publish(*pointcloud_msg); 
+            pointcloud_msg = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", binary_dash_lanes).toImageMsg();
+            pub_lane_point_msg->publish(*pointcloud_msg); 
+
+            auto distance_center_msg = std_msgs::msg::Int32();
+            distance_center_msg.data = distance_from_center;
+            pub_lane_pixel_distance->publish(distance_center_msg);
             
             // Deallocate Memory
             frame.release();
             edges.release();
             overlay.release();
             lanes_binary_img.release();
+            binary_solid_lanes.release();
+            binary_dash_lanes.release();
             houghLines.clear();
             laneLines.clear();
         }
 
-        void handlePotholes(Mat frame, Mat edges) {
-            // To-do
-            // Publish Messages
-            // sensor_msgs::msg::Image::SharedPtr overlay_msg 
-        }
+        rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_threshhold_values;
+        // rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_camera; // non-compressed version
+        rclcpp::Subscription<sensor_msgs::msg::CompressedImage>::SharedPtr sub_camera;
 
-        void updateROI(const std_msgs::msg::String::SharedPtr msg) {
-            // turn msg into string
-            string msg_string = msg->data;
-
-            // Get individual numbers from string
-            stringstream ss(msg_string);
-            vector<int> values;
-            int num;
-            while (ss >> num) {
-                values.push_back(num);
-            }
-            
-            // Set values
-            /*
-                roi.x
-                roi.y
-                roi.width
-                roi.height
-            */
-            if ( 
-                (values[0] >= 0 && values[1] >= 0) 
-                &&                
-                (
-                    ((WIDTH == 0 || HEIGHT == 0) && values[3] >= values[1] && values[2] >= values[0]) 
-                    || 
-                    (values[0] + values[2] <= WIDTH && values[1] + values[3] <= HEIGHT)
-                )
-            ){
-                ROI.x = values[0];
-                ROI.y = values[1];
-                ROI.width = values[2];
-                ROI.height = values[3];
-                cout << "ROI Updated to " << msg->data.c_str() << endl;
-            } else {
-                cout << "Invalid ROI: " << msg->data.c_str() << endl;
-            }
-        }
-        rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_threshhold_values_;
-        rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_camera_;
-
-        rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_lane_overlay_;
+        rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_lane_overlay;
         rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_lane_point_msg;
+        rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr pub_lane_pixel_distance;
 
-        rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_white_;
-        rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_white_two;
-        rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_edge_;
+        rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_white;
+        rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_edge;
 
 
 };
 
 int main(int argc, char **argv){
-
-    initGlobalVariablesForLab();
-
     rclcpp::init(argc,argv);
     auto node = make_shared<WhiteDetection>();
-
     rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;
