@@ -18,6 +18,7 @@ using namespace std;
 
 // Uses compressed image, switch commented code out for testing with non-compressed data
 string topicmsg = "/sensors/cameras/center/image/compressed"; 
+// string topicmsg = "/sensors/cameras/center/image";
 
 class WhiteDetection : public rclcpp::Node
 {
@@ -25,7 +26,7 @@ class WhiteDetection : public rclcpp::Node
         WhiteDetection() : Node("white_detection_node"){
 
             // sub_camera = this->create_subscription<sensor_msgs::msg::Image>(topicmsg, 5, bind(&WhiteDetection::callback, this, placeholders::_1)); // Non-compressed image
-            sub_camera = this->create_subscription<sensor_msgs::msg::CompressedImage>(topicmsg,5, bind(&WhiteDetection::callback, this, placeholders::_1));
+            sub_camera = this->create_subscription<sensor_msgs::msg::CompressedImage>(topicmsg,5, bind(&WhiteDetection::callback, this, placeholders::_1)); // Compressed
 
             sub_threshhold_values = this->create_subscription<std_msgs::msg::String>("perception/lane/slider_values", 5,
                 bind(&WhiteDetection::adjustThresholds, this, placeholders::_1));
@@ -40,9 +41,9 @@ class WhiteDetection : public rclcpp::Node
 
     private:
 
-        void callback(const sensor_msgs::msg::CompressedImage::SharedPtr msg){ //const sensor_msgs::msg::Image::SharedPtr msg //non-compressed
+        void callback(const sensor_msgs::msg::CompressedImage::SharedPtr msg){ //const sensor_msgs::msg::Image::SharedPtr msg //non-compressed  const sensor_msgs::msg::CompressedImage::SharedPtr // Compressed
             // Mat image = cv_bridge::toCvShare(msg, "bgr8")->image; // Non-compressed
-            Mat image = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8) -> image;
+            Mat image = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8) -> image; // Compressed
             handleImage(image);
         }
 
@@ -118,51 +119,55 @@ class WhiteDetection : public rclcpp::Node
 
         void handleLanes(Mat frame, Mat edges) {
             vector<Vec4i> houghLines = HoughTransformOnEdges(edges);
-            vector<Lane> laneLines = LaneLinesFromSegments(houghLines);
+            if (houghLines.size() > 0) {
 
-            // Apply Lanes to frame
-            Mat overlay = overlayLanes(frame, laneLines);
+                vector<Lane> laneLines = LaneLinesFromSegments(houghLines);
 
-            // Display lanes on binary image to convert to pointCloud2
-            // Non-separated
-            Mat lanes_binary_img = overlayLanes_binary(frame, laneLines);
-            // Separated
-            pair<Mat, Mat> binary_lanes = overlayLanes_binary_separated(frame, laneLines);
-            Mat binary_solid_lanes = binary_lanes.first;
-            Mat binary_dash_lanes = binary_lanes.second;
 
-            // For using velocity controller gain to stay in center of line
-            int distance_from_center = calculateDistanceFromCenter(laneLines);
+                // Apply Lanes to frame
+                Mat overlay = overlayLanes(frame, laneLines);
 
-            // Publish Messages
-            sensor_msgs::msg::Image::SharedPtr overlay_msg = cv_bridge:/:CvImage(std_msgs::msg::Header(), "bgr8", overlay).toImageMsg();
-            pub_lane_overlay->publish(*overlay_msg);  
+                // Display lanes on binary image to convert to pointCloud2
+                // Non-separated
+                Mat lanes_binary_img = overlayLanes_binary(frame, laneLines);
+                // Separated
+                pair<Mat, Mat> binary_lanes = overlayLanes_binary_separated(frame, laneLines);
+                Mat binary_solid_lanes = binary_lanes.first;
+                Mat binary_dash_lanes = binary_lanes.second;
 
-            sensor_msgs::msg::Image::SharedPtr pointcloud_msg = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", lanes_binary_img).toImageMsg();
-            pub_lane_point_msg->publish(*pointcloud_msg); 
-            pointcloud_msg = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", binary_solid_lanes).toImageMsg();
-            pub_lane_point_msg->publish(*pointcloud_msg); 
-            pointcloud_msg = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", binary_dash_lanes).toImageMsg();
-            pub_lane_point_msg->publish(*pointcloud_msg); 
+                // For using velocity controller gain to stay in center of line
+                int distance_from_center = calculateDistanceFromCenter(laneLines);
 
-            auto distance_center_msg = std_msgs::msg::Int32();
-            distance_center_msg.data = distance_from_center;
-            pub_lane_pixel_distance->publish(distance_center_msg);
-            
-            // Deallocate Memory
-            frame.release();
-            edges.release();
-            overlay.release();
-            lanes_binary_img.release();
-            binary_solid_lanes.release();
-            binary_dash_lanes.release();
-            houghLines.clear();
-            laneLines.clear();
+                // Publish Messages
+                sensor_msgs::msg::Image::SharedPtr overlay_msg = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", overlay).toImageMsg();
+                pub_lane_overlay->publish(*overlay_msg);  
+
+                sensor_msgs::msg::Image::SharedPtr pointcloud_msg = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", lanes_binary_img).toImageMsg();
+                pub_lane_point_msg->publish(*pointcloud_msg); 
+                pointcloud_msg = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", binary_solid_lanes).toImageMsg();
+                pub_lane_point_msg->publish(*pointcloud_msg); 
+                pointcloud_msg = cv_bridge::CvImage(std_msgs::msg::Header(), "mono8", binary_dash_lanes).toImageMsg();
+                pub_lane_point_msg->publish(*pointcloud_msg); 
+
+                auto distance_center_msg = std_msgs::msg::Int32();
+                distance_center_msg.data = distance_from_center;
+                pub_lane_pixel_distance->publish(distance_center_msg);
+                
+                // Deallocate Memory
+                frame.release();
+                edges.release();
+                overlay.release();
+                lanes_binary_img.release();
+                binary_solid_lanes.release();
+                binary_dash_lanes.release();
+                houghLines.clear();
+                laneLines.clear();
+            }
         }
 
         rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_threshhold_values;
         // rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_camera; // non-compressed version
-        rclcpp::Subscription<sensor_msgs::msg::CompressedImage>::SharedPtr sub_camera;
+        rclcpp::Subscription<sensor_msgs::msg::CompressedImage>::SharedPtr sub_camera; // compressed version
 
         rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_lane_overlay;
         rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_lane_point_msg;

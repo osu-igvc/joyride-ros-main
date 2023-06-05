@@ -33,15 +33,27 @@ int HOUGH_THRESHOLD = 35;
 static double HOUGH_THETA = CV_PI/180;
 int HOUGH_MIN_LINE_LENGTH = 15;
 int HOUGH_MAX_LINE_GAP = 75;
+// min and max angle that we want lines to be
+double LANE_MIN_SLOPE = 0.1;
+
 // Lane Separation
 /* Distance used to determine what segments are of the same line */
 int SEP_DISTANCE_BETWEEN_SEGMENTS = 38;
 /* Minimum y length a lane can be to be considered Solid */
 int SEP_DISTANCE_BETWEEN_LANES_Y = 100;
 
+// Lane center 
+int HORIZON_POINT_CENTER = 200;
+/* Arbitrary Value that we want the distance from center of the camera to be to a lane when we see only one lane*/
+int DIST_FROM_CENTER;
+int LANES_CENTER;
+String LANE_BEING_TRACKED = "BOTH";
+/* bias we want to stay away from lane when only one is detected*/
+int HALF_LANE_DISTANCE = 600; // Adjust as needed
+
 struct Lane {
     vector<Point> points;
-    bool isSolid;
+    bool isSolid = true;
 };
 
 void setHeightWidth(Mat frame) {
@@ -172,11 +184,13 @@ vector<Vec4i> HoughTransformOnEdges(Mat frame) {
     std::vector<Vec4i> lines; // (x_1, y_1, x_2, y_2) Where '_2' is the end point
     HoughLinesP(frame, lines, 1.75, HOUGH_THETA, HOUGH_THRESHOLD, HOUGH_MIN_LINE_LENGTH, HOUGH_MAX_LINE_GAP);
 
-    // ------------Remove out of bounds Y---------------------------------
+    // ------------Remove out of bounds Y && Horizontal Line--------------
     /* Distance from top of screen we want to stop detecting lanes */
     int HORIZON_MAX = 200;
     lines.erase(remove_if(lines.begin(), lines.end(), [HORIZON_MAX](const Vec4i& vec){
-        return vec[1] < HORIZON_MAX || vec[3] < HORIZON_MAX; }), lines.end()); 
+        double slope = double((vec[3] - vec[1])) / double((vec[2] - vec[0]));
+        return (vec[1] < HORIZON_MAX || vec[3] < HORIZON_MAX) || abs(slope) < LANE_MIN_SLOPE; 
+        }), lines.end());
 
     // ------------Sort HoughLines----------------------------------------
     // y_1 is sorted in descending order
@@ -261,27 +275,90 @@ vector<Lane> LaneLinesFromSegments(vector<Vec4i> lines) {
     return laneLines;
 }
 
+int calculateDistWithOneLane(int x_point){
+    int center_img = WIDTH/2;
+
+    /* Return value: Pos-> car too far right    Neg-> car too far left */
+    int distance_from_center = 0;
+
+    if (x_point > WIDTH/2){ // We see the right lane
+        LANES_CENTER = x_point - HALF_LANE_DISTANCE;
+        distance_from_center = LANES_CENTER - center_img;
+        LANE_BEING_TRACKED = "RIGHT";
+    } else { // We see left lane
+        LANES_CENTER = x_point + HALF_LANE_DISTANCE;
+        distance_from_center = LANES_CENTER - center_img;
+        LANE_BEING_TRACKED = "LEFT";
+    }  
+
+    return distance_from_center;
+}
+
 /**
  * For using velocity controller gain to stay in center of line
 */
 int calculateDistanceFromCenter(vector<Lane> laneLines) {
     /* Distance from bottom of screen we want to measure lanes at */
-    int target_y = HEIGHT - 100; // TODO: measure
-    /* how far away from lane we want to be when we only see one */
-    int distance_from_lane = 100; // TODO: calculate/measure 
+    int target_y = HEIGHT - HORIZON_POINT_CENTER; // TODO: measure
     int center_img = WIDTH/2;
 
     /* Return value: Pos-> car too far right    Neg-> car too far left */
     int distance_from_center = 0;
+
     // Get points along target_y that are lanes
     vector<int> xs_at_target_y;
+
+    // turn line segments into segment of points
+    vector<Lane> laneOfPixels;
     for (const auto& lane : laneLines){
+        vector<Point> newLane;
+        // Convert each segment into pixel points in newLane
+        for (size_t i = 1; i < lane.points.size(); i ++) {
+            int x1 = lane.points[i-1].x;
+            int x2 = lane.points[i].x;
+            int y1 = lane.points[i-1].y;
+            int y2 = lane.points[i].y;
+
+            int dx = abs(x2 - x1);
+            int dy = abs(y2 - y1);
+            int sx = (x1 < x2) ? 1 : -1;
+            int sy = (y1 < y2) ? 1 : -1;
+            int err = dx - dy;
+
+            while(true) {
+                newLane.push_back(Point(x1,y1));
+
+                if(x1 == x2 && y1 == y2){
+                    break;
+                }
+
+                int e2 = 2 * err;
+                if (e2 > -dy){
+                    err -=dy;
+                    x1 += sx;
+                }
+                if (e2 < dx) {
+                    err += dx;
+                    y1 += sy;
+                }
+            }
+        }
+
+        // Add newLane to laneOfPixels
+        Lane newlane = {newLane, lane.isSolid};
+        laneOfPixels.push_back(newlane);
+    }
+
+
+    for (const auto& lane : laneOfPixels){
         for (const auto& point : lane.points) {
             if (point.y == target_y){
                 xs_at_target_y.push_back(point.x);
             }
         }
     }
+
+    cout << "Xs Detected: " << xs_at_target_y.size() << endl;
 
     // Calculate Distance car is from Lanes
     if (xs_at_target_y.size() > 1)  { // At least two lanes
@@ -295,16 +372,26 @@ int calculateDistanceFromCenter(vector<Lane> laneLines) {
                 close_high = x;
             }
         }
+
+        if (close_low == 0) {
+            return calculateDistWithOneLane(close_high);
+        } else if (close_high == WIDTH) {
+            return calculateDistWithOneLane(close_low);
+        }
+        LANES_CENTER = (close_low + close_high) / 2;
         // compare lane_center to frame_center: pos if to the right, neg if to left
-        distance_from_center = ((close_low + close_high) / 2) - center_img;
+        distance_from_center = LANES_CENTER - center_img;
+
+        LANE_BEING_TRACKED = "BOTH";
+
     } else if (xs_at_target_y.size() == 1) { // one lane available
-        if (xs_at_target_y[0] > WIDTH/2){ // We see the right lane
-            distance_from_center = xs_at_target_y[0] - distance_from_lane - center_img;
-        } else { // We see left lane
-            distance_from_center = xs_at_target_y[0] + distance_from_lane - center_img;
-        }  
+        return calculateDistWithOneLane(xs_at_target_y[0]);
+    } else {
+        cout << " NO LINES DETECTED AT HORIZON " << endl;
+        LANE_BEING_TRACKED = "NONE";
     }
 
+    DIST_FROM_CENTER = distance_from_center;
     return distance_from_center;
 }
 
@@ -322,7 +409,7 @@ Mat overlayHoughLines(Mat frame, vector<Vec4i> lines) {
     // Draw lines onto image
     for (size_t i = 0; i < lines.size(); i++) {
         // Point start
-        line(overlay, Point(lines[i][0], lines[i][1]), Point(lines[i][2], lines[i][3]), Scalar(0,0,255), 3, LINE_AA);
+        line(overlay, Point(lines[i][0], lines[i][1]), Point(lines[i][2], lines[i][3]), Scalar(0,0,255), 5, LINE_AA);
     }
 
     // Deallocate Memory
@@ -345,6 +432,13 @@ Mat overlayLanes(Mat frame, vector<Lane> lanes, const Scalar& color = Scalar(0,2
             line(overlay, lanes[i].points[j-1], lanes[i].points[j], color, 3, LINE_AA);
         }
     }
+
+    // Draw lane horizon point
+    line(overlay, Point(0, HEIGHT - HORIZON_POINT_CENTER), Point(WIDTH, HEIGHT - HORIZON_POINT_CENTER), Scalar(255,0,0), 5, LINE_AA);
+    putText(overlay, "Dist Center: " + to_string(DIST_FROM_CENTER) + "pxls", Point(100, 100), FONT_HERSHEY_SIMPLEX, 2.0, Scalar(255,255,255), 5);
+    circle(overlay, Point(LANES_CENTER, HEIGHT - HORIZON_POINT_CENTER), 20, Scalar(0,0,255), 5);
+    putText(overlay, "Tracking: " + LANE_BEING_TRACKED, Point(WIDTH - 800, 100), FONT_HERSHEY_SIMPLEX, 2.0, Scalar(255,255,255), 5);
+
     // Deallocate Memory
     lanes.clear();
     frame.release();
