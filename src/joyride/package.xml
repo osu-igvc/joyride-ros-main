@@ -1,18 +1,3 @@
-<?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-<package format="3">
-  <name>joyride</name>
-  <version>1.0.0</version>
-  <description>Joyride is a self-driving vehicle designed by students from Oklahoma State University.</description>
-  <maintainer email="max.desantis@okstate.edu">Max DeSantis</maintainer>
-  <license>LGPL</license>
-
-  <buildtool_depend>ament_cmake</buildtool_depend>
-
-  <exec_depend>joyride_bringup</exec_depend>
-  <exec_depend>joyride_interfaces</exec_depend>
-
-  <export>
-    <build_type>ament_cmake</build_type>
-  </export>
-</package>
+version https://git-lfs.github.com/spec/v1
+oid sha256:64a301dc75bebe420c7ab816b7fc0020b3e920f06b9a2b5ea5ffc41ae52d26c9
+size 650

@@ -1,28 +1,3 @@
-# Python
-from http.server import executable
-import os
-from ament_index_python.packages import get_package_share_directory
-
-# ROS
-import launch
-import launch_ros.actions
-
-def generate_launch_description():
-
-    transform_config = os.path.join(
-        get_package_share_directory('joyride_core'),
-        'config',
-        'static_transform_config.yaml'
-    )
-
-    return launch.LaunchDescription([
-        launch_ros.actions.Node(
-            package='joyride_servers',
-            output='screen',
-            namespace='servers',
-            executable='joyride_static_tf_broadcaster',
-            name='static_transform_node',
-            parameters=[transform_config]),
-            
-    ]
-  )
+version https://git-lfs.github.com/spec/v1
+oid sha256:63647502d95d664a63407fbfc3add628c2ef2e0079df6d4e57cb537dcc8986df
+size 696

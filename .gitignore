@@ -1,12 +1,3 @@
-build/*
-install/*
-log/*
-joyride-ros-main.code-workspace
-*.db3
-*.vscode
-.vscode/c_cpp_properties.json
-.vscode/settings.json
-.vscode/c_cpp_properties.json
-.vscode/settings.json
-.vscode/c_cpp_properties.json
-.vscode/settings.json
+version https://git-lfs.github.com/spec/v1
+oid sha256:86663f12c4e233d8dc996fcb890f06e4440224beb8c4005f81482eb202e5b0cd
+size 256

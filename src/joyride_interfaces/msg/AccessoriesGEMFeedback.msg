@@ -1,20 +1,3 @@
-
-bool left_turn_signal_on
-bool right_turn_signal_on
-bool hazards_on
-
-bool headlights_on
-bool highbeams_on
-
-bool wipers_on
-
-bool driver_seatbelt_on
-
-# Possible gear options
-byte NEUTRAL=0
-byte FORWARD=1
-byte REVERSE=2
-byte CHARGING=3
-byte UNKNOWN=4
-
-byte gear_status
+version https://git-lfs.github.com/spec/v1
+oid sha256:21e9939337c7b4780cfd2dd433cb2c783b4371f5ad9537ccfcfcb84b1c348030
+size 265

@@ -1,34 +1,3 @@
-
-import launch
-from datetime import datetime
-
-from launch.substitutions import LaunchConfiguration, TextSubstitution
-from launch.actions import DeclareLaunchArgument
-
-def generate_launch_description():
-
-    time = datetime.now()
-    date_str = time.strftime("_%Y_%m_%d-%H_%M")
-    bag_name = LaunchConfiguration('bag_name')
-    final_bag_name = LaunchConfiguration('final_bag_name')
-
-    declare_bagname_cmd = DeclareLaunchArgument(
-        'bag_name',
-        default_value='rosbag',
-        description='Name of output bag file'
-    )
-
-    final_bag_file_cmd = DeclareLaunchArgument(
-        'final_bag_name',
-        default_value=[LaunchConfiguration('bag_name'), date_str])
-
-    return launch.LaunchDescription([
-
-        declare_bagname_cmd,
-        final_bag_file_cmd,
-
-        launch.actions.ExecuteProcess(
-            cmd=['ros2', 'bag', 'record', '-a', '--include-hidden-topics', '-o', final_bag_name],
-            output='screen'
-        )
-    ])
+version https://git-lfs.github.com/spec/v1
+oid sha256:d111d08bb048b5cd8533af6c775995563db66d7d806eaf7e57cad8f4d057bb8e
+size 958
