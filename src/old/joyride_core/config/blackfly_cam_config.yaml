@@ -1,27 +1,3 @@
-# /sensors/cameras/lane_camera_img_pub:
-#   ros__parameters:
-#     serial_no: '18295828'
-#     pixel_format: 'RGB8Packed'
-#     video_mode: 'Mode1'
-#     img_pub_topic: '/sensors/cameras/lane/image_raw'
-
-/sensors/cameras/lane_camera_img_pub:
-  ros__parameters:
-    serial_no:  '18295828' #18295818
-    pixel_format: 'RGB8Packed'
-    video_mode: 'Mode2'
-    img_pub_topic: '/sensors/cameras/lane/image_raw'
-
-/sensors/cameras/left_sign_camera_img_pub:
-  ros__parameters:
-    serial_no: '18295825'
-    pixel_format: 'RGB8Packed'
-    video_mode: 'Mode1'
-    img_pub_topic: '/sensors/cameras/left_sign/image_raw'
-
-/sensors/cameras/right_sign_camera_img_pub:
-  ros__parameters:
-    serial_no: '18295818'
-    pixel_format: 'RGB8Packed'
-    video_mode: 'Mode1'
-    img_pub_topic: '/sensors/cameras/right_sign/image_raw'
+version https://git-lfs.github.com/spec/v1
+oid sha256:9a5283aec8b16e55d9763fdb29e9ad93399ba021cf563c50dd2cb1c5650dcb83
+size 811

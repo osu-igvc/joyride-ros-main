@@ -1,19 +1,3 @@
-#include "rclcpp/rclcpp.hpp"
-#include "joyride_localization/joyride_fake_odom.hpp"
-#include <memory>
-
-int main(int argc, char **argv)
-{
-    rclcpp::init(argc, argv);
-
-    const rclcpp::NodeOptions options;
-    auto joyride_fake_odom = std::make_shared<joyride_odometry::JoyrideFakeOdom>(options);
-
-    rclcpp::spin(joyride_fake_odom->get_node_base_interface());
-
-
-
-
-    rclcpp::shutdown();
-    return 0;
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:c69a72f1ea953c41c6d911358167fb16b921946caa52b6ea9a4e04d129f3ed59
+size 405

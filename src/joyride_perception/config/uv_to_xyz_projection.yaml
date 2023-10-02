@@ -1,6 +1,3 @@
-/perception/uv_to_pointcloud:
-  ros_parameters:
-    camera_frame: "center"
-    data_transformed: "lanes"
-    calibration_file: "calibration.csv"
-    subscriber_topic: "perception/object_to_point_cloud"
+version https://git-lfs.github.com/spec/v1
+oid sha256:4d0b677679afe5f8e5e6303995de7e0081d2f57fa2f17666f7e5d13703611606
+size 201

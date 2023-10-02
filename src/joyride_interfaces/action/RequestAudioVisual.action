@@ -1,12 +1,3 @@
-# Request
-bool toggle_front_left_blinker
-bool toggle_front_right_blinker
-bool activate_buzzer
----
-
-# Result
-
----
-
-# Feedback
-
+version https://git-lfs.github.com/spec/v1
+oid sha256:6a1eac9941de7554593b1feda071bc11a183bfdd0e0e7e48820ece5bee7764d4
+size 126

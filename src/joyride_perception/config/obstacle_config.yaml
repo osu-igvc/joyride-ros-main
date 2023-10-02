@@ -1,9 +1,3 @@
-/perception/pedestrian_detector:
-  ros__parameters:
-    image_source_topic: '/sensors/cameras/center/image'
-    image_output_topic: '/perception/pedestrians/image'
-
-/perception/obstacle_detector:
-  ros__parameters:
-    image_source_topic: '/sensors/cameras/center/image'
-    image_output_topic: '/perception/obstacles/image'
+version https://git-lfs.github.com/spec/v1
+oid sha256:23dc638ceb2b850e768c19dabcd7d2054cd06c01a6ff883afa729dfb2b8ca56a
+size 324

@@ -1,20 +1,3 @@
-image_width: 1024
-image_height: 768
-camera_name: lane_camera
-camera_matrix:
-  rows: 3
-  cols: 3
-  data: [1148.615198, 0.000000, 515.109074, 0.000000, 1145.009629, 370.870531, 0.000000, 0.000000, 1.000000]
-distortion_model: plumb_bob
-distortion_coefficients:
-  rows: 1
-  cols: 5
-  data: [-0.177661, -0.053962, 0.005350, -0.005446, 0.000000]
-rectification_matrix:
-  rows: 3
-  cols: 3
-  data: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 1.000000]
-projection_matrix:
-  rows: 3
-  cols: 4
-  data: [1100.646118, 0.000000, 510.462922, 0.000000, 0.000000, 1119.142090, 372.016666, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
+version https://git-lfs.github.com/spec/v1
+oid sha256:f5f4204c6df4111ae8b6f95eb3ae46fe5eeca625c0268a1d67f995e0b1410d8b
+size 659

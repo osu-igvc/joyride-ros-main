@@ -1,25 +1,3 @@
-from setuptools import setup
-
-package_name = 'joyride_base'
-
-setup(
-    name=package_name,
-    version='0.0.0',
-    packages=[package_name],
-    data_files=[
-        ('share/ament_index/resource_index/packages',
-            ['resource/' + package_name]),
-        ('share/' + package_name, ['package.xml']),
-    ],
-    install_requires=['setuptools'],
-    zip_safe=True,
-    maintainer='joyride-obc',
-    maintainer_email='max.desantis@okstate.edu',
-    description='TODO: Package description',
-    license='TODO: License declaration',
-    tests_require=['pytest'],
-    entry_points={
-        'console_scripts': [
-        ],
-    },
-)
+version https://git-lfs.github.com/spec/v1
+oid sha256:95bf2cc7889ceb90a1f8808a97a9c97068a632bbbec32914a9defe81bce7c38e
+size 633

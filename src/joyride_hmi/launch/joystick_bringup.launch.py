@@ -1,29 +1,3 @@
-from http.server import executable
-import os
-
-from ament_index_python.packages import get_package_share_directory
-
-from launch import LaunchDescription
-from launch_ros.actions import Node
-
-
-
-def generate_launch_description():
-
-    return LaunchDescription([
-
-        # ----------- Publish Joystick Info ----------- #
-        Node(
-            package='joyride_hmi',
-            executable='joystick_pub_node',
-            name='Joystick_Publisher'
-        ),
-
-        # ----------- Publish Joystick Info ----------- #
-        Node(
-            package='joyride_hmi',
-            executable='joystick_mapper_node',
-            name='Joystick_Velocity_Mapper'
-        ),
-
-    ])
+version https://git-lfs.github.com/spec/v1
+oid sha256:d1af3f685a82c5687f664e426f6ed3c29055f206b0fa42f21e4808bcc3d3ea5a
+size 676
