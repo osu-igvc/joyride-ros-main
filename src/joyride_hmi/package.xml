@@ -1,3 +1,23 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:f52afd5cd9f95048216e9633d9d91ef7a4bd4ab3bf83d857d5e164f48c1fce4b
-size 783
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>joyride_hmi</name>
+  <version>1.0.0</version>
+  <description>Human-Machine Interface nodes for Joyride self-driving vehicle.</description>
+  <maintainer email="max.desantis@okstate.edu">Max DeSantis</maintainer>
+  <license>LGPL</license>
+
+  <depend>std_msgs</depend>
+  <depend>action_msgs</depend>
+  <depend>joyride_interfaces</depend>
+  <depend>rclpy</depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

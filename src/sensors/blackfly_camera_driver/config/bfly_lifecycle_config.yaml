@@ -1,3 +1,22 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:8b3cedccde595913da72a8f7178545730a2c20c1406a1af4408b96069a3d5123
-size 583
+
+/sensors/cameras/bfly_center:
+  ros__parameters:
+    serial_no: '18295827' # '18295827'
+    pixel_format: 'RGB8Packed'
+    video_mode: 'Mode1'
+    raw_image_topic: '/sensors/cameras/center/image'
+    compress_image: True
+
+/sensors/cameras/bfly_left:
+  ros__parameters:
+    serial_no: '18295825'
+    pixel_format: 'RGB8Packed'
+    video_mode: 'Mode1'
+    raw_image_topic: '/sensors/cameras/left/image'
+
+/sensors/cameras/bfly_right:
+  ros__parameters:
+    serial_no: '18295818'
+    pixel_format: 'RGB8Packed'
+    video_mode: 'Mode1'
+    raw_image_topic: '/sensors/cameras/right/image'

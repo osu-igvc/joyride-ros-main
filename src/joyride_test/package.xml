@@ -1,3 +1,23 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:3219f49a54a90a93eaac997faf6b3947e8bc37ba2fb72f0c546e5252bbbad052
-size 800
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>joyride_test</name>
+  <version>1.0.0</version>
+  <description>Internal testing and validation nodes for Joyride self-driving vehicle.</description>
+  <maintainer email="max.desantis@okstate.edu">Max DeSantis</maintainer>
+  <license>LGPL</license>
+
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>joyride_interfaces</depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

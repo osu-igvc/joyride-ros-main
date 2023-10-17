@@ -1,3 +1,23 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:fcc5a097c18be80cd430ba944357f2ce99b716325d7d6f006cc4ea707dc320f1
-size 778
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>joyride_base</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="max.desantis@okstate.edu">joyride-obc</maintainer>
+  <license>TODO: License declaration</license>
+
+  <depend>std_msgs</depend>
+  <depend>joyride_interfaces</depend>
+  <depend>geometry_msgs</depend>
+  <depend>diagnostic_msgs</depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

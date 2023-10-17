@@ -1,3 +1,12 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:7febbbee1392955d67ef34755f86f31a07223ba2d7cd2326f3b28cae5a4fd98a
-size 289
+computer_monitor_server:
+  ros__parameters:
+    frequency: 1.0
+    diagnostic_topic: /diagnostics
+
+    cpu_warning_percentage: 90
+    cpu_diagnostic_name: /utility/cpu
+    cpu_hardware_id: 0xf0
+
+    ram_warning_percentage: 90
+    ram_diagnostic_name: /utility/ram
+    ram_hardware_id: 0xf1

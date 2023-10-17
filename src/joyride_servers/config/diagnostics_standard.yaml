@@ -1,3 +1,28 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:6396cba76d355c764029888b261be80ede6b4c40b61c8cb51d400bf25fea07b7
-size 649
+diagnostic_analyzers:
+  ros__parameters:
+    path: system
+    
+    servers:
+      type: diagnostic_aggregator/GenericAnalyzer
+      path: servers
+      startswith: ['/servers']
+
+    dbw:
+      type: diagnostic_aggregator/GenericAnalyzer
+      path: dbw
+      startswith: ['/dbw']
+
+    # sensors:
+    #   type: diagnostic_aggregator/GenericAnalyzer
+    #   path: sensors
+    #   startswith: ['/sensors']
+
+    # algorithms:
+    #   type: diagnostic_aggregator/GenericAnalyzer
+    #   path: algorithms
+    #   startswith: ['/algorithms']
+
+    utility:
+      type: diagnostic_aggregator/GenericAnalyzer
+      path: utility
+      startswith: ['/utility']

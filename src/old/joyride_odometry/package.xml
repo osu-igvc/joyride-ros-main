@@ -1,3 +1,19 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:d7cb523bb0ec74db29a4626262031f81547f02d3c333338eade2a22c07b079d7
-size 654
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>joyride_odometry</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="joyride-obc@todo.todo">joyride-obc</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+  <depend>joyride_interfaces</depend>
+  
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

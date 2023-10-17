@@ -1,3 +1,27 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:0a8c0d0b5e76de0b3de6cb6509cf47dc43e7db98315879ff5b705e45e868a503
-size 381
+QListWidget {
+    color: #FFFFFF;
+    background-color: #33373B;
+}
+
+QListWidget::item {
+    height: 50px;
+}
+
+QListWidget::item:selected {
+    background-color: #2ABf9E;
+}
+
+QLabel {
+    background-color: #FFFFFF;
+    qproperty-alignment: AlignCenter;
+}
+
+QPushButton {
+    background-color: #2ABf9E;
+    padding: 20px;
+    font-size: 18px;
+}
+
+QMainWindow {
+    background: #f5f5f5;
+}

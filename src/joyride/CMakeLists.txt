@@ -1,3 +1,10 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:9471b80e0461e27e8191dc3e2335dd1da8e2e1463b8263effe23de668ee7ee2b
-size 171
+cmake_minimum_required(VERSION 3.5)
+project(joyride)
+
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)
+endif()
+
+find_package(ament_cmake REQUIRED)
+
+ament_package()

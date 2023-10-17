@@ -1,3 +1,25 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:1915d6a15d076ae620dbc20834aca595965a75b953f5e77b6a8359b67efbbe7b
-size 700
+/perception/lane_detection_node:
+  ros__parameters:
+    image_source_topic: '/cameras/front_raw'
+    image_output_topic: '/perception/front_lane_detected'
+
+/perception/pedestrian_detector_node:
+  ros__parameters:
+    image_source_topic: '/cameras/front_raw'
+    image_output_topic: '/perception/image_front_pedestrian'
+    hue_upper: 84
+    hue_lower: 8
+    sat_upper: 255
+    sat_lower: 105
+    val_upper: 255
+    val_lower: 192
+
+
+/perception/obstacle_detector_node:
+  ros__parameters:
+    image_source_topic: '/cameras/front_raw'
+    image_output_topic: '/perception/image_front_pedestrian'
+    edge_threshold1: 230
+    edge_threshold2: 255
+    object_area_lower: 3000
+    object_area_upper: 40000

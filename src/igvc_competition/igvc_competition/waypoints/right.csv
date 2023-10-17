@@ -1,3 +1,5 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:3a6c93ab2bc96ea6d162188a3fed8a96484c193c1d8b1794ee50d0ad3fc07334
-size 69
+# x, y, theta
+0.0, 0.0, 0.0
+1.0, 1.0, 1.0
+2.0, 2.0, 2.0
+3.0, 3.0, 3.0

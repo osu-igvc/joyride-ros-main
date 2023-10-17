@@ -1,3 +1,20 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:7373dccd365e87bcece5699d0cda76177fab1252a17d31ac29f08573253f187a
-size 401
+
+#include <memory>
+
+#include "rclcpp/rclcpp.hpp"
+#include "joyride_odometry/joyride_navsat_odom.hpp"
+
+int main(int argc, char **argv)
+{
+    rclcpp::init(argc, argv);
+
+    const rclcpp::NodeOptions options;
+
+    auto navsat_odom_node = std::make_shared<joyride_odometry::NavSatOdom>(options);
+
+    rclcpp::spin(navsat_odom_node->get_node_base_interface());
+
+    rclcpp::shutdown();
+    
+    return 0;
+}

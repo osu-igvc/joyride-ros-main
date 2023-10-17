@@ -1,3 +1,6 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:30461f6702c0253674ddeae894d56fe6b849f431bb561154fc4af090ad090894
-size 251
+/perception/uv_to_pointcloud:
+  ros_parameters:
+    camera_frame: "center"
+    data_transformed: "lanes"
+    calibration_file: "/src/joyride_perception/joyride_perception/calibration_center.csv"
+    subscriber_topic: "perception/object_to_point_cloud"

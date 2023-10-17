@@ -1,3 +1,19 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:af6cf268c933ba76660c665756d19fc883ff5dae4d23b998e5d27bea3d863955
-size 433
+#include "rclcpp/rclcpp.hpp"
+#include "joyride_control_lib/pid.h"
+
+class SteeringPID : public rclcpp::Node {
+  public:
+    SteeringPID();
+
+  private:
+    rclcpp::Time T; 
+    double time;
+
+    
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_; 
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+
+    void pid_callback(const std_msgs::msg::String::SharedPtr msg);
+    
+    PID* controller;
+};

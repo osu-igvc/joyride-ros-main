@@ -1,3 +1,24 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:5b454a64678984545ed28e9de651b679b96d8242bcc76ffc1924762434ae7b2b
-size 820
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>joyride_servers</name>
+  <version>1.0.0</version>
+  <description>Servers and service providers for Joyride self-driving vehicle.</description>
+  <maintainer email="max.desantis@okstate.edu">Max DeSantis</maintainer>
+  <license>LGPL</license>
+
+  <depend>std_msgs</depend>
+  <depend>action_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>joyride_interfaces</depend>
+  <depend>rclpy</depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

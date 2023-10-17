@@ -1,3 +1,23 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:6e47f0c65cda8f5ed4c2267957cf994b68c464c78a38082d65d9115b0861a374
-size 782
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>joyride_perception</name>
+  <version>1.0.0</version>
+  <description>Perception algorithms for Joyride self-driving vehicle.</description>
+  <maintainer email="max.desantis@okstate.edu">Max DeSantis</maintainer>
+  <license>LGPL</license>
+
+  <depend>std_msgs</depend>
+  <depend>action_msgs</depend>
+  <depend>joyride_interfaces</depend>
+  <depend>rclpy</depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

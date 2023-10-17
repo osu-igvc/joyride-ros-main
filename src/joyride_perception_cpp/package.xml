@@ -1,3 +1,30 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:cbfc1645f40f078cba36beb73105f3b23037131d19ba285b61b59b389d33f4bc
-size 1035
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>joyride_perception_cpp</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="icook@okstate.edu">isabell</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>cv_bridge</depend>
+  <depend>image_transport</depend>
+  <depend>OpenCV</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+    <install>
+      <include file="include/joyride_perception_cpp/lane_helperFunctions.h"/>
+      <include file="include/joyride_perception_cpp/lane_mainFunctions.h"/>
+      <include file="include/joyride_perception_cpp/slider.h"/>
+    </install>
+  </export>
+</package>

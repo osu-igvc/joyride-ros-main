@@ -1,3 +1,21 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:eeab46c158c048e67dcc45eafa9020438e9a58c079deb8e1a07bddcdb983f3cc
-size 680
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>joyride_control_lib</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="Lucaslorenhudson@gmail.com">allthisandthat</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
