@@ -1,6 +1,4 @@
 /src/igvc_competition/resource/igvc_competition filter=lfs diff=lfs merge=lfs -text
-/src/joyride_base/resource/joyride_base filter=lfs diff=lfs merge=lfs -text
-/src/joyride_control_py/resource/joyride_control_py filter=lfs diff=lfs merge=lfs -text
 /src/joyride_hmi/resource/joyride_hmi filter=lfs diff=lfs merge=lfs -text
 /src/joyride_perception/resource/joyride_perception filter=lfs diff=lfs merge=lfs -text
 /src/joyride_servers/resource/joyride_servers filter=lfs diff=lfs merge=lfs -text
