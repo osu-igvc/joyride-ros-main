@@ -1,3 +1,12 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:2d3217cc8209428a7a6ce81bb792b3016117098dbcd0242106d731cdb725c9ad
-size 507
+[submodule "src/joyride_sensors/urg_node2"]
+	path = src/joyride_sensors/urg_node2
+	url = git@github.com:Hokuyo-aut/urg_node2.git
+[submodule "src/joyride_ros2_socketcan"]
+	path = src/joyride_ros2_socketcan
+	url = https://github.com/osu-igvc/joyride_ros2_socketcan
+[submodule "src/joyride_vectornav"]
+	path = src/joyride_vectornav
+	url = https://github.com/osu-igvc/joyride_vectornav
+[submodule "src/joyride_diagnostics"]
+	path = src/joyride_diagnostics
+	url = https://github.com/osu-igvc/joyride_diagnostics

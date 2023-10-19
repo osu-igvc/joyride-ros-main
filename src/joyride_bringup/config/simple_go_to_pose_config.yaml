@@ -310,4 +310,4 @@ simple_go_to_pose:
     maximum_angular_speed: 1.57
     odom_topic: "odom"
     plan_topic: "plan"
-    cmd_topic:  "cmd_vel_simple"
+    cmd_topic:  "cmd_vel"

@@ -2,24 +2,25 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import PointCloud2, PointField, Image, CompressedImage
 from cv_bridge import CvBridge
-
 import numpy as np
 import cv2
 import os
 import scipy.linalg as LA
 from scipy.optimize import lsq_linear
 
+
 class PointCloudPublisher(Node):
     def __init__(self):
         super().__init__('point_cloud_publisher')
-        
+
         # Get ROS parameters
         self.camera_frame = self.declare_parameter('camera_frame','center').get_parameter_value().string_value
         self.trans_info = self.declare_parameter('data_transformed','lanes').get_parameter_value().string_value
         self.calibration_type = self.declare_parameter("calibration_type","correlated").get_parameter_value().string_value
         self.calibration_file = self.declare_parameter('calibration_file', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/joyride_perception/calibration_center.csv').get_parameter_value().string_value
-        self.image_sub_topic = self.declare_parameter("subscriber_topic", "/sensors/cameras/center/image/compressed").get_parameter_value().string_value
-        if self.image_sub_topic.split("/")[-1] == "compressed": self.compressed = True
+        self.image_sub_topic = self.declare_parameter("subscriber_topic", "/perception/lane/white").get_parameter_value().string_value
+
+        self.compressed = True if self.image_sub_topic.split("/")[-1] == "compressed" else False
 
         self.hsv_bounds = np.array([[41, 38, 143],[80,255,255]], dtype=np.uint8)
         #print('filepath: ', os.getcwd())
@@ -92,7 +93,7 @@ class PointCloudPublisher(Node):
     def calibrate_uv_xyz_transform(self,  calibration_type: str, calibration_file: str) -> np.ndarray:
         if calibration_type == "correlated":
             U, V, X, Y, Z = np.loadtxt(calibration_file,skiprows=2, unpack=True, delimiter=",")
-            R = np.transpose([np.ones_like(U), U, U**2, U**3, V, V**2, V**3, U*V, U*V**2, U**2 *V])     # origionally :  R = self.create_regressor(uv)
+            R = self.create_regressor(np.array([U,V]).T)
             sol = lsq_linear(LA.block_diag(R,R,R) ,np.append(X, [Y,Z]))
             Θ = sol.x.reshape(10,3, order="F")
             return Θ
@@ -101,14 +102,15 @@ class PointCloudPublisher(Node):
             return Θ
         
     def extract_uv_points(self, image:np.ndarray) -> np.ndarray:
-        image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        hsv_mask = cv2.inRange(image_hsv, self.hsv_bounds[0], self.hsv_bounds[1])
-        image_masked = cv2.bitwise_and(image,image, mask=hsv_mask)
+        # This section is used for color images. Comment out if feeding a black and white image
+        # image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        # hsv_mask = cv2.inRange(image_hsv, self.hsv_bounds[0], self.hsv_bounds[1])
+        # image_masked = cv2.bitwise_and(image,image, mask=hsv_mask)
 
-        cv2.imshow("Image",image_masked)
+        cv2.imshow("Image",image)
         cv2.waitKey(1)
 
-        uv = np.argwhere(image_masked != 0)
+        uv = np.argwhere(image != 0)
         return uv
 
     def project_image(self, uv: np.ndarray) -> PointCloud2:
@@ -117,7 +119,7 @@ class PointCloudPublisher(Node):
         
         msg = PointCloud2()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = 'base_link'
+        msg.header.frame_id = '/base_link'
         msg.height = 1
         msg.width = len(uv)
         msg.fields.append(PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1))
