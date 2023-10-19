@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'velocity_preprocessor = joyride_control_py.vel_preprocessor:main',
+            'vel_preprocessor = joyride_control_py.vel_preprocessor:main',
             'simple_go_to_pose = joyride_control_py.simple_go_to_pose:main'
         ],
     },

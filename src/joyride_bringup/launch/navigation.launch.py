@@ -56,11 +56,11 @@ def generate_launch_description():
         ),
 
         # Control
-        #Node(
-           # package='joyride_control_py',
-          #  executable='vel_preprocessor.py',
-         #   name='vel_node',
-        #),
+        Node(
+           package='joyride_control_py',
+           executable='vel_preprocessor.py',
+           name='vel_node',
+        ),
         
 
         # Localization
