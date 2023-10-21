@@ -13,6 +13,8 @@
       - 'wheelBR'
       - 'wheelBL'
       - 'hokuyo_front'
+      - 'base_link_odom' 
+      - 'base_link_map'
 
     hokuyo_front:
       frame_id: "base_link"
@@ -24,6 +26,28 @@
       rotation.y: 0.0
       rotation.z: 0.0
       rotation.w: 0.0
+# Jimmy used these two to corret a TF error they may not have correct information 
+    base_link_map:
+      frame_id: "map"
+      child_frame_id: "base_link"
+      translation.x: 0.0
+      translation.y: 0.0
+      translation.z: 0.0
+      rotation.x: 0.0
+      rotation.y: 0.0
+      rotation.z: 0.0
+      rotation.w: 1.0
+# Jimmy used these two to corret a TF error they may not have correct information 
+    base_link_odom:
+      frame_id: "base_link"
+      child_frame_id: "odom"
+      translation.x: 0.0
+      translation.y: 0.0
+      translation.z: 0.0
+      rotation.x: 0.0
+      rotation.y: 0.0
+      rotation.z: 0.0
+      rotation.w: 1.0
 
     imu:
       frame_id: "base_link"

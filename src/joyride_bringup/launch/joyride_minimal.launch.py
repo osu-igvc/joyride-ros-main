@@ -87,7 +87,7 @@ def generate_launch_description():
         # Velocity preprocessor
         Node(
             package='joyride_control_py',
-            executable='velocity_preprocessor',
+            executable='vel_preprocessor',
             name='vel_node',
         ),
 ])

@@ -16,7 +16,7 @@ from nav2_common.launch import RewrittenYaml
 def generate_launch_description():
 
     controller_type = LaunchConfiguration('controller_type')
-    nav_params = LaunchConfiguration('nav_params')
+    nav_params = LaunchConfiguration('nav2_params')
 
     declare_controller_type_cmd = DeclareLaunchArgument(
         'controller_type',
@@ -24,7 +24,7 @@ def generate_launch_description():
     )
 
     final_nav_params_path = DeclareLaunchArgument(
-        'nav_params',
+        'nav2_params',
         default_value=[get_package_share_directory('joyride_bringup'), '/config/',LaunchConfiguration('controller_type')])
 
     return LaunchDescription([
@@ -39,11 +39,19 @@ def generate_launch_description():
             ])
         ),
 
-        # Transforms
+        # # Transforms - Possibly Old version; throws TF error
+        # IncludeLaunchDescription(
+        #     PythonLaunchDescriptionSource([os.path.join(
+        #     get_package_share_directory('joyride_core'), 'launch'),
+        #     '/static_transforms.launch.py'
+        #     ])
+        # ),
+
+        # Transforms - Static TFs
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('joyride_core'), 'launch'),
-            '/static_transforms.launch.py'
+            get_package_share_directory('joyride_bringup'), 'launch'),
+            '/joyride_transforms.launch.py'
             ])
         ),
 
@@ -58,17 +66,25 @@ def generate_launch_description():
         # Control
         Node(
            package='joyride_control_py',
-           executable='vel_preprocessor.py',
+           executable='vel_preprocessor',
            name='vel_node',
         ),
         
 
         # Localization
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('joyride_bringup'), 'launch'),
-            '/gps_localization.launch.py']),
+           PythonLaunchDescriptionSource([os.path.join(
+           get_package_share_directory('joyride_bringup'), 'launch'),
+           '/gps_localization.launch.py']),
         ),
+        
+        # Faked Localization
+        # Node(
+        #     package='joyride_localization',
+        #     executable='fake_odom',
+        #     name='fake_odom',
+        #     output='screen',
+        # ),
 
         # Navstack
         IncludeLaunchDescription(

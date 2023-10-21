@@ -131,7 +131,7 @@ def generate_launch_description():
             ),
 
          # 2D Lidar
-       IncludeLaunchDescription(
+        IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory('joyride_bringup'), 'launch'),
                 '/lidar2D.launch.py'
@@ -139,12 +139,12 @@ def generate_launch_description():
         ),
 
        # # Vectornav
-       IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([os.path.join(
-                get_package_share_directory('vectornav'), 'launch'),
-                '/vectornav.launch.py'
-        ])
-        ),
+        #IncludeLaunchDescription(
+        #    PythonLaunchDescriptionSource([os.path.join(
+        #        get_package_share_directory('vectornav'), 'launch'),
+        #        '/vectornav.launch.py'
+        #])
+        #),
 
        # # Faked Localization
         #Node(
@@ -165,7 +165,7 @@ def generate_launch_description():
        # # Velocity Preprocessor
         Node(
             package='joyride_control_py',
-            executable='velocity_preprocessor',
+            executable='vel_preprocessor',
             name='vel_node',
         ),
 

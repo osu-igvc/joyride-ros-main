@@ -29,7 +29,6 @@ setup(
             'obstacle_detector = joyride_perception.obstacle_detector:main',
             'uv_to_pointcloud = joyride_perception.uv_to_pointcloud:main',
             'orange_detector = joyride_perception.orange_detector:main',
-            'uv_to_pointcloud_test = joyride_perception.uv_to_pointcloud_test:main',
             'Bfly_LDC = joyride_perception.Bfly_LDC:main'
         ],
     },
