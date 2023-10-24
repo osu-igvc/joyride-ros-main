@@ -26,21 +26,11 @@
       rotation.y: 0.0
       rotation.z: 0.0
       rotation.w: 0.0
-# Jimmy used these two to corret a TF error they may not have correct information 
-    base_link_map:
-      frame_id: "map"
-      child_frame_id: "base_link"
-      translation.x: 0.0
-      translation.y: 0.0
-      translation.z: 0.0
-      rotation.x: 0.0
-      rotation.y: 0.0
-      rotation.z: 0.0
-      rotation.w: 1.0
+
 # Jimmy used these two to corret a TF error they may not have correct information 
     base_link_odom:
-      frame_id: "base_link"
-      child_frame_id: "odom"
+      frame_id: "odom"
+      child_frame_id: "base_link"
       translation.x: 0.0
       translation.y: 0.0
       translation.z: 0.0
@@ -60,16 +50,16 @@
       rotation.z: 0.0
       rotation.w: 1.0
     
-    map_odom:
-      frame_id: "map"
-      child_frame_id: "odom"
-      translation.x: 0.0
-      translation.y: 0.0
-      translation.z: 0.0
-      rotation.x: 0.0
-      rotation.y: 0.0
-      rotation.z: 0.0
-      rotation.w: 1.0
+    # map_odom:
+    #   frame_id: "map"
+    #   child_frame_id: "odom"
+    #   translation.x: 0.0
+    #   translation.y: 0.0
+    #   translation.z: 0.0
+    #   rotation.x: 0.0
+    #   rotation.y: 0.0
+    #   rotation.z: 0.0
+    #   rotation.w: 1.0
 
     bfly_center:
       frame_id: "base_link"

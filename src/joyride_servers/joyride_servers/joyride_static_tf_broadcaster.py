@@ -8,8 +8,6 @@ from rcl_interfaces.msg import ParameterDescriptor
 
 
 
-#   Error: Warning: Invalid frame ID "vectornav" passed to canTransform argument source_frame - frame does not exist 
-#   Can be fixed by using code in line 54 or 58. 
 class StaticTransformNode(Node):
 
     def __init__(self):
@@ -55,7 +53,7 @@ class StaticTransformNode(Node):
 
             self.frames.append(F)
         
-        self.get_logger().warn('All frames:' + str(self.frames))        
+        #self.get_logger().warn('All frames:' + str(self.frames))        
 
     def broadcast_timer_callback(self):
         t = self.get_clock().now().to_msg()

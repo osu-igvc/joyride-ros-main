@@ -1,0 +1,122 @@
+[0.010s] Invoking command in '/home/joyride-obc/joyride-ros-main/src/joyride_bringup/build/joyride_bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/joyride-obc/joyride-ros-main/install/nav2_simple_commander:/home/joyride-obc/joyride-ros-main/install/joyride_test:/home/joyride-obc/joyride-ros-main/install/joyride_servers:/home/joyride-obc/joyride-ros-main/install/joyride_sensors_generic:/home/joyride-obc/joyride-ros-main/install/joyride_ros2_socketcan:/home/joyride-obc/joyride-ros-main/install/joyride_perception:/home/joyride-obc/joyride-ros-main/install/joyride_hmi:/home/joyride-obc/joyride-ros-main/install/joyride_control_py:/home/joyride-obc/joyride-ros-main/install/joyride_blackfly_gige:/home/joyride-obc/joyride-ros-main/install/joyride_base:/home/joyride-obc/joyride-ros-main/install/blackfly_camera_driver:/home/joyride-obc/joyride-ros-main/install/joyride_core:/home/joyride-obc/joyride-ros-main/install/igvc_competition:/opt/ros/humble /home/joyride-obc/.local/bin/cmake /home/joyride-obc/joyride-ros-main/src/joyride_bringup -DCMAKE_INSTALL_PREFIX=/home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup
+[0.070s] -- The C compiler identification is GNU 11.4.0
+[0.108s] -- The CXX compiler identification is GNU 11.4.0
+[0.115s] -- Detecting C compiler ABI info
+[0.147s] -- Detecting C compiler ABI info - done
+[0.153s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.153s] -- Detecting C compile features
+[0.153s] -- Detecting C compile features - done
+[0.155s] -- Detecting CXX compiler ABI info
+[0.192s] -- Detecting CXX compiler ABI info - done
+[0.198s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.198s] -- Detecting CXX compile features
+[0.198s] -- Detecting CXX compile features - done
+[0.202s] -- Found ament_cmake: 1.3.4 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.453s] -- Found Python3: /usr/bin/python3.10 (found version "3.10.12") found components: Interpreter 
+[0.551s] -- Found ament_lint_auto: 0.12.6 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[0.628s] -- Added test 'copyright' to check source files copyright and LICENSE
+[0.632s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[0.632s] -- Configured cppcheck include dirs: 
+[0.632s] -- Configured cppcheck exclude dirs and/or files: 
+[0.635s] -- Added test 'cpplint' to check C / C++ code against the Google style
+[0.635s] -- Configured cpplint exclude dirs and/or files: 
+[0.636s] -- Added test 'flake8' to check Python code syntax and style conventions
+[0.638s] -- Added test 'lint_cmake' to check CMake code style
+[0.639s] -- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257
+[0.642s] -- Added test 'uncrustify' to check C / C++ code style
+[0.642s] -- Configured uncrustify additional arguments: 
+[0.644s] -- Added test 'xmllint' to check XML markup files
+[0.646s] -- Configuring done (0.6s)
+[0.647s] -- Generating done (0.0s)
+[0.647s] -- Build files have been written to: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/build/joyride_bringup
+[0.651s] Invoked command in '/home/joyride-obc/joyride-ros-main/src/joyride_bringup/build/joyride_bringup' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/joyride-obc/joyride-ros-main/install/nav2_simple_commander:/home/joyride-obc/joyride-ros-main/install/joyride_test:/home/joyride-obc/joyride-ros-main/install/joyride_servers:/home/joyride-obc/joyride-ros-main/install/joyride_sensors_generic:/home/joyride-obc/joyride-ros-main/install/joyride_ros2_socketcan:/home/joyride-obc/joyride-ros-main/install/joyride_perception:/home/joyride-obc/joyride-ros-main/install/joyride_hmi:/home/joyride-obc/joyride-ros-main/install/joyride_control_py:/home/joyride-obc/joyride-ros-main/install/joyride_blackfly_gige:/home/joyride-obc/joyride-ros-main/install/joyride_base:/home/joyride-obc/joyride-ros-main/install/blackfly_camera_driver:/home/joyride-obc/joyride-ros-main/install/joyride_core:/home/joyride-obc/joyride-ros-main/install/igvc_competition:/opt/ros/humble /home/joyride-obc/.local/bin/cmake /home/joyride-obc/joyride-ros-main/src/joyride_bringup -DCMAKE_INSTALL_PREFIX=/home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup
+[0.652s] Invoking command in '/home/joyride-obc/joyride-ros-main/src/joyride_bringup/build/joyride_bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/joyride-obc/joyride-ros-main/install/nav2_simple_commander:/home/joyride-obc/joyride-ros-main/install/joyride_test:/home/joyride-obc/joyride-ros-main/install/joyride_servers:/home/joyride-obc/joyride-ros-main/install/joyride_sensors_generic:/home/joyride-obc/joyride-ros-main/install/joyride_ros2_socketcan:/home/joyride-obc/joyride-ros-main/install/joyride_perception:/home/joyride-obc/joyride-ros-main/install/joyride_hmi:/home/joyride-obc/joyride-ros-main/install/joyride_control_py:/home/joyride-obc/joyride-ros-main/install/joyride_blackfly_gige:/home/joyride-obc/joyride-ros-main/install/joyride_base:/home/joyride-obc/joyride-ros-main/install/blackfly_camera_driver:/home/joyride-obc/joyride-ros-main/install/joyride_core:/home/joyride-obc/joyride-ros-main/install/igvc_competition:/opt/ros/humble /home/joyride-obc/.local/bin/cmake --build /home/joyride-obc/joyride-ros-main/src/joyride_bringup/build/joyride_bringup -- -j24 -l24
+[0.679s] Invoked command in '/home/joyride-obc/joyride-ros-main/src/joyride_bringup/build/joyride_bringup' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/joyride-obc/joyride-ros-main/install/nav2_simple_commander:/home/joyride-obc/joyride-ros-main/install/joyride_test:/home/joyride-obc/joyride-ros-main/install/joyride_servers:/home/joyride-obc/joyride-ros-main/install/joyride_sensors_generic:/home/joyride-obc/joyride-ros-main/install/joyride_ros2_socketcan:/home/joyride-obc/joyride-ros-main/install/joyride_perception:/home/joyride-obc/joyride-ros-main/install/joyride_hmi:/home/joyride-obc/joyride-ros-main/install/joyride_control_py:/home/joyride-obc/joyride-ros-main/install/joyride_blackfly_gige:/home/joyride-obc/joyride-ros-main/install/joyride_base:/home/joyride-obc/joyride-ros-main/install/blackfly_camera_driver:/home/joyride-obc/joyride-ros-main/install/joyride_core:/home/joyride-obc/joyride-ros-main/install/igvc_competition:/opt/ros/humble /home/joyride-obc/.local/bin/cmake --build /home/joyride-obc/joyride-ros-main/src/joyride_bringup/build/joyride_bringup -- -j24 -l24
+[0.727s] Invoking command in '/home/joyride-obc/joyride-ros-main/src/joyride_bringup/build/joyride_bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/joyride-obc/joyride-ros-main/install/nav2_simple_commander:/home/joyride-obc/joyride-ros-main/install/joyride_test:/home/joyride-obc/joyride-ros-main/install/joyride_servers:/home/joyride-obc/joyride-ros-main/install/joyride_sensors_generic:/home/joyride-obc/joyride-ros-main/install/joyride_ros2_socketcan:/home/joyride-obc/joyride-ros-main/install/joyride_perception:/home/joyride-obc/joyride-ros-main/install/joyride_hmi:/home/joyride-obc/joyride-ros-main/install/joyride_control_py:/home/joyride-obc/joyride-ros-main/install/joyride_blackfly_gige:/home/joyride-obc/joyride-ros-main/install/joyride_base:/home/joyride-obc/joyride-ros-main/install/blackfly_camera_driver:/home/joyride-obc/joyride-ros-main/install/joyride_core:/home/joyride-obc/joyride-ros-main/install/igvc_competition:/opt/ros/humble /home/joyride-obc/.local/bin/cmake --install /home/joyride-obc/joyride-ros-main/src/joyride_bringup/build/joyride_bringup
+[0.745s] -- Install configuration: ""
+[0.745s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch
+[0.745s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/navstack.launch.py
+[0.745s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joyride_perception.launch.py
+[0.745s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/gui.launch.py
+[0.745s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/navsat_transform.launch.py
+[0.745s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joyride_JJJT_test.launch.py
+[0.745s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/install
+[0.745s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/install/COLCON_IGNORE
+[0.745s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/install/setup.sh
+[0.745s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/install/setup.ps1
+[0.745s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/install/_local_setup_util_sh.py
+[0.745s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/install/.colcon_install_layout
+[0.745s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/install/local_setup.zsh
+[0.746s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/install/local_setup.ps1
+[0.746s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/install/_local_setup_util_ps1.py
+[0.746s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/install/setup.bash
+[0.746s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/install/local_setup.sh
+[0.746s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/install/setup.zsh
+[0.746s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/install/local_setup.bash
+[0.746s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/lifecycle_sensors.launch.py
+[0.746s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/lidar2D.launch.py
+[0.746s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joyride_joystick_control_sensors.launch.py
+[0.746s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/online_async_launch.py
+[0.746s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/navigation.launch.py
+[0.746s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joyride_purepursuit.launch.py
+[0.746s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joyride_minimal_fake.launch.py
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/sensorsWithPerception.py
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joyride_diagnostics.launch.py
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/__pycache__
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/__pycache__/joyride_joystick_control.launch.cpython-310.pyc
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/__pycache__/sensorsWithPerception.cpython-310.pyc
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/__pycache__/joyride_purepursuit.launch.cpython-310.pyc
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/__pycache__/joyride_sensors.launch.cpython-310.pyc
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/fake_joy_test.launch.py
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/CAN.launch.py
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/log
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/log/COLCON_IGNORE
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/log/latest_build
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/log/latest
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/log/build_2023-10-10_11-03-58
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/log/build_2023-10-10_11-03-58/events.log
+[0.747s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/log/build_2023-10-10_11-03-58/logger_all.log
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/log/build_2023-10-10_11-00-29
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/log/build_2023-10-10_11-00-29/events.log
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/log/build_2023-10-10_11-00-29/logger_all.log
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joyride_mppi.launch.py
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joyride_sensors.launch.py
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joyride_minimal.launch.py
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joystick.launch.py
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joyride_joystick_control.launch.py
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/build
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/build/COLCON_IGNORE
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/build/.built_by
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joyride_simple_go_to_pose.launch.py
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joyride_transforms.launch.py
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/gps_localization.launch.py
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/rosbag_recorder.launch.py
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joyride_nav_pp_clean.launch.py
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/launch/joyride_JJJT_test.py
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/config
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/config/diagnostic_minimal.yaml
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/config/obstacle_config.yaml
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/config/nav2_params.yaml
+[0.748s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/config/mapper_params_online_async.yaml
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/config/purepursuit_config.yaml
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/config/mppi_config.yaml
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/config/lidar_config.yaml
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/config/nav_pp_clean.yaml
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/config/teb_config.yaml
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/config/simple_go_to_pose_config.yaml
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/ament_index/resource_index/package_run_dependencies/joyride_bringup
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/ament_index/resource_index/parent_prefix_path/joyride_bringup
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/environment/ament_prefix_path.sh
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/environment/ament_prefix_path.dsv
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/environment/path.sh
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/environment/path.dsv
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/local_setup.bash
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/local_setup.sh
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/local_setup.zsh
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/local_setup.dsv
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/package.dsv
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/ament_index/resource_index/packages/joyride_bringup
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/cmake/joyride_bringupConfig.cmake
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/cmake/joyride_bringupConfig-version.cmake
+[0.749s] -- Installing: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/install/joyride_bringup/share/joyride_bringup/package.xml
+[0.752s] Invoked command in '/home/joyride-obc/joyride-ros-main/src/joyride_bringup/build/joyride_bringup' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/joyride-obc/joyride-ros-main/install/nav2_simple_commander:/home/joyride-obc/joyride-ros-main/install/joyride_test:/home/joyride-obc/joyride-ros-main/install/joyride_servers:/home/joyride-obc/joyride-ros-main/install/joyride_sensors_generic:/home/joyride-obc/joyride-ros-main/install/joyride_ros2_socketcan:/home/joyride-obc/joyride-ros-main/install/joyride_perception:/home/joyride-obc/joyride-ros-main/install/joyride_hmi:/home/joyride-obc/joyride-ros-main/install/joyride_control_py:/home/joyride-obc/joyride-ros-main/install/joyride_blackfly_gige:/home/joyride-obc/joyride-ros-main/install/joyride_base:/home/joyride-obc/joyride-ros-main/install/blackfly_camera_driver:/home/joyride-obc/joyride-ros-main/install/joyride_core:/home/joyride-obc/joyride-ros-main/install/igvc_competition:/opt/ros/humble /home/joyride-obc/.local/bin/cmake --install /home/joyride-obc/joyride-ros-main/src/joyride_bringup/build/joyride_bringup

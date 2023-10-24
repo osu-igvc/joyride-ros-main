@@ -68,8 +68,8 @@ class PointCloudPublisher(Node):
 
     def compressed_image_callback(self, msg:CompressedImage):
         cv_image = self.bridge.compressed_imgmsg_to_cv2(msg)
-        cv_image = cv2.flip(cv_image, 0)
-        cv_image = cv2.flip(cv_image, 1)
+        #cv_image = cv2.flip(cv_image, 0)
+        #cv_image = cv2.flip(cv_image, 1)
         cv2.imshow("Original",cv_image)
         uv = self.extract_uv_points(cv_image)
         point_cloud_msg = self.project_image(uv)
@@ -78,8 +78,8 @@ class PointCloudPublisher(Node):
     def image_callback(self, msg:Image):
         # Convert the binary image to OpenCV format
         cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='mono8')
-        cv_image = cv2.flip(cv_image, 0)
-        cv_image = cv2.flip(cv_image, 1)
+        #cv_image = cv2.flip(cv_image, 0)
+        #cv_image = cv2.flip(cv_image, 1)
 
         # Extract UV points from the binary image
         uv_points = self.extract_uv_points(cv_image)
@@ -114,9 +114,11 @@ class PointCloudPublisher(Node):
         return uv
 
     def project_image(self, uv: np.ndarray) -> PointCloud2:
-        Φ = self.create_regressor(uv)
+        Φ = np.transpose([np.ones_like(uv[:,0]), uv[:,0], uv[:,0]**2, uv[:,0]**3, uv[:,1], uv[:,1]**2, uv[:,1]**3, uv[:,0]*uv[:,1], uv[:,0]*uv[:,1]**2, uv[:,0]**2 *uv[:,1]])
         P = Φ @ self.Θ
         
+        print(f"{np.shape(P)=}") # want Nx3 array
+
         msg = PointCloud2()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = '/base_link'
@@ -126,7 +128,7 @@ class PointCloudPublisher(Node):
         msg.fields.append(PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1))
         msg.fields.append(PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1))
         msg.is_bigendian = False
-        msg.point_step = 12
+        msg.point_step =len(msg.fields)*4
         msg.row_step = msg.point_step * msg.width
         msg.is_dense = True
         msg.data = np.asarray(P, dtype=np.float32).tobytes()
