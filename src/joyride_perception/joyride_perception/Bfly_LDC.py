@@ -68,15 +68,9 @@ class Bfly_LDC():
             print('Number of cameras detected: %d' % num_cameras)
 
             # Finish if there are no cameras
-            if num_cameras == 0:
-
-                # Clear camera list before releasing system
-                cam_list.Clear()
-
-                # Release system instance
-                system.ReleaseInstance()
+            if num_cameras is 0:
                 print('No Cameras Found!')
-
+                
             else:
                 for i, cams in enumerate(cam_list):
 
@@ -175,11 +169,13 @@ class Bfly_LDC():
                             # ... error handling ...
                             print(f'Error: Input {user_input} unrecognised.')
                             pass
+                        
+                # The usage of del is preferred to assigning the variable to None for the cameras.
+                del cams
 
             #NOTE: If you break a loop without terminating the cameras it will lead to a sudden forced quit and not proceed
             # to the next section after this method is run
-            # The usage of del is preferred to assigning the variable to None for the cameras.
-            del cams
+            
 
             # Clear camera list before releasing system
             cam_list.Clear()
@@ -188,8 +184,9 @@ class Bfly_LDC():
             system.ReleaseInstance()
         
         
-        except :
+        except Exception as e:
             print('Get Image Error'.center(100, '='))
+            print(e)
         
         
 
@@ -334,8 +331,9 @@ class Bfly_LDC():
         # ... More Error Handeling ...
         except IndexError:
             print('INDEX ERROR'.center(100, '-'))
-        except: 
+        except Exception as e: 
             print('CALIBRATION ERROR'.center(100, '-'))
+            print(e)
 
 
 
