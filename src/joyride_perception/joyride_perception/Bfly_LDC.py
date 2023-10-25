@@ -1,4 +1,5 @@
 # Pathing
+import enum
 import os
 from PIL import Image
 
@@ -6,6 +7,7 @@ from PIL import Image
 import cv2 as cv
 import glob
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Camera requirements
 import PySpin
@@ -26,13 +28,15 @@ class Bfly_LDC():
 
 
         # Check/Make a directory to save Data
+        self.dir_path = os.path.dirname(os.path.abspath(__file__))
         self.output_dir = 'Camera Calibration Data'
         print(f'Checking for {self.output_dir} folder.')
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
-            print(f'No folder for {self.output_dir}. Creating folder.')
-        else:
-            print(f'Folder for {self.output_dir} located.')
+        self.check_for_folder(self.output_dir)
+        # if not os.path.exists(self.output_dir):
+        #     os.makedirs(self.output_dir)
+        #     print(f'No folder for {self.output_dir}. Creating folder.')
+        # else:
+        #     print(f'Folder for {self.output_dir} located.')
 
         # Aquiring aquisition time
         while True:
@@ -68,7 +72,7 @@ class Bfly_LDC():
             print('Number of cameras detected: %d' % num_cameras)
 
             # Finish if there are no cameras
-            if num_cameras is 0:
+            if num_cameras == 0:
                 print('No Cameras Found!')
                 
             else:
@@ -93,7 +97,7 @@ class Bfly_LDC():
                                 cam_name = 'BlackFly Left'
                             case '18295818':
                                 cam_name = 'BlackFly Right'
-                            case '18295827':
+                            case '18295828':
                                 cam_name = 'BlackFly Center'
                             case _ :
                                 cam_name = 'Unkown Camera'
@@ -153,7 +157,10 @@ class Bfly_LDC():
                             print("Saving calibration images to: %s" % cam_image_dir_path)
 
                             # cycles through all the frames until they are all saved in the corresponding cameras folder
+                            self.record_video(cam_name = cam_name,frames = imgs, width = camWidth, height = camHeight)
+                            
                             for n, img in enumerate(imgs):
+                                print(n, ' ', img)
                                 Image.fromarray(img).save(os.path.join(cam_image_dir_path, '%08d.png' % n))
 
                             # Begining Calibration
@@ -188,7 +195,50 @@ class Bfly_LDC():
             print('Get Image Error'.center(100, '='))
             print(e)
         
+
+        # === Testing methods to clean up readability === #
+    def check_for_folder(self,filename):
+        """
+        Checks for folder with given filename and creates one if one doesnt exists in the folder in which this script is contained 
+        I.E. ( ../somefolder/Bfly_LDC) would create X folder (../somefolder/X)
         
+        args: 
+            filename - string containing filename or path in relation to this python script 
+        
+        """
+        # Check/Make a directory to save Data
+        print(f'PATH >>> {self.dir_path}')
+        
+        
+        if not os.path.exists( os.path.join(self.dir_path, filename) ):
+            os.makedirs(os.path.join(self.dir_path, filename))
+            print(f'No folder for {filename} in path. Creating folder.')
+                
+        else:
+            print(f'Folder for {filename} located in path.')
+    
+
+    # === TEST METHOD === #
+    def record_video(self, cam_name, frames, width, height):
+        print('Checkpoint 1')
+        video_path = cam_name + '\\' + 'Video'
+        self.check_for_folder(video_path)
+
+        channel = 3
+        fps = 30
+
+        fourcc = cv.VideoWriter_fourcc(*"XVID")
+        #Syntax: cv2.VideoWriter( filename, fourcc, fps, frameSize )
+        video = cv.VideoWriter('test.avi', fourcc, float(fps), (width, height))
+ 
+        for frame in enumerate(frames):
+            video.write(frame[1])
+ 
+        video.release()
+        print('Video saved at %s.avi' % video_path)
+
+            
+            
 
 
 
