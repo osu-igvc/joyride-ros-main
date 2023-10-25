@@ -2,12 +2,13 @@
 import enum
 import os
 from PIL import Image
+import glob
 
 # Utilities
 import cv2 as cv
-import glob
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 # Camera requirements
 import PySpin
@@ -43,6 +44,7 @@ class Bfly_LDC():
             try:
                 self.duration = int(input("Enter the calibration duration in seconds: "))
                 print(f"Starting each camera for: {self.duration} seconds" )
+                self.duration = self.duration * 35
                 break
             except ValueError:
                 print("Invalid input. Please enter an integer.")
@@ -108,20 +110,15 @@ class Bfly_LDC():
 
                         cam_dir_path = os.path.join(self.output_dir,cam_name)
                         print(f'Checking for specific camera "{cam_dir_path}" folder.')
-                        if not os.path.exists(cam_dir_path):
-                            print(f'No folder for {cam_name} in path {self.output_dir}. Creating folder.')
-                            os.makedirs(cam_dir_path)
-                        else:
-                            print(f'Folder for {cam_name} in path {cam_dir_path} located.')
+                        
+                        self.check_for_folder(cam_dir_path)
 
                         # Checks if camera image path exits if not makes one.
                         cam_image_dir_path = os.path.join(cam_dir_path, 'Images')
                         print(f'Checking for specific camera "{cam_image_dir_path}" folder.')
-                        if not os.path.exists(cam_image_dir_path):
-                            print(f'No folder for "Images" in path {cam_image_dir_path}. Creating folder.')
-                            os.makedirs(cam_image_dir_path)
-                        else:
-                            print(f'Folder for "Images" in path {cam_dir_path} located.')
+                        
+                        self.check_for_folder(cam_image_dir_path)
+                        
                         print('File Check Completed'.center(25, '='))
                         # === End of file confirmation === #
 
@@ -154,17 +151,12 @@ class Bfly_LDC():
                                 cam.stop() # Stop recording
                                 print("Ending recording")
 
-                            print("Saving calibration images to: %s" % cam_image_dir_path)
-
                             # cycles through all the frames until they are all saved in the corresponding cameras folder
-                            self.record_video(cam_name = cam_name,frames = imgs, width = camWidth, height = camHeight)
+                            self.record_video(filepath = cam_dir_path,frames = imgs, width = camWidth, height = camHeight)
                             
-                            for n, img in enumerate(imgs):
-                                print(n, ' ', img)
-                                Image.fromarray(img).save(os.path.join(cam_image_dir_path, '%08d.png' % n))
-
-                            # Begining Calibration
-                            self.calibrateDistortion(cam_dir_path,cam_image_dir_path, camWidth, camHeight)
+                            print("Saving calibration images to: %s" % cam_image_dir_path)
+                            for n, img in enumerate(tqdm(imgs)):
+                                Image.fromarray(img).save(os.path.join(os.path.join(self.dir_path, cam_image_dir_path), '%08d.png' % n))
                             break
                             
 
@@ -176,6 +168,9 @@ class Bfly_LDC():
                             # ... error handling ...
                             print(f'Error: Input {user_input} unrecognised.')
                             pass
+                        
+                    # Begining Calibration
+                    self.calibrateDistortion(cam_dir_path,cam_image_dir_path, camWidth, camHeight)
                         
                 # The usage of del is preferred to assigning the variable to None for the cameras.
                 del cams
@@ -197,6 +192,25 @@ class Bfly_LDC():
         
 
         # === Testing methods to clean up readability === #
+
+    def conformation(self, message = 'None'):
+        confirm = False
+        user_input = input('Confirm? [Y/N]: ')
+        while confirm:
+            if user_input.lower() in ('y', 'yes', 'Y', 'Yes', 'YES'):
+                return True
+            elif user_input.lower() in ('n', 'no', 'N', 'No','NO'):
+            
+                print(f'{message}: {confirm}')
+                break
+
+            else:
+            # ... error handling ...
+                print(f'Error: Input {user_input} unrecognised.')
+                pass        
+        
+        return confirm
+
     def check_for_folder(self,filename):
         """
         Checks for folder with given filename and creates one if one doesnt exists in the folder in which this script is contained 
@@ -219,25 +233,44 @@ class Bfly_LDC():
     
 
     # === TEST METHOD === #
-    def record_video(self, cam_name, frames, width, height):
-        print('Checkpoint 1')
-        video_path = cam_name + '\\' + 'Video'
+    def record_video(self, filepath, frames, width, height):
+        
+        video_path = filepath + '\\' + 'Video'
         self.check_for_folder(video_path)
 
-        channel = 3
-        fps = 30
+        fps = 35
 
         fourcc = cv.VideoWriter_fourcc(*"XVID")
         #Syntax: cv2.VideoWriter( filename, fourcc, fps, frameSize )
-        video = cv.VideoWriter('test.avi', fourcc, float(fps), (width, height))
+        video = cv.VideoWriter(os.path.join(self.dir_path,video_path + '\\calibration video.avi'), fourcc, float(fps), (width, height))
  
-        for frame in enumerate(frames):
+        for frame in enumerate(tqdm(frames)):
             video.write(frame[1])
  
         video.release()
         print('Video saved at %s.avi' % video_path)
 
-            
+    def extract_frames(self, file, directory, interval: int = 100, flip: bool = False) -> None:
+        """
+        Extrernal Code to extract frames from video.
+        """
+        i = 1
+        i_saved = 0
+        stream = cv.VideoCapture(file)
+        if stream.isOpened():
+            for i in tqdm(range(int(stream.get(cv.CAP_PROP_FRAME_COUNT)))):
+                ret, frame = stream.read()
+                if (i - i_saved) == interval:
+                    i_saved = i
+                    if flip:
+                        frame_saved = cv.flip(cv.flip(frame,0),1)
+                    else:
+                        frame_saved = frame
+                    cv.imwrite(f"{directory[1]}\\frame_{i}.jpg",frame_saved)
+                else:
+                    pass
+                i += 1
+        stream.release()
             
 
 
