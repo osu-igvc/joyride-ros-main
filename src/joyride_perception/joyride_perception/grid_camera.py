@@ -5,8 +5,10 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
+
 class ImageSubscriber(Node):
     def __init__(self):
+
 
         filePath = "/home/joyride-obc/joyride-ros-main/CurveFitParams_center.csv"
 
@@ -54,12 +56,14 @@ class ImageSubscriber(Node):
     def image_callback(self, msg):
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+            cv_image = cv2.flip(cv_image, 0)
+            cv_image = cv2.flip(cv_image, 1)
         except Exception as e:
             self.get_logger().error('Error converting image: %s' % str(e))
             return
         
-        cv_image = cv2.flip(cv_image, 0)
-        cv_image = cv2.flip(cv_image, 1)
+        # cv_image = cv2.flip(cv_image, 0)
+        # cv_image = cv2.flip(cv_image, 1)
 
         # masked = self.maskYellow(cv_image)
         # centers = self.detectYellowPoints(masked)
@@ -93,6 +97,10 @@ class ImageSubscriber(Node):
         # cv2.line(cv_image, (width // 2, 0), (width // 2, height - 1), (0, 255, 0), 2)  # Vertical line
         # cv2.line(cv_image, (0, height // 2), (width - 1, height // 2), (0, 255, 0), 2)  # Horizontal line
 
+     
+        # height,width=cv_image.shape[:2]
+        # print(height,",",width)
+        
         cv2.imshow('image', cv_image)
         cv2.waitKey(1)
 

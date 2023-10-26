@@ -39,6 +39,7 @@ class Bfly_LDC():
             try:
                 self.duration = int(input("Enter the calibration duration in seconds: "))
                 print(f"Starting each camera for: {self.duration} seconds" )
+                self.duration = self.duration * 35
                 break
             except ValueError:
                 print("Invalid input. Please enter an integer.")
@@ -188,8 +189,9 @@ class Bfly_LDC():
             system.ReleaseInstance()
         
         
-        except :
+        except Exception as e:
             print('Get Image Error'.center(100, '='))
+            print(e)
         
         
 
@@ -219,8 +221,8 @@ class Bfly_LDC():
             criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
             # prepare object points to look for on Chessboard
-            cbrow = 7 # Chessboard rows
-            cbcol = 6 # Chessboard columns
+            cbrow = 5 # Chessboard rows
+            cbcol = 4 # Chessboard columns
 
             print(f'looking for {cbrow} by {cbcol} board')
 
@@ -261,6 +263,7 @@ class Bfly_LDC():
             cv.destroyAllWindows()
 
             # Gathers callibration data
+            
             ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
             newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (camWidth,camHeight), 1, (camWidth,camHeight))
 
@@ -334,8 +337,9 @@ class Bfly_LDC():
         # ... More Error Handeling ...
         except IndexError:
             print('INDEX ERROR'.center(100, '-'))
-        except: 
+        except Exception as e: 
             print('CALIBRATION ERROR'.center(100, '-'))
+            print(e)
 
 
 

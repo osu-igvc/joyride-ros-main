@@ -52,6 +52,10 @@ class LifecycleBlackflyCameraDriver(Node):
         try:
             if self.bfly_camera is not None:
                 img = cv2.cvtColor(self.bfly_camera.get_array(), cv2.COLOR_RGB2BGR)
+                # === Start: Testing fliping the image === #
+                # img = cv2.flip(img, 0)
+                # img = cv2.flip(img, 1)
+                # === End:  Testing fliping the image === #
                 img_msg = self.cv_bridge.cv2_to_imgmsg(img, 'bgr8')
                 self.image_publisher.publish(img_msg)
 

@@ -19,7 +19,7 @@ void JoyrideFakeOdom::initializeParameters()
     this->declare_parameter("linear_lag", 0.1);
     this->declare_parameter("angular_lag", 0.1);
     this->declare_parameter("pub_odom_rate", 100.0);
-    this->declare_parameter("odom_topic", "odom");
+    this->declare_parameter("odom_topic", "/odom");
     this->declare_parameter("cmd_ack_topic", "cmd_ack");
     this->declare_parameter("odom_frame", "odom");
     this->declare_parameter("base_frame", "base_link");

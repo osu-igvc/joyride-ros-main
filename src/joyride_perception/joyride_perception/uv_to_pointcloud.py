@@ -9,6 +9,10 @@ import scipy.linalg as LA
 from scipy.optimize import lsq_linear
 
 
+# import matplotlib.pyplot as plt #Imported for troubleshooting
+# import matplotlib as mpl #Imported for troubleshooting 
+
+
 class PointCloudPublisher(Node):
     def __init__(self):
         super().__init__('point_cloud_publisher')
@@ -66,6 +70,9 @@ class PointCloudPublisher(Node):
                 10
             )
 
+
+
+
     def compressed_image_callback(self, msg:CompressedImage):
         cv_image = self.bridge.compressed_imgmsg_to_cv2(msg)
         #cv_image = cv2.flip(cv_image, 0)
@@ -75,11 +82,14 @@ class PointCloudPublisher(Node):
         point_cloud_msg = self.project_image(uv)
         self.publisher.publish(point_cloud_msg)
 
+
+
+
     def image_callback(self, msg:Image):
         # Convert the binary image to OpenCV format
         cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='mono8')
-        #cv_image = cv2.flip(cv_image, 0)
-        #cv_image = cv2.flip(cv_image, 1)
+        cv_image = cv2.flip(cv_image, 0)
+        cv_image = cv2.flip(cv_image, 1)
 
         # Extract UV points from the binary image
         uv_points = self.extract_uv_points(cv_image)
@@ -89,6 +99,9 @@ class PointCloudPublisher(Node):
 
         # Publish the PointCloud2 message  
         self.publisher.publish(point_cloud_msg)
+
+
+
 
     def calibrate_uv_xyz_transform(self,  calibration_type: str, calibration_file: str) -> np.ndarray:
         if calibration_type == "correlated":
@@ -101,6 +114,9 @@ class PointCloudPublisher(Node):
             Θ = np.loadtxt(calibration_file,skiprows=1, delimiter=",")
             return Θ
         
+
+
+
     def extract_uv_points(self, image:np.ndarray) -> np.ndarray:
         # This section is used for color images. Comment out if feeding a black and white image
         # image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -116,12 +132,14 @@ class PointCloudPublisher(Node):
     def project_image(self, uv: np.ndarray) -> PointCloud2:
         Φ = np.transpose([np.ones_like(uv[:,0]), uv[:,0], uv[:,0]**2, uv[:,0]**3, uv[:,1], uv[:,1]**2, uv[:,1]**3, uv[:,0]*uv[:,1], uv[:,0]*uv[:,1]**2, uv[:,0]**2 *uv[:,1]])
         P = Φ @ self.Θ
+
+       
         
         print(f"{np.shape(P)=}") # want Nx3 array
 
         msg = PointCloud2()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = '/base_link'
+        msg.header.frame_id = 'bfly_center'
         msg.height = 1
         msg.width = len(uv)
         msg.fields.append(PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1))

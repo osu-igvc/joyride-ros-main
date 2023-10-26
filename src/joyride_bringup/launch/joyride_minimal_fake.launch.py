@@ -72,14 +72,6 @@ def generate_launch_description():
                 get_package_share_directory('joyride_bringup'), 'launch'),
                 '/joyride_sensors.launch.py'])
         ),
-        
-        # Vectornav INS
-        #IncludeLaunchDescription(
-        #    PythonLaunchDescriptionSource([os.path.join(
-        #    get_package_share_directory('vectornav'), 'launch'),
-        #    '/vectornav.launch.py'
-        #    ])
-        #),
 
         # Faked Localization
         Node(

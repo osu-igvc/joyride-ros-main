@@ -1,5 +1,4 @@
 
-
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -11,6 +10,12 @@ from launch_ros.actions import Node
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from nav2_common.launch import RewrittenYaml
+
+# Sets params file and controller type and its config
+# Finds path of files needed
+# Launches minimal - CAN, Diagnostics, Static Tfs, Sensors, Faked Localization for indoors
+# Launches Navstack with params file. Possibly add in map file directory later. For now when launching this file you have to specify the map yaml path: 
+# ros2 launch joyride_bringup navigation.launch.py map:=/home/joyride-obc/joyride-ros-main/src/joyride_bringup/maps/empty_map.yaml
 
 
 def generate_launch_description():
@@ -25,66 +30,29 @@ def generate_launch_description():
 
     final_nav_params_path = DeclareLaunchArgument(
         'nav2_params',
-        default_value=[get_package_share_directory('joyride_bringup'), '/config/',LaunchConfiguration('controller_type')])
+        default_value=[get_package_share_directory('joyride_bringup'), '/config/','nav2_params.yaml'])
+    
 
     return LaunchDescription([
         declare_controller_type_cmd,
         final_nav_params_path,
 
-        # CAN
+        # Minimal fake
         IncludeLaunchDescription(
+            
             PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('joyride_bringup'), 'launch'),
-            '/CAN.launch.py'
+            '/joyride_minimal_fake.launch.py'
             ])
         ),
-
-        # # Transforms - Possibly Old version; throws TF error
+        # Minimal 
         # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource([os.path.join(
-        #     get_package_share_directory('joyride_core'), 'launch'),
-        #     '/static_transforms.launch.py'
-        #     ])
-        # ),
-
-        # Transforms - Static TFs
-        # IncludeLaunchDescription(
+            
         #     PythonLaunchDescriptionSource([os.path.join(
         #     get_package_share_directory('joyride_bringup'), 'launch'),
-        #     '/joyride_transforms.launch.py'
+        #     '/joyride_minimal.launch.py'
         #     ])
-        # ), 
-
-        # GPS/IMU
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource([os.path.join(
-        #     get_package_share_directory('vectornav'), 'launch'),
-        #     '/vectornav.launch.py'
-        # ])
         # ),
-
-        # Control
-        Node(
-           package='joyride_control_py',
-           executable='vel_preprocessor',
-           name='vel_node',
-        ),
-        
-
-        # Localization
-        IncludeLaunchDescription(
-           PythonLaunchDescriptionSource([os.path.join(
-           get_package_share_directory('joyride_bringup'), 'launch'),
-           '/gps_localization.launch.py']),
-        ),
-        
-        # Faked Localization
-        #Node(
-        #     package='joyride_localization',
-        #     executable='fake_odom',
-        #     name='fake_odom',
-        #     output='screen',
-        #),
 
         # Navstack
         IncludeLaunchDescription(
@@ -93,19 +61,5 @@ def generate_launch_description():
             '/navstack.launch.py']),
             launch_arguments={'params_file':nav_params}.items()
         ),
-        # # Cameras
-        #IncludeLaunchDescription(
-        #    PythonLaunchDescriptionSource([os.path.join(
-        #        get_package_share_directory('blackfly_camera_driver'), 'launch'),
-        #        '/bfly_center_lifecycle.launch.py'
-        #    ])
-        #    ),
-
-        # 2D Lidar
-        #IncludeLaunchDescription(
-        #    PythonLaunchDescriptionSource([os.path.join(
-        #        get_package_share_directory('joyride_bringup'), 'launch'),
-        #        '/lidar2D.launch.py'
-        #   ])
-        #),
+        
     ])

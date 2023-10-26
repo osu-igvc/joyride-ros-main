@@ -4,7 +4,6 @@
   ros__parameters:
     frames:
       - 'imu'
-      - 'map_odom'
       - 'bfly_center'
       - 'bfly_right'
       - 'blfy_left'
@@ -13,12 +12,10 @@
       - 'wheelBR'
       - 'wheelBL'
       - 'hokuyo_front'
-      - 'base_link_odom' 
-      - 'base_link_map'
 
     hokuyo_front:
       frame_id: "base_link"
-      child_frame_id: "hokuyo_front"
+      child_frame_id: "front_lidar"
       translation.x: 2.134
       translation.y: 0.0
       translation.z: 0.0
@@ -26,18 +23,6 @@
       rotation.y: 0.0
       rotation.z: 0.0
       rotation.w: 0.0
-
-# Jimmy used these two to corret a TF error they may not have correct information 
-    base_link_odom:
-      frame_id: "odom"
-      child_frame_id: "base_link"
-      translation.x: 0.0
-      translation.y: 0.0
-      translation.z: 0.0
-      rotation.x: 0.0
-      rotation.y: 0.0
-      rotation.z: 0.0
-      rotation.w: 1.0
 
     imu:
       frame_id: "base_link"
@@ -50,17 +35,6 @@
       rotation.z: 0.0
       rotation.w: 1.0
     
-    # map_odom:
-    #   frame_id: "map"
-    #   child_frame_id: "odom"
-    #   translation.x: 0.0
-    #   translation.y: 0.0
-    #   translation.z: 0.0
-    #   rotation.x: 0.0
-    #   rotation.y: 0.0
-    #   rotation.z: 0.0
-    #   rotation.w: 1.0
-
     bfly_center:
       frame_id: "base_link"
       child_frame_id: "bfly_center"
