@@ -193,11 +193,12 @@ class Bfly_LDC():
 
         # === Testing methods to clean up readability === #
 
-    def conformation(self, message = 'None'):
+    def conformation(self, message = 'Confirmed'):
         confirm = False
         user_input = input('Confirm? [Y/N]: ')
         while confirm:
             if user_input.lower() in ('y', 'yes', 'Y', 'Yes', 'YES'):
+                print(f'{message}: {confirm}')
                 return True
             elif user_input.lower() in ('n', 'no', 'N', 'No','NO'):
             
