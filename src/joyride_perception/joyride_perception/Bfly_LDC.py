@@ -33,11 +33,7 @@ class Bfly_LDC():
         self.output_dir = 'Camera Calibration Data'
         print(f'Checking for {self.output_dir} folder.')
         self.check_for_folder(self.output_dir)
-        # if not os.path.exists(self.output_dir):
-        #     os.makedirs(self.output_dir)
-        #     print(f'No folder for {self.output_dir}. Creating folder.')
-        # else:
-        #     print(f'Folder for {self.output_dir} located.')
+
 
         # Aquiring aquisition time
         while True:
@@ -50,13 +46,6 @@ class Bfly_LDC():
                 print("Invalid input. Please enter an integer.")
                 continue
             
-        # NOTE: testing confirm method
-        print("TESTING CONFIRM METHOD")
-        
-        if self.conformation():
-            print("True has been passed")
-        else:
-            print("Fasle has been passed")
 
 
     def getCameraImages(self):
@@ -165,6 +154,9 @@ class Bfly_LDC():
                             print("Saving calibration images to: %s" % cam_image_dir_path)
                             for n, img in enumerate(tqdm(imgs)):
                                 Image.fromarray(img).save(os.path.join(os.path.join(self.dir_path, cam_image_dir_path), '%08d.png' % n))
+
+                            # Begining Calibration
+                            self.calibrateDistortion(cam_dir_path,cam_image_dir_path, camWidth, camHeight)
                             break
                             
 
@@ -177,11 +169,10 @@ class Bfly_LDC():
                             print(f'Error: Input {user_input} unrecognised.')
                             pass
                         
-                    # Begining Calibration
-                    self.calibrateDistortion(cam_dir_path,cam_image_dir_path, camWidth, camHeight)
+                    
                         
-                # The usage of del is preferred to assigning the variable to None for the cameras.
-                del cams
+                    # The usage of del is preferred to assigning the variable to None for the cameras.
+                    del cams
 
             #NOTE: If you break a loop without terminating the cameras it will lead to a sudden forced quit and not proceed
             # to the next section after this method is run
@@ -202,15 +193,14 @@ class Bfly_LDC():
         # === Testing methods to clean up readability === #
 
     def conformation(self, message = 'Confirmed'):
-        confirm = False
         user_input = input('Confirm? [Y/N]: ')
-        while confirm:
+        while True:
             if user_input.lower() in ('y', 'yes', 'Y', 'Yes', 'YES'):
-                print(f'{message}: {confirm}')
+                print(f'{message}: {True}')
                 return True
             elif user_input.lower() in ('n', 'no', 'N', 'No','NO'):
             
-                print(f'{message}: {confirm}')
+                print(f'{message}: {False}')
                 break
 
             else:
@@ -218,7 +208,7 @@ class Bfly_LDC():
                 print(f'Error: Input {user_input} unrecognised.')
                 pass        
         
-        return confirm
+        return False
 
     def check_for_folder(self,filename):
         """
@@ -230,7 +220,7 @@ class Bfly_LDC():
         
         """
         # Check/Make a directory to save Data
-        print(f'\nPATH >>> {self.dir_path}')
+        print(f'PATH >>> {self.dir_path}')
         
         
         if not os.path.exists( os.path.join(self.dir_path, filename) ):
@@ -243,20 +233,20 @@ class Bfly_LDC():
 
     def record_video(self, filepath, frames, width, height):
         
-        video_path = filepath + '\\' + 'Video'
+        video_path = filepath + '/' + 'Video'
         self.check_for_folder(video_path)
 
         fps = 35
 
         fourcc = cv.VideoWriter_fourcc(*"XVID")
         #Syntax: cv2.VideoWriter( filename, fourcc, fps, frameSize )
-        video = cv.VideoWriter(os.path.join(self.dir_path,video_path + '\\calibration video.avi'), fourcc, float(fps), (width, height))
+        video = cv.VideoWriter(os.path.join(self.dir_path,video_path + '/calibration video.avi'), fourcc, float(fps), (width, height))
  
         for frame in enumerate(tqdm(frames)):
             video.write(frame[1])
  
         video.release()
-        print('Video saved at %s.avi' % video_path)
+        print('Video saved at %s' % video_path)
 
     def extract_frames(self, file, directory, interval: int = 100, flip: bool = False) -> None:
         """
@@ -335,9 +325,17 @@ class Bfly_LDC():
             objpoints = [] # 3d point in real world space
             imgpoints = [] # 2d points in image plane.
 
-            images = glob.glob(f'{image_path}\*.png')
+            print(f'Obtaining images form: {image_path}')
 
-            for fname in images:
+
+
+            images = glob.glob(f'{os.path.join(self.dir_path,image_path)}/*.png')
+            # images = glob.glob(f'{image_path}/*.png')
+
+
+
+            print(f'\nObtaining Intrinsic values.\n {images}')
+            for fname in tqdm(images):
 
                 calImg = cv.imread(fname)
                 gray = cv.cvtColor(calImg, cv.COLOR_BGR2GRAY)
@@ -353,19 +351,19 @@ class Bfly_LDC():
 
                     # [[[ NOT REQUIRED ]]]
                     # Draw and display the corners 
-                    # cv.drawChessboardCorners(calImg, (cbrow,cbcol), corners2, ret)
-                    # cv.imshow('img', calImg) # Ubuntu has issues displaying images should still run past this step
-                    # cv.waitKey(1)
+                    cv.drawChessboardCorners(calImg, (cbrow,cbcol), corners2, ret)
+                    cv.imshow('img', calImg) # Ubuntu has issues displaying images should still run past this step
+                    cv.waitKey(1)
 
                 else:
-                    print(f'No Calibration board found in: {fname}. Deleting image.')
+                    # Removes images with no chessboard
                     os.remove(fname)
 
 
             cv.destroyAllWindows()
 
             # Gathers callibration data
-            
+            print(f'Finished grabbing images.')
             ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
             newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (camWidth,camHeight), 1, (camWidth,camHeight))
 
@@ -387,12 +385,12 @@ class Bfly_LDC():
             # cv.imwrite(os.path.join(data_path,'calibresult.png'), dst)
 
             # Checks and displays total error of distortion
-            mean_error = 0
-            for i in range(len(objpoints)):
-                imgpoints2, _ = cv.projectPoints(objpoints[i], rvecs[i], tvecs[i], mtx, dist)
-                error = cv.norm(imgpoints[i], imgpoints2, cv.NORM_L2)/len(imgpoints2)
-                mean_error += error
-            print( "total error: {}".format(mean_error/len(objpoints)) )
+            # mean_error = 0
+            # for i in range(len(objpoints)):
+            #     imgpoints2, _ = cv.projectPoints(objpoints[i], rvecs[i], tvecs[i], mtx, dist)
+            #     error = cv.norm(imgpoints[i], imgpoints2, cv.NORM_L2)/len(imgpoints2)
+            #     mean_error += error
+            # print( "total error: {}".format(mean_error/len(objpoints)) )
 
             
             # Input validation
@@ -402,29 +400,7 @@ class Bfly_LDC():
                 
                 if user_input.lower() in ('y', 'yes', 'Y', 'Yes', 'YES'):
                     # Converting to numpy array for easy save/load data
-                    
-                    # NOTE: Code below is commented out for testing of the save_to_numpy method
-                    # ret_numpy          = np.array(ret)
-                    # mtx_numpy          = np.array(mtx)
-                    # dist_numpy         = np.array(dist)
-                    # rvecs_numpy        = np.array(rvecs)
-                    # tvecs_numpy        = np.array(tvecs)
-                    # newcameramtx_numpy = np.array(newcameramtx)
-                    
-                    # with open(os.path.join(data_path,'Ret.npy'), 'wb') as f:
-                    #     np.save(f,ret_numpy)
-                    # with open(os.path.join(data_path,'Mtx.npy'), 'wb') as f:
-                    #     np.save(f,mtx_numpy)
-                    # with open(os.path.join(data_path,'Dist.npy'), 'wb') as f:
-                    #     np.save(f,dist_numpy)
-                    # with open(os.path.join(data_path,'Rvecs.npy'), 'wb') as f:
-                    #     np.save(f,rvecs_numpy)
-                    # with open(os.path.join(data_path,'Tvecs.npy'), 'wb') as f:
-                    #     np.save(f,tvecs_numpy)
-                    # with open(os.path.join(data_path,'NewCameraMtx.npy'), 'wb') as f:
-                    #     np.save(f,newcameramtx_numpy)
-                    
-                    # === TODO Testing save to numpy method === #
+                
                     self.save_to_numpy(array=ret,file_name='Ret.npy',file_path= array_path)
                     self.save_to_numpy(array=mtx,file_name='Mtx.npy',file_path= array_path)
                     self.save_to_numpy(array=dist,file_name='Dist.npy',file_path= array_path)
