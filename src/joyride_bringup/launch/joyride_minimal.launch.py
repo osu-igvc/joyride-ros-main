@@ -43,9 +43,9 @@ def generate_launch_description():
         # ROSBAGGER
         # IncludeLaunchDescription(
         #     PythonLaunchDescriptionSource([os.path.join(
-        #         get_package_share_directory('joyride_bringup'), 'launch'),
-        #         '/rosbag_recorder.launch.py']),
-        #     launch_arguments={'bag_name':'outdoor_navtest'}.items()
+        #          get_package_share_directory('joyride_bringup'), 'launch'),
+        #          '/rosbag_recorder.launch.py']),
+        #      launch_arguments={'bag_name':'outdoor_navtest'}.items()
         # ),
 
         # Static transforms

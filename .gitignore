@@ -3,6 +3,7 @@ install/*
 log/*
 joyride-ros-main.code-workspace
 *.db3
+*.avi
 *.vscode
 .vscode/c_cpp_properties.json
 .vscode/settings.json

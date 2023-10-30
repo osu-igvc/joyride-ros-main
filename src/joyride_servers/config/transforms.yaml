@@ -12,6 +12,7 @@
       - 'wheelBR'
       - 'wheelBL'
       - 'hokuyo_front'
+      - 'map_odom'
 
     hokuyo_front:
       frame_id: "base_link"
@@ -23,7 +24,16 @@
       rotation.y: 0.0
       rotation.z: 0.0
       rotation.w: 0.0
-
+    map_odom:
+      frame_id: "map"
+      child_frame_id: "odom"
+      translation.x: 0.0
+      translation.y: 0.0
+      translation.z: 0.0
+      rotation.x: 0.0
+      rotation.y: 0.0
+      rotation.z: 0.0
+      rotation.w: 1.0
     imu:
       frame_id: "base_link"
       child_frame_id: "vectornav"
