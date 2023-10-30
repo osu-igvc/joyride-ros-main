@@ -49,6 +49,14 @@ class Bfly_LDC():
             except ValueError:
                 print("Invalid input. Please enter an integer.")
                 continue
+            
+        # NOTE: testing confirm method
+        print("TESTING CONFIRM METHOD")
+        
+        if self.conformation():
+            print("True has been passed")
+        else:
+            print("Fasle has been passed")
 
 
     def getCameraImages(self):
@@ -222,18 +230,17 @@ class Bfly_LDC():
         
         """
         # Check/Make a directory to save Data
-        print(f'PATH >>> {self.dir_path}')
+        print(f'\nPATH >>> {self.dir_path}')
         
         
         if not os.path.exists( os.path.join(self.dir_path, filename) ):
             os.makedirs(os.path.join(self.dir_path, filename))
-            print(f'No folder for {filename} in path. Creating folder.')
+            print(f'No folder for {filename} in path. Creating folder.\n')
                 
         else:
-            print(f'Folder for {filename} located in path.')
+            print(f'Folder for {filename} located in path.\n')
     
 
-    # === TEST METHOD === #
     def record_video(self, filepath, frames, width, height):
         
         video_path = filepath + '\\' + 'Video'
@@ -272,7 +279,21 @@ class Bfly_LDC():
                     pass
                 i += 1
         stream.release()
-            
+    
+    def save_to_numpy(self, array,file_name, file_path):
+        """
+        Save given numpy array in a given filepath with the given file name
+        
+        args:
+            numpy_array(array): array to be saved into a given file location and given name
+            filename(str): file name to be saved as
+            file_path(str): file location to be saved to
+        """
+        
+        numpy_array = np.array(array)
+        
+        with open(os.path.join(file_path,file_name), 'wb') as f:
+            np.save(f,numpy_array)
 
 
 
@@ -294,14 +315,16 @@ class Bfly_LDC():
             Calibration data in numpy arrays (Ret.npy, Mtx.npy, Dist.npy, Rvecs.npy, Tvecs.npy, NewCameraMtx.npy).
         """
         _ , camera_name = os.path.split(data_path)
+        array_path = os.path.join(data_path, 'Arrays')
+        self.check_for_folder(array_path)
         print(f'Beginning Calibration for {camera_name}'.center(50,'='))
         try:     
             # termination criteria
             criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
             # prepare object points to look for on Chessboard
-            cbrow = 7 # Chessboard rows
-            cbcol = 6 # Chessboard columns
+            cbrow = 5 # Chessboard rows
+            cbcol = 4 # Chessboard columns
 
             print(f'looking for {cbrow} by {cbcol} board')
 
@@ -378,25 +401,35 @@ class Bfly_LDC():
                 
                 if user_input.lower() in ('y', 'yes', 'Y', 'Yes', 'YES'):
                     # Converting to numpy array for easy save/load data
-                    ret_numpy          = np.array(ret)
-                    mtx_numpy          = np.array(mtx)
-                    dist_numpy         = np.array(dist)
-                    rvecs_numpy        = np.array(rvecs)
-                    tvecs_numpy        = np.array(tvecs)
-                    newcameramtx_numpy = np.array(newcameramtx)
-
-                    with open(os.path.join(data_path,'Ret.npy'), 'wb') as f:
-                        np.save(f,ret_numpy)
-                    with open(os.path.join(data_path,'Mtx.npy'), 'wb') as f:
-                        np.save(f,mtx_numpy)
-                    with open(os.path.join(data_path,'Dist.npy'), 'wb') as f:
-                        np.save(f,dist_numpy)
-                    with open(os.path.join(data_path,'Rvecs.npy'), 'wb') as f:
-                        np.save(f,rvecs_numpy)
-                    with open(os.path.join(data_path,'Tvecs.npy'), 'wb') as f:
-                        np.save(f,tvecs_numpy)
-                    with open(os.path.join(data_path,'NewCameraMtx.npy'), 'wb') as f:
-                        np.save(f,newcameramtx_numpy)
+                    
+                    # NOTE: Code below is commented out for testing of the save_to_numpy method
+                    # ret_numpy          = np.array(ret)
+                    # mtx_numpy          = np.array(mtx)
+                    # dist_numpy         = np.array(dist)
+                    # rvecs_numpy        = np.array(rvecs)
+                    # tvecs_numpy        = np.array(tvecs)
+                    # newcameramtx_numpy = np.array(newcameramtx)
+                    
+                    # with open(os.path.join(data_path,'Ret.npy'), 'wb') as f:
+                    #     np.save(f,ret_numpy)
+                    # with open(os.path.join(data_path,'Mtx.npy'), 'wb') as f:
+                    #     np.save(f,mtx_numpy)
+                    # with open(os.path.join(data_path,'Dist.npy'), 'wb') as f:
+                    #     np.save(f,dist_numpy)
+                    # with open(os.path.join(data_path,'Rvecs.npy'), 'wb') as f:
+                    #     np.save(f,rvecs_numpy)
+                    # with open(os.path.join(data_path,'Tvecs.npy'), 'wb') as f:
+                    #     np.save(f,tvecs_numpy)
+                    # with open(os.path.join(data_path,'NewCameraMtx.npy'), 'wb') as f:
+                    #     np.save(f,newcameramtx_numpy)
+                    
+                    # === TODO Testing save to numpy method === #
+                    self.save_to_numpy(array=ret,file_name='Ret.npy',file_path= array_path)
+                    self.save_to_numpy(array=mtx,file_name='Mtx.npy',file_path= array_path)
+                    self.save_to_numpy(array=dist,file_name='Dist.npy',file_path= array_path)
+                    self.save_to_numpy(array=rvecs,file_name='Rvecs.npy',file_path= array_path)
+                    self.save_to_numpy(array=tvecs,file_name='Tvecs.npy',file_path= array_path)
+                    self.save_to_numpy(array=newcameramtx,file_name='NewCameraMtx.npy',file_path= array_path)
                     
                     print(f'New Calibration Data has been saved for {camera_name}.')
                     break
