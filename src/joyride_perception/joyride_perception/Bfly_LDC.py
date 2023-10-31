@@ -31,20 +31,10 @@ class Bfly_LDC():
         # Check/Make a directory to save Data
         self.dir_path = os.path.dirname(os.path.abspath(__file__))
         self.output_dir = 'Camera Calibration Data'
+        self.duration = 0
+        
         print(f'Checking for {self.output_dir} folder.')
         self.check_for_folder(self.output_dir)
-
-
-        # Aquiring aquisition time
-        while True:
-            try:
-                self.duration = int(input("Enter the calibration duration in seconds: "))
-                print(f"Starting each camera for: {self.duration} seconds" )
-                self.duration = self.duration * 35
-                break
-            except ValueError:
-                print("Invalid input. Please enter an integer.")
-                continue
             
 
 
@@ -73,106 +63,106 @@ class Bfly_LDC():
             # Finish if there are no cameras
             if num_cameras == 0:
                 print('No Cameras Found!')
+                raise UnboundLocalError()
                 
-            else:
-                for i, cams in enumerate(cam_list):
+                
 
-                    # Retrieve device serial number for filename
-                    node_device_serial_number = PySpin.CStringPtr(cams.GetTLDeviceNodeMap().GetNode('DeviceSerialNumber'))
+            for i, cams in enumerate(cam_list):
 
-                    # Holds Camera path to save data 
-                    cam_dir_path = ''
+                # Retrieve device serial number for filename
+                node_device_serial_number = PySpin.CStringPtr(cams.GetTLDeviceNodeMap().GetNode('DeviceSerialNumber'))
 
-                    #  Checks serial number
-                    if PySpin.IsReadable(node_device_serial_number):
-                        device_serial_number = node_device_serial_number.GetValue()
-                        print('Camera %d serial number set to %s...' % (i, device_serial_number))
+                # Holds Camera path to save data 
+                cam_dir_path = ''
 
-                        #Assigns name to camera. To add extra cameras add "case '<Serial Number>:" followed by "cam_name = '<Camera Name>'
-                        # TODO Get the correct serial numbers
-                        cam_name = ''
-                        match device_serial_number:
-                            case '18295825':
-                                cam_name = 'BlackFly Left'
-                            case '18295818':
-                                cam_name = 'BlackFly Right'
-                            case '18295827':
-                                cam_name = 'BlackFly Center'
-                            case _ :
-                                cam_name = 'Unkown Camera'
+                #  Checks serial number
+                if PySpin.IsReadable(node_device_serial_number):
+                    device_serial_number = node_device_serial_number.GetValue()
+                    print('Camera %d serial number set to %s...' % (i, device_serial_number))
 
-                        # === Creating path for camera data to be save === #
-                        # Checks if camera data path exits if not makes one.
-                        print('Checking Files'.center(25, '='))
+                    #Assigns name to camera. To add extra cameras add "case '<Serial Number>:" followed by "cam_name = '<Camera Name>'
+                    # TODO Get the correct serial numbers
+                    cam_name = ''
+                    match device_serial_number:
+                        case '18295825':
+                            cam_name = 'BlackFly Left'
+                        case '18295818':
+                            cam_name = 'BlackFly Right'
+                        case '18295827':
+                            cam_name = 'BlackFly Center'
+                        case _ :
+                            cam_name = 'Unkown Camera'
 
-                        cam_dir_path = os.path.join(self.output_dir,cam_name)
-                        print(f'Checking for specific camera "{cam_dir_path}" folder.')
-                        
-                        self.check_for_folder(cam_dir_path)
+                    # === Creating path for camera data to be save === #
+                    # Checks if camera data path exits if not makes one.
+                    print('Checking Files'.center(50, '='))
 
-                        # Checks if camera image path exits if not makes one.
-                        cam_image_dir_path = os.path.join(cam_dir_path, 'Images')
-                        print(f'Checking for specific camera "{cam_image_dir_path}" folder.')
-                        
-                        self.check_for_folder(cam_image_dir_path)
-                        
-                        print('File Check Completed'.center(25, '='))
-                        # === End of file confirmation === #
+                    cam_dir_path = os.path.join(self.output_dir,cam_name)
+                    print(f'Checking for specific camera "{cam_dir_path}" folder.')
+                    
+                    self.check_for_folder(cam_dir_path)
 
-                    # Input validation for camera to be calibrated
-                    while True:
-                        
-                        print(f'Do you wish to Calibrate Distortion Matrix for {cam_name}')
-                        user_input = input('Confirm? [Y/N]: ')
-                        
-                        if user_input.lower() in ('y', 'yes', 'Y', 'Yes', 'YES'):
-                            # Acquire and initialize Camera
-                            print(f'Opening camera {cam_name}')
-                            with Camera(device_serial_number) as cam: 
+                    # Checks if camera image path exits if not makes one.
+                    cam_image_dir_path = os.path.join(cam_dir_path, 'Images')
+                    print(f'Checking for specific camera "{cam_image_dir_path}" folder.')
+                    
+                    self.check_for_folder(cam_image_dir_path)
+                    
+                    print('File Check Completed'.center(50, '='))
+                    # === End of file confirmation === #
 
-                                
-                                camWidth  = cam.SensorWidth
-                                camHeight = cam.SensorHeight
+                # Input validation for camera to be calibrated
+                    
+                print(f'\nDo you wish to Calibrate Distortion Matrix for {cam_name}')        
+                if not self.conformation(f'Calibrating Distortion Matrix for {cam_name}'):
+                    continue
+                
+                # Aquiring aquisition time
+                while True:
+                    try:
+                        self.duration = int(input("Enter the calibration duration in seconds: "))
+                        print(f"Starting each camera for: {self.duration} seconds" )
+                        self.duration = self.duration * 35
+                        break
+                    except ValueError:
+                        print("Invalid input. Please enter an integer.")
+                        continue
+                
+                print(f'Opening camera {cam_name}')
+                with Camera(device_serial_number) as cam: 
 
-                                print(f'Camera {device_serial_number} is {camWidth} by {camHeight} pixels')
+                    camWidth  = cam.SensorWidth
+                    camHeight = cam.SensorHeight
 
-                                # Allows color from from image 
-                                if 'Bayer' in cam.PixelFormat:
-                                    cam.PixelFormat = "RGB8Packed"
+                    print(f'Camera {device_serial_number} is {camWidth} by {camHeight} pixels')
 
-                                print("Image format in: " + cam.PixelFormat)
+                    # Allows color from from image 
+                    if 'Bayer' in cam.PixelFormat:
+                        cam.PixelFormat = "RGB8Packed"
 
-                                cam.start() # Start recording
-                                imgs = [cam.get_array() for n in range(self.duration)] # Get frames
+                    print("Image format in: " + cam.PixelFormat)
 
-                                cam.stop() # Stop recording
-                                print("Ending recording")
+                    cam.start() # Start recording
+                    imgs = [cam.get_array() for n in range(self.duration)] # Get frames
 
-                            # cycles through all the frames until they are all saved in the corresponding cameras folder
-                            self.record_video(filepath = cam_dir_path,frames = imgs, width = camWidth, height = camHeight)
-                            
-                            print("Saving calibration images to: %s" % cam_image_dir_path)
-                            for n, img in enumerate(tqdm(imgs)):
-                                Image.fromarray(img).save(os.path.join(os.path.join(self.dir_path, cam_image_dir_path), '%08d.png' % n))
+                    cam.stop() # Stop recording
+                    print("Ending recording")
 
-                            # Begining Calibration
-                            self.calibrateDistortion(cam_dir_path,cam_image_dir_path, camWidth, camHeight)
-                            break
-                            
+                # cycles through all the frames until they are all saved in the corresponding cameras folder
+                self.record_video(filepath = cam_dir_path,frames = imgs, width = camWidth, height = camHeight)
+                
+                print("Saving calibration images to: %s" % cam_image_dir_path)
+                for n, img in enumerate(tqdm(imgs)):
+                    Image.fromarray(img).save(os.path.join(os.path.join(self.dir_path, cam_image_dir_path), '%08d.png' % n))
 
-                        elif user_input.lower() in ('n', 'no', 'N', 'No','NO'):
-                            print(f'Skipping Calibration for: {cam_name}')
-                            break
-
-                        else:
-                            # ... error handling ...
-                            print(f'Error: Input {user_input} unrecognised.')
-                            pass
-                        
+                # Begining Calibration
+                
+                self.calibrateDistortion(cam_dir_path,cam_image_dir_path, camWidth, camHeight)
+                break   
                     
                         
-                    # The usage of del is preferred to assigning the variable to None for the cameras.
-                    del cams
+            # The usage of del is preferred to assigning the variable to None for the cameras.
+            del cams    
 
             #NOTE: If you break a loop without terminating the cameras it will lead to a sudden forced quit and not proceed
             # to the next section after this method is run
@@ -184,6 +174,8 @@ class Bfly_LDC():
             # Release system instance
             system.ReleaseInstance()
         
+        except UnboundLocalError:
+            pass
         
         except Exception as e:
             print('Get Image Error'.center(100, '='))
@@ -233,14 +225,14 @@ class Bfly_LDC():
 
     def record_video(self, filepath, frames, width, height):
         
-        video_path = filepath + '/' + 'Video'
+        video_path = filepath + '\\' + 'Video'
         self.check_for_folder(video_path)
 
         fps = 35
 
         fourcc = cv.VideoWriter_fourcc(*"XVID")
         #Syntax: cv2.VideoWriter( filename, fourcc, fps, frameSize )
-        video = cv.VideoWriter(os.path.join(self.dir_path,video_path + '/calibration video.avi'), fourcc, float(fps), (width, height))
+        video = cv.VideoWriter(os.path.join(self.dir_path,video_path + '\calibration video.avi'), fourcc, float(fps), (width, height))
  
         for frame in enumerate(tqdm(frames)):
             video.write(frame[1])
@@ -285,10 +277,7 @@ class Bfly_LDC():
         with open(os.path.join(file_path,file_name), 'wb') as f:
             np.save(f,numpy_array)
 
-
-
-
-    def calibrateDistortion(self,data_path, image_path, camWidth, camHeight):
+    def calibrateDistortion(self,data_path, image_path, camWidth, camHeight, imgs = None):
         """
         Calibrates lens distortion using PNG images from the specified filepath and saves the calibration data into a numpy array for later use.
 
@@ -327,14 +316,11 @@ class Bfly_LDC():
 
             print(f'Obtaining images form: {image_path}')
 
-
-
+            #obtains images in given path
             images = glob.glob(f'{os.path.join(self.dir_path,image_path)}/*.png')
-            # images = glob.glob(f'{image_path}/*.png')
 
 
-
-            print(f'\nObtaining Intrinsic values.\n {images}')
+            print(f'\nObtaining Intrinsic values.\n')
             for fname in tqdm(images):
 
                 calImg = cv.imread(fname)
@@ -365,62 +351,26 @@ class Bfly_LDC():
             # Gathers callibration data
             print(f'Finished grabbing images.')
             ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
-            newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (camWidth,camHeight), 1, (camWidth,camHeight))
-
-            #TODO undistort and send back or copy into camera drives
-            # currently ony used here on images to get error total
-
-            # mapx, mapy = cv.initUndistortRectifyMap(mtx, dist, None, newcameramtx, (camWidth,camHeight), 5)
-            # dst = cv.remap(calImg, mapx, mapy, cv.INTER_LINEAR)
-
-
-            # cv.imshow('img', calImg) # Ubuntu has issues displaying images should still run past this step
-            # cv.waitKey(0)
-
-            # mapx, mapy = cv.initUndistortRectifyMap(mtx, dist, None, newcameramtx, (camWidth,camHeight), 5)
-            # dst = cv.remap(calImg, mapx, mapy, cv.INTER_LINEAR)
-            # x, y, w, h = roi
-            # dst = dst[y:y+h, x:x+w]
-            # print(os.path.join(data_path,'calibresult.png'))
-            # cv.imwrite(os.path.join(data_path,'calibresult.png'), dst)
-
-            # Checks and displays total error of distortion
-            # mean_error = 0
-            # for i in range(len(objpoints)):
-            #     imgpoints2, _ = cv.projectPoints(objpoints[i], rvecs[i], tvecs[i], mtx, dist)
-            #     error = cv.norm(imgpoints[i], imgpoints2, cv.NORM_L2)/len(imgpoints2)
-            #     mean_error += error
-            # print( "total error: {}".format(mean_error/len(objpoints)) )
+            newcameramtx, _ = cv.getOptimalNewCameraMatrix(mtx, dist, (camWidth,camHeight), 1, (camWidth,camHeight))
 
             
-            # Input validation
-            while True:
-                print(f'Do you wish so Save and Overide the Calibration Distortion Matrix for {camera_name}')
-                user_input = input('Confirm? [Y/N]: ')
+            # Input validation to save data
+            print(f'Do you wish so Save and Overide the Calibration Distortion Matrix for {camera_name}')
+            if self.conformation('Saving data'):
                 
-                if user_input.lower() in ('y', 'yes', 'Y', 'Yes', 'YES'):
-                    # Converting to numpy array for easy save/load data
                 
-                    self.save_to_numpy(array=ret,file_name='Ret.npy',file_path= array_path)
-                    self.save_to_numpy(array=mtx,file_name='Mtx.npy',file_path= array_path)
-                    self.save_to_numpy(array=dist,file_name='Dist.npy',file_path= array_path)
-                    self.save_to_numpy(array=rvecs,file_name='Rvecs.npy',file_path= array_path)
-                    self.save_to_numpy(array=tvecs,file_name='Tvecs.npy',file_path= array_path)
-                    self.save_to_numpy(array=newcameramtx,file_name='NewCameraMtx.npy',file_path= array_path)
-                    
-                    print(f'New Calibration Data has been saved for {camera_name}.')
-                    break
+                self.save_to_numpy(array=ret,file_name='Ret.npy',file_path= array_path)
+                self.save_to_numpy(array=mtx,file_name='Mtx.npy',file_path= array_path)
+                self.save_to_numpy(array=dist,file_name='Dist.npy',file_path= array_path)
+                self.save_to_numpy(array=rvecs,file_name='Rvecs.npy',file_path= array_path)
+                self.save_to_numpy(array=tvecs,file_name='Tvecs.npy',file_path= array_path)
+                self.save_to_numpy(array=newcameramtx,file_name='NewCameraMtx.npy',file_path= array_path)
+                
+                print(f'New Calibration Data has been saved for {camera_name}.')
+                
 
 
-                elif user_input.lower() in ('n', 'no', 'N', 'No','NO'):
-                    print(f'New Calibration Data has __NOT__ been saved for {camera_name}.')
-                    break
 
-
-                else:
-                # ... error handling ...
-                    print(f'Error: Input {user_input} unrecognised.')
-                    continue
 
         # ... More Error Handeling ...
         except IndexError:
