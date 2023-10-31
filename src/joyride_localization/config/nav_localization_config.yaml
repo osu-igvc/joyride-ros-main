@@ -15,7 +15,7 @@ navsat_transform:
 
 navsat_odom_node:
   ros__parameters:
-    use_fake_odom: false
+    use_fake_odom: true
     tf_frequency: 50.0
     #expected_lat: 36.1156
     #expected_lon: -97.0584

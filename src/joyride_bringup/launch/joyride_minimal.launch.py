@@ -77,7 +77,7 @@ def generate_launch_description():
                 '/joyride_sensors.launch.py'])
         ),
 
-        # GPS-based Localization
+        # # GPS-based Localization
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory('joyride_bringup'), 'launch'),
