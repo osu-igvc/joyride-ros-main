@@ -305,9 +305,8 @@ class Bfly_LDC():
         Saves:
             Calibration data in numpy arrays (Ret.npy, Mtx.npy, Dist.npy, Rvecs.npy, Tvecs.npy, NewCameraMtx.npy).
         """
-        # _ , camera_name = os.path.split(data_path)
-        # array_path = os.path.join(self.dir_path, os.path.join(data_path, 'Arrays'))
-        # self.check_for_folder(array_path)
+
+        
 
 
         print(f'Beginning Calibration for {camera_name}'.center(50,'='))
