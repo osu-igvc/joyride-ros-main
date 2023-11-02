@@ -21,7 +21,7 @@ from nav2_common.launch import RewrittenYaml
 def generate_launch_description():
 
     # controller_type = LaunchConfiguration('controller_type')
-    nav_params = LaunchConfiguration('nav2__minimal_params')
+    nav_params = LaunchConfiguration('nav2_minimal_params')
 
     # declare_controller_type_cmd = DeclareLaunchArgument(
     #     'controller_type',

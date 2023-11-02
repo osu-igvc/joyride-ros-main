@@ -17,11 +17,11 @@ def generate_launch_description():
     return LaunchDescription([
 
         # Cameras
-        # IncludeLaunchDescription(
-        #    PythonLaunchDescriptionSource([os.path.join(
-        #        get_package_share_directory('blackfly_camera_driver'), 'launch'),
-        #        '/bfly_center_lifecycle.launch.py'])
-        # ),
+        IncludeLaunchDescription(
+           PythonLaunchDescriptionSource([os.path.join(
+               get_package_share_directory('blackfly_camera_driver'), 'launch'),
+               '/bfly_center_lifecycle.launch.py'])
+        ),
 
         # Vectornav INS
         IncludeLaunchDescription(
@@ -31,9 +31,9 @@ def generate_launch_description():
         ),
 
         # 2D Lidar
-        # IncludeLaunchDescription(
-        #    PythonLaunchDescriptionSource([os.path.join(
-        #        get_package_share_directory('joyride_bringup'), 'launch'),
-        #        '/lidar2D.launch.py'])
-        # ),
+        IncludeLaunchDescription(
+           PythonLaunchDescriptionSource([os.path.join(
+               get_package_share_directory('joyride_bringup'), 'launch'),
+               '/lidar2D.launch.py'])
+        ),
     ])
