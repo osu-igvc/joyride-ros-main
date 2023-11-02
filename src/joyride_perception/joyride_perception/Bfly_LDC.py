@@ -78,10 +78,9 @@ class Bfly_LDC():
                 #  Checks serial number
                 if PySpin.IsReadable(node_device_serial_number):
                     device_serial_number = node_device_serial_number.GetValue()
-                    print('Camera %d serial number set to %s...' % (i, device_serial_number))
+                    
 
                     #Assigns name to camera. To add extra cameras add "case '<Serial Number>:" followed by "cam_name = '<Camera Name>'
-                    # TODO Get the correct serial numbers
                     cam_name = ''
                     match device_serial_number:
                         case '18295825':
@@ -92,6 +91,7 @@ class Bfly_LDC():
                             cam_name = 'BlackFly Center'
                         case _ :
                             cam_name = 'Unkown Camera'
+                    print('Camera %s serial number set to %s...' % (cam_name, device_serial_number))
 
                     # === Creating path for camera data to be save === #
                     # Checks if camera data path exits if not makes one.
@@ -99,14 +99,20 @@ class Bfly_LDC():
 
                     cam_dir_path = os.path.join(self.output_dir,cam_name)
                     print(f'Checking for specific camera "{cam_dir_path}" folder.')
-                    
                     self.check_for_folder(cam_dir_path)
 
                     # Checks if camera image path exits if not makes one.
-                    cam_image_dir_path = os.path.join(cam_dir_path, 'Images')
-                    print(f'Checking for specific camera "{cam_image_dir_path}" folder.')
-                    
-                    self.check_for_folder(cam_image_dir_path)
+                    cam_image_path = os.path.join(cam_dir_path, 'Images')
+                    print(f'Checking for specific camera "{cam_image_path}" folder.')
+                    self.check_for_folder(cam_image_path)
+
+                    cam_array_path = os.path.join(cam_dir_path, 'Arrays')
+                    print(f'Checking for specific camera "{cam_array_path}" folder.')
+                    self.check_for_folder(cam_array_path)
+
+                    cam_video_path = os.path.join(cam_dir_path, 'Videos')
+                    print(f'Checking for specific camera "{cam_video_path}" folder.')
+                    self.check_for_folder(cam_video_path)
                     
                     print('File Check Completed'.center(50, '='))
                     # === End of file confirmation === #
@@ -134,7 +140,7 @@ class Bfly_LDC():
                     camWidth  = cam.SensorWidth
                     camHeight = cam.SensorHeight
 
-                    print(f'Camera {device_serial_number} is {camWidth} by {camHeight} pixels')
+                    print(f'Camera {cam_name} is {camWidth} by {camHeight} pixels')
 
                     # Allows color from from image 
                     if 'Bayer' in cam.PixelFormat:
@@ -149,15 +155,15 @@ class Bfly_LDC():
                     print("Ending recording")
 
                 # cycles through all the frames until they are all saved in the corresponding cameras folder
-                self.record_video(filepath = cam_dir_path,frames = imgs, width = camWidth, height = camHeight)
+                self.record_video(filepath = cam_video_path,frames = imgs, width = camWidth, height = camHeight)
                 
-                print("Saving calibration images to: %s" % cam_image_dir_path)
+                print("Saving calibration images to: %s" % cam_image_path)
                 for n, img in enumerate(tqdm(imgs)):
-                    Image.fromarray(img).save(os.path.join(os.path.join(self.dir_path, cam_image_dir_path), '%08d.png' % n))
+                    Image.fromarray(img).save(os.path.join(os.path.join(self.dir_path, cam_image_path), '%08d.png' % n))
 
                 # Begining Calibration
                 
-                self.calibrateDistortion(cam_dir_path,cam_image_dir_path, camWidth, camHeight)
+                self.calibrateDistortion(cam_name, cam_image_path, cam_array_path, camWidth, camHeight)
                 break   
                     
                         
@@ -185,6 +191,15 @@ class Bfly_LDC():
         # === Testing methods to clean up readability === #
 
     def conformation(self, message = 'Confirmed'):
+        """
+        Asks user for yes or no input after that is given returns a true or false
+
+        args(str):
+            Asks for confirmation message in a string format to be printed afer giving a [Y/N]
+
+        returns(bool):
+            Returns True if input was yes and returns False for no
+        """
         user_input = input('Confirm? [Y/N]: ')
         while True:
             if user_input.lower() in ('y', 'yes', 'Y', 'Yes', 'YES'):
@@ -223,22 +238,19 @@ class Bfly_LDC():
             print(f'Folder for {filename} located in path.\n')
     
 
-    def record_video(self, filepath, frames, width, height):
-        
-        video_path = filepath + '\\' + 'Video'
-        self.check_for_folder(video_path)
+    def record_video(self, filepath, frames, width, height, fps = None):
 
         fps = 35
 
         fourcc = cv.VideoWriter_fourcc(*"XVID")
         #Syntax: cv2.VideoWriter( filename, fourcc, fps, frameSize )
-        video = cv.VideoWriter(os.path.join(self.dir_path,video_path + '\calibration video.avi'), fourcc, float(fps), (width, height))
+        video = cv.VideoWriter(os.path.join(self.dir_path,filepath + '\calibration video.avi'), fourcc, float(fps), (width, height))
  
         for frame in enumerate(tqdm(frames)):
             video.write(frame[1])
  
         video.release()
-        print('Video saved at %s' % video_path)
+        print('Video saved at %s' % filepath)
 
     def extract_frames(self, file, directory, interval: int = 100, flip: bool = False) -> None:
         """
@@ -274,10 +286,10 @@ class Bfly_LDC():
         
         numpy_array = np.array(array)
         
-        with open(os.path.join(file_path,file_name), 'wb') as f:
+        with open(os.path.join(os.path.join(self.dir_path,file_path),file_name), 'wb') as f:
             np.save(f,numpy_array)
 
-    def calibrateDistortion(self,data_path, image_path, camWidth, camHeight, imgs = None):
+    def calibrateDistortion(self, camera_name, image_path,  array_path, camWidth, camHeight, imgs = None,):
         """
         Calibrates lens distortion using PNG images from the specified filepath and saves the calibration data into a numpy array for later use.
 
@@ -293,9 +305,10 @@ class Bfly_LDC():
         Saves:
             Calibration data in numpy arrays (Ret.npy, Mtx.npy, Dist.npy, Rvecs.npy, Tvecs.npy, NewCameraMtx.npy).
         """
-        _ , camera_name = os.path.split(data_path)
-        array_path = os.path.join(data_path, 'Arrays')
-        self.check_for_folder(array_path)
+
+        
+
+
         print(f'Beginning Calibration for {camera_name}'.center(50,'='))
         try:     
             # termination criteria
@@ -348,8 +361,12 @@ class Bfly_LDC():
 
             cv.destroyAllWindows()
 
+            # # Checks if any callibration data is avalible
+            # if ret == False:
+            #     raise UnboundLocalError
+            
             # Gathers callibration data
-            print(f'Finished grabbing images.')
+            print(f'Obtained Calibration matrix.')
             ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
             newcameramtx, _ = cv.getOptimalNewCameraMatrix(mtx, dist, (camWidth,camHeight), 1, (camWidth,camHeight))
 
@@ -373,6 +390,8 @@ class Bfly_LDC():
 
 
         # ... More Error Handeling ...
+        except UnboundLocalError:
+            print('No Chess Board Grid found'.center(100,'-'))
         except IndexError:
             print('INDEX ERROR'.center(100, '-'))
         except Exception as e: 
