@@ -12,7 +12,7 @@
       - 'wheelBR'
       - 'wheelBL'
       - 'front_lidar'
-      - 'map_odom'
+      # - 'map_odom'
 
     hokuyo_front:
       frame_id: "base_link"

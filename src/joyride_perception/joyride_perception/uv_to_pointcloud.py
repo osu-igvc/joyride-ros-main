@@ -20,8 +20,8 @@ class PointCloudPublisher(Node):
         # Get ROS parameters
         self.camera_frame = self.declare_parameter('camera_frame','center').get_parameter_value().string_value
         self.trans_info = self.declare_parameter('data_transformed','lanes').get_parameter_value().string_value
-        self.calibration_type = self.declare_parameter("calibration_type","params").get_parameter_value().string_value
-        self.calibration_file = self.declare_parameter('calibration_file', '/home/joyride-obc/joyride-ros-main/CurveFitParams_center.csv').get_parameter_value().string_value
+        self.calibration_type = self.declare_parameter("calibration_type","correlated").get_parameter_value().string_value
+        self.calibration_file = self.declare_parameter('calibration_file', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/joyride_perception/calibration_center_tm.csv').get_parameter_value().string_value
         self.image_sub_topic = self.declare_parameter("subscriber_topic", "/perception/lane/white").get_parameter_value().string_value
 
         self.compressed = True if self.image_sub_topic.split("/")[-1] == "compressed" else False
@@ -77,6 +77,7 @@ class PointCloudPublisher(Node):
         cv_image = self.bridge.compressed_imgmsg_to_cv2(msg)
         #cv_image = cv2.flip(cv_image, 0)
         #cv_image = cv2.flip(cv_image, 1)
+
         cv2.imshow("Original",cv_image)
         uv = self.extract_uv_points(cv_image)
         point_cloud_msg = self.project_image(uv)
@@ -90,6 +91,9 @@ class PointCloudPublisher(Node):
         cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='mono8')
         cv_image = cv2.flip(cv_image, 0)
         cv_image = cv2.flip(cv_image, 1)
+
+        print(cv_image.shape)
+        print(2)
 
         # Extract UV points from the binary image
         uv_points = self.extract_uv_points(cv_image)
@@ -139,7 +143,7 @@ class PointCloudPublisher(Node):
 
         msg = PointCloud2()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = 'bfly_center'
+        msg.header.frame_id = 'base_link'
         msg.height = 1
         msg.width = len(uv)
         msg.fields.append(PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1))

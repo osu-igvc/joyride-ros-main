@@ -46,6 +46,7 @@ void JoyrideFakeOdom::initializeROS()
 
     pub_odom_timer_ = this->create_wall_timer(std::chrono::milliseconds((int)(1000.0 / pub_odom_rate_)), std::bind(&joyride_odometry::JoyrideFakeOdom::publishOdomCallback, this));
 
+   
     position_x_ = 0.0;
     position_y_ = 0.0;
     position_z_ = 0.0;
@@ -55,6 +56,7 @@ void JoyrideFakeOdom::initializeROS()
     velocity_y_ = 0.0;
     velocity_z_ = 0.0;
     yaw_rate_ = 0.0;
+
 }
 
 void JoyrideFakeOdom::newCmdAckCallback(const ackermann_msgs::msg::AckermannDrive::SharedPtr msg)
@@ -64,6 +66,8 @@ void JoyrideFakeOdom::newCmdAckCallback(const ackermann_msgs::msg::AckermannDriv
 
 void JoyrideFakeOdom::publishOdomCallback()
 {
+    // odomTF = buildOdometryTransform(this->[odom_msg.pose.pose.position.x, odom_msg.pose.pose.position.y, odom_msg.pose.pose.position.z], this->odom_msg.pose.pose.orientation, this->world_frame_id_, this->base_link_frame_id_);
+
     nav_msgs::msg::Odometry odom_msg;
 
     odom_msg.header.stamp = this->now();
@@ -108,4 +112,5 @@ void JoyrideFakeOdom::computeOdom(const ackermann_msgs::msg::AckermannDrive::Sha
     yaw_rate_ = angular_velocity;
     
 }
+
 } // namespace joyride_odometry
