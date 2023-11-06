@@ -21,16 +21,16 @@ from nav2_common.launch import RewrittenYaml
 def generate_launch_description():
 
     # controller_type = LaunchConfiguration('controller_type')
-    nav_params = LaunchConfiguration('nav2_minimal_params')
+    nav_params = LaunchConfiguration('nav2_params')
 
-    # declare_controller_type_cmd = DeclareLaunchArgument(
-    #     'controller_type',
-    #     default_value='purepursuit_config.yaml'
-    # )
+    declare_controller_type_cmd = DeclareLaunchArgument(
+        'controller_type',
+        default_value='purepursuit_config.yaml'
+    )
 
     final_nav_params_path = DeclareLaunchArgument(
-        'nav2_minimal_params',
-        default_value=[get_package_share_directory('joyride_bringup'), '/config/','nav2_minimal_params.yaml'])
+        'nav2_params',
+        default_value=[get_package_share_directory('joyride_bringup'), '/config/','nav2_params.yaml'])
     
 
     return LaunchDescription([

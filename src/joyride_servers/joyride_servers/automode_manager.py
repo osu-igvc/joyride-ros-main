@@ -60,6 +60,8 @@ class AutoModeManagerServerNode(Node):
 
     # ------------- ROS Callbacks ------------- #
     def publishSystemStatus_Timer_Callback(self):
+        # self.get_logger().warn('Initial state in timer: {}'.format(self.SYSTEM_STATUS))
+        # self.get_logger().warn('Auto state: {}'.format(self.SYSTEM_STATUS.auto_software_enabled))
         # Update system status
         if self.SYSTEM_STATUS.system_status != SystemDiagnosticSummary.OK:
             self.SYSTEM_STATUS.auto_software_enabled = False
@@ -78,7 +80,8 @@ class AutoModeManagerServerNode(Node):
         self.last_request_time = self.get_clock().now().nanoseconds
         
     def handleDBWSystem_Callback(self, msg:DriveByWireSystemInfo):
-        
+        # self.get_logger().warn('Initial state in DBW callback: {}'.format(self.SYSTEM_STATUS))
+        # self.get_logger().warn('Auto state: {}'.format(self.SYSTEM_STATUS.auto_software_enabled))
         # If timout passed, allow us to exit based on hardware. Otherwise ignore it.
         if self.get_clock().now().nanoseconds - self.last_request_time > self.dbw_enable_request_timeout * 1e9:
             if not msg.hardware_auto_enable:
@@ -113,7 +116,8 @@ class AutoModeManagerServerNode(Node):
         self.diagnostic_pub.publish(supplementalDiag)
 
     def requestAutoEnableDisable_Callback(self, request, response):
-        
+        self.get_logger().warn('Initial state in Auto enable: {}'.format(self.SYSTEM_STATUS))
+        self.get_logger().warn('Auto state: {}'.format(self.SYSTEM_STATUS.auto_software_enabled))
         # Ensure last status isn't out of date
 
         if self.get_clock().now().nanoseconds - self.get_clock().now().from_msg(self.SYSTEM_STATUS.stamp).nanoseconds > self.status_valid_timeout * 1E9: # time in nano
@@ -131,6 +135,7 @@ class AutoModeManagerServerNode(Node):
         
         # Check new status is different
         if self.SYSTEM_STATUS.auto_software_enabled == request.set_auto_enabled:
+            self.get_logger().warn('Previous state: {}'.format(self.SYSTEM_STATUS.auto_software_enabled))
             self.get_logger().warn('Request set enable: {}, received by {}. Ignoring - system is already in that state.'.format(request.set_auto_enabled, request.sender_name))
             response.response = RequestAutoEnableDisable.Response.ALREADY_IN_STATE
             return response
@@ -176,8 +181,8 @@ def main():
     rclpy.init()
 
     automodeManagerServerNode = AutoModeManagerServerNode()
-    #updater = diagnostic_updater.Updater(automodeManagerServerNode)
-    #updater.add('status', automodeManagerServerNode.diagnosticUpdate)
+    # updater = diagnostic_updater.Updater(automodeManagerServerNode)
+    # updater.add('status', automodeManagerServerNode.diagnosticUpdate)
     rclpy.spin(automodeManagerServerNode)
     automodeManagerServerNode.destroy_node()
     rclpy.shutdown()

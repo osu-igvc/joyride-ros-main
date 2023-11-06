@@ -56,6 +56,42 @@ class LifecycleBlackflyCameraDriver(Node):
                 # img = cv2.flip(img, 0)
                 # img = cv2.flip(img, 1)
                 # === End:  Testing fliping the image === #
+
+                #TODO import intrinsics to indavidual camera
+                # === Start: Testing of Intrinsics === #
+                # try:
+                #     match self.serial_no:
+                #         case '18295827':
+                #             #Camera Center
+                #             dist, newcameramtx, mtx , roi= self.grab_intrinsic('BlackFly Center')
+                #         case '18295825':
+                #             #Camera Left
+                #             dist, newcameramtx, mtx , roi= self.grab_intrinsic('BlackFly Left')
+                #         case '18295818':
+                #             #Camera Right
+                #             dist, newcameramtx, mtx , roi = self.grab_intrinsic('BlackFly Right')
+                #         case _:
+                #             #Unkown Camera
+                #             dist, newcameramtx, mtx , roi= self.grab_intrinsic('Unkown Camera')
+                # except:
+                #     pass
+
+                # try:
+                #     print('TEST UNDISTORT'.center(100,'-'))
+                #     # corrected_img = cv2.undistort(img,mtx,dist,None,newcameramtx)
+                #     print(f'Img Size: {img.shape[1::-1]}')
+                #     mapx, mapy = cv2.initUndistortRectifyMap(mtx,dist,None,newcameramtx, (img.shape[0],img.shape[1]),5)
+                #     corrected_img = cv2.remap(img,mapx,mapy,cv2.INTER_LINEAR)
+                #     # x, y, w, h = roi
+                #     # corrected_img = corrected_img[y:y+h, x:x+w]
+                #     print('PASSED UNDISTORT'.center(100,'-'))
+                #     img_msg = self.cv_bridge.cv2_to_imgmsg(corrected_img, 'bgr8')
+                # except Exception as e:
+                #     print(f'no worky: {self.serial_no}')
+                #     print(e)
+                #     img_msg = self.cv_bridge.cv2_to_imgmsg(img, 'bgr8')
+                # === End: Testing of Intrinsics === #
+
                 img_msg = self.cv_bridge.cv2_to_imgmsg(img, 'bgr8')
                 self.image_publisher.publish(img_msg)
 
@@ -79,13 +115,24 @@ class LifecycleBlackflyCameraDriver(Node):
     def set_updater(self, updater):
         self.updater = updater
 
+    def grab_intrinsic(self, Camera_name):
+        dst = np.load(f'/home/joyride-obc/joyride-ros-main/src/joyride_perception/joyride_perception/Camera Calibration Data/{Camera_name}/Arrays/Dist.npy')
+
+        newcameramtx = np.load(f'/home/joyride-obc/joyride-ros-main/src/joyride_perception/joyride_perception/Camera Calibration Data/{Camera_name}/Arrays/NewCameraMtx.npy')
+
+        mtx = np.load(f'/home/joyride-obc/joyride-ros-main/src/joyride_perception/joyride_perception/Camera Calibration Data/{Camera_name}/Arrays/Mtx.npy')
+
+        roi = np.load(f'/home/joyride-obc/joyride-ros-main/src/joyride_perception/joyride_perception/Camera Calibration Data/{Camera_name}/Arrays/Roi.npy')
+
+        return dst, newcameramtx, mtx , roi
+
     # --------------------- Lifecycle Management --------------------- #
 
     def on_configure(self, state: State) -> TransitionCallbackReturn:
 
 
         # Parameters
-        self.serial_no = self.declare_parameter('serial_no', '18295828').get_parameter_value().string_value
+        self.serial_no = self.declare_parameter('serial_no', '18295827').get_parameter_value().string_value
         self.image_raw_publish_topic = self.declare_parameter('raw_image_topic', '/bfly_{}/image_raw'.format(self.serial_no)).get_parameter_value().string_value
         self.video_mode = self.declare_parameter('video_mode','Mode1').get_parameter_value().string_value
         self.pixel_format = self.declare_parameter('pixel_format', 'RGB8Packed').get_parameter_value().string_value

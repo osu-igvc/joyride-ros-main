@@ -137,8 +137,14 @@ class Bfly_LDC():
                 print(f'Opening camera {cam_name}')
                 with Camera(device_serial_number) as cam: 
 
-                    camWidth  = cam.SensorWidth
-                    camHeight = cam.SensorHeight
+                    # Adjusts camera pixels for calibration
+                    #NOTE Check the in the blackfly driver for the pixels or before the img is published print <img name>.shape[]
+
+                    cam.Width = 1024
+                    cam.Height = 768
+
+                    camWidth  = cam.Width
+                    camHeight = cam.Height
 
                     print(f'Camera {cam_name} is {camWidth} by {camHeight} pixels')
 
@@ -244,7 +250,7 @@ class Bfly_LDC():
 
         fourcc = cv.VideoWriter_fourcc(*"XVID")
         #Syntax: cv2.VideoWriter( filename, fourcc, fps, frameSize )
-        video = cv.VideoWriter(os.path.join(self.dir_path,filepath + '\calibration video.avi'), fourcc, float(fps), (width, height))
+        video = cv.VideoWriter((os.path.join(self.dir_path,filepath + '\calibration video.avi')), fourcc, float(fps), (width, height))
  
         for frame in enumerate(tqdm(frames)):
             video.write(frame[1])
@@ -361,14 +367,10 @@ class Bfly_LDC():
 
             cv.destroyAllWindows()
 
-            # # Checks if any callibration data is avalible
-            # if ret == False:
-            #     raise UnboundLocalError
-            
             # Gathers callibration data
             print(f'Obtained Calibration matrix.')
             ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
-            newcameramtx, _ = cv.getOptimalNewCameraMatrix(mtx, dist, (camWidth,camHeight), 1, (camWidth,camHeight))
+            newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (camWidth,camHeight), 1, (camWidth,camHeight))
 
             
             # Input validation to save data
@@ -382,7 +384,7 @@ class Bfly_LDC():
                 self.save_to_numpy(array=rvecs,file_name='Rvecs.npy',file_path= array_path)
                 self.save_to_numpy(array=tvecs,file_name='Tvecs.npy',file_path= array_path)
                 self.save_to_numpy(array=newcameramtx,file_name='NewCameraMtx.npy',file_path= array_path)
-                
+                self.save_to_numpy(array=roi,file_name='Roi.npy',file_path= array_path)
                 print(f'New Calibration Data has been saved for {camera_name}.')
                 
 

@@ -79,5 +79,12 @@ def generate_launch_description():
             executable='fake_odom',
             name='fake_odom',
             output='screen',
-        )
+        ),
+        
+        # Velocity preprocessor
+        Node(
+            package='joyride_control_py',
+            executable='vel_preprocessor',
+            name='vel_node',
+        ),
 ])
