@@ -87,17 +87,6 @@ def generate_launch_description():
     return LaunchDescription([
         diagnostic_param_cmd,
 
-        # ----------- ROSCAN Server ----------- #
-
-        Node(
-            package='joyride_ros2_socketcan',
-            output='screen',
-            namespace='servers',
-            executable='roscan_server',
-            name='roscan_interface',
-            parameters=[can_config],
-        ),
-
        # # Diagnostics
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
