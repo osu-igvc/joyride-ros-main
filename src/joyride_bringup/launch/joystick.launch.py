@@ -13,14 +13,6 @@ def generate_launch_description():
 
     return LaunchDescription([
 
-        # CAN Server
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('joyride_bringup'), 'launch'),
-            '/CAN.launch.py'
-            ])
-         ),
-
         # Transforms
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(

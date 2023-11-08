@@ -116,6 +116,10 @@ controller_server:
       cost_scaling_gain: 1.0
       inflation_cost_scaling_factor: 3.0
 
+# controller_server_rclcpp_node:
+#   ros__parameters:
+#     use_sim_time: False
+
 local_costmap:
   local_costmap:
     ros__parameters:

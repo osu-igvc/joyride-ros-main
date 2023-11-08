@@ -36,8 +36,6 @@ private:
     void publishOdomCallback();
 
 
-    // void buildOdometryTransform(const ackermann_msgs::msg::AckermannDrive::SharedPtr msg);
-
     void computeOdom(const ackermann_msgs::msg::AckermannDrive::SharedPtr msg);
 
 
@@ -47,10 +45,7 @@ private:
     // ROS Publishers
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
     rclcpp::TimerBase::SharedPtr pub_odom_timer_;
-    // TF2
-    // std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
-    // std::unique_ptr<tf2_ros::TransformListener> tf_listener_;
-    // tf2_ros::TransformBroadcaster odom_broadcaster_;
+    
 
     // Variables
     double position_x_;

@@ -24,7 +24,6 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 
 
-
 def generate_launch_description():
 
     default_diagnostic = os.path.join(get_package_share_directory('joyride_bringup'), 'config', 'diagnostic_minimal.yaml')
@@ -49,13 +48,6 @@ def generate_launch_description():
             ])
         ),
 
-        # CAN Server
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('joyride_bringup'), 'launch'),
-            '/CAN.launch.py'
-            ])
-         ),
 
         # Diagnostics
         IncludeLaunchDescription(

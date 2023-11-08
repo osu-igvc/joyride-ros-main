@@ -24,6 +24,10 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 
 
+# Add DeclareLaunchArguments to the LaunchDescription
+# LaunchDescription(Nodes, LaunchArguments) or something similar
+FAKE_LOCOLIZATION = True
+
 
 def generate_launch_description():
 
@@ -37,50 +41,53 @@ def generate_launch_description():
         description='Path to diagnostic config file'
     )
 
-    return LaunchDescription([
-        diagnostic_param_cmd,
+    Nodes = []
+    LaunchArguments = []
 
-        # ROSBAGGER
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource([os.path.join(
-        #          get_package_share_directory('joyride_bringup'), 'launch'),
-        #          '/rosbag_recorder.launch.py']),
-        #      launch_arguments={'bag_name':'outdoor_navtest'}.items()
-        # ),
+    #Include launch arguments
+    LaunchArguments.append(diagnostic_param_cmd)
 
-        # Static transforms
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([os.path.join(
-                get_package_share_directory('joyride_bringup'), 'launch'),
-                '/joyride_transforms.launch.py'])
-        ),
+    # Include other launch files
+    Nodes.append(IncludeLaunchDescription(PythonLaunchDescriptionSource([os.path.join(get_package_share_directory('joyride_bringup'), 'launch'),'/joyride_transforms.launch.py'])))
 
-        # Diagnostics
-        IncludeLaunchDescription(
+    Nodes.append(IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory('joyride_bringup'), 'launch'),
                 '/joyride_diagnostics.launch.py']),
             launch_arguments={'diagnostic_config': diagnostic_config}.items()
-        ),
-
-        # Sensors
-        IncludeLaunchDescription(
+        ))
+    
+    Nodes.append(IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory('joyride_bringup'), 'launch'),
                 '/joyride_sensors.launch.py'])
-        ),
+        ))
 
-        # GPS-based Localization
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([os.path.join(
-                get_package_share_directory('joyride_bringup'), 'launch'),
-                '/gps_localization.launch.py'])
-        ),
-
-        # Velocity preprocessor
-        Node(
+    # Add independant nodes
+    Nodes.append(Node(
             package='joyride_control_py',
             executable='vel_preprocessor',
             name='vel_node',
-        ),
-])
+        ))
+
+
+    # Switch between fake and gps localization
+    if FAKE_LOCOLIZATION:
+        Nodes.append(Node(
+            package='joyride_localization',
+            executable='fake_odom',
+            name='fake_odom',
+            output='screen',
+        ))
+    
+    else:
+        Nodes.append(IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([os.path.join(
+                get_package_share_directory('joyride_bringup'), 'launch'),
+                '/gps_localization.launch.py'])
+        ))
+
+    Launch = Nodes
+
+    # Return all required nodes for basic operation
+    return LaunchDescription(Launch)

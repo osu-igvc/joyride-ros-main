@@ -9,8 +9,8 @@ import scipy.linalg as LA
 from scipy.optimize import lsq_linear
 
 
-# import matplotlib.pyplot as plt #Imported for troubleshooting
-# import matplotlib as mpl #Imported for troubleshooting 
+import matplotlib.pyplot as plt #Imported for troubleshooting
+
 
 
 class PointCloudPublisher(Node):
@@ -71,8 +71,6 @@ class PointCloudPublisher(Node):
             )
 
 
-
-
     def compressed_image_callback(self, msg:CompressedImage):
         cv_image = self.bridge.compressed_imgmsg_to_cv2(msg)
         #cv_image = cv2.flip(cv_image, 0)
@@ -82,8 +80,6 @@ class PointCloudPublisher(Node):
         uv = self.extract_uv_points(cv_image)
         point_cloud_msg = self.project_image(uv)
         self.publisher.publish(point_cloud_msg)
-
-
 
 
     def image_callback(self, msg:Image):
@@ -137,7 +133,13 @@ class PointCloudPublisher(Node):
         Φ = np.transpose([np.ones_like(uv[:,0]), uv[:,0], uv[:,0]**2, uv[:,0]**3, uv[:,1], uv[:,1]**2, uv[:,1]**3, uv[:,0]*uv[:,1], uv[:,0]*uv[:,1]**2, uv[:,0]**2 *uv[:,1]])
         P = Φ @ self.Θ
 
-       
+
+
+        # This commented block will plot all extracted uv points that are converted into xyz. It will stop the code 
+        x=P[:,0]
+        y=P[:,1]
+        plt.scatter(x,y,.01)
+        plt.show()
         
         print(f"{np.shape(P)=}") # want Nx3 array
 

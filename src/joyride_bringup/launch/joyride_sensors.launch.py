@@ -12,7 +12,16 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from nav2_common.launch import RewrittenYaml
 
 
+#Cameras = False
+
 def generate_launch_description():
+
+
+
+    # Nodes = []
+
+    # if Cameras == True:
+    #     Nodes.append()
 
     return LaunchDescription([
 

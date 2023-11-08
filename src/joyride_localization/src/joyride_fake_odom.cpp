@@ -66,7 +66,6 @@ void JoyrideFakeOdom::newCmdAckCallback(const ackermann_msgs::msg::AckermannDriv
 
 void JoyrideFakeOdom::publishOdomCallback()
 {
-    // odomTF = buildOdometryTransform(this->[odom_msg.pose.pose.position.x, odom_msg.pose.pose.position.y, odom_msg.pose.pose.position.z], this->odom_msg.pose.pose.orientation, this->world_frame_id_, this->base_link_frame_id_);
 
     nav_msgs::msg::Odometry odom_msg;
 

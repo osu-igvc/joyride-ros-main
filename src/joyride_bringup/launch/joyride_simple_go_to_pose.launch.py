@@ -47,13 +47,6 @@ def generate_launch_description():
             launch_arguments={'params_file':nav_params}.items()
         ),
 
-        # Perception
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([os.path.join(
-                get_package_share_directory('joyride_bringup'), 'launch'),
-                '/joyride_perception.launch.py']),
-        ),
-
         #Simple Pose Controller
         Node(
             package="joyride_control_py",

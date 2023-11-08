@@ -54,14 +54,6 @@ def generate_launch_description():
             '/joyride_transforms.launch.py'
             ])
         ),
- 
-        # CAN Server
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('joyride_bringup'), 'launch'),
-            '/CAN.launch.py'
-            ])
-         ),
 
         # Diagnostics
         IncludeLaunchDescription(
