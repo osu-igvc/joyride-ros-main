@@ -126,8 +126,11 @@ class PointCloudPublisher(Node):
         cv2.imshow("Image",image)
         cv2.waitKey(1)
 
-        uv = np.argwhere(image != 0)
+        vu = np.argwhere(image != 0)
+        uv = vu[:, ::-1]
         return uv
+
+
 
     def project_image(self, uv: np.ndarray) -> PointCloud2:
         Φ = np.transpose([np.ones_like(uv[:,0]), uv[:,0], uv[:,0]**2, uv[:,0]**3, uv[:,1], uv[:,1]**2, uv[:,1]**3, uv[:,0]*uv[:,1], uv[:,0]*uv[:,1]**2, uv[:,0]**2 *uv[:,1]])
@@ -136,10 +139,10 @@ class PointCloudPublisher(Node):
 
 
         # This commented block will plot all extracted uv points that are converted into xyz. It will stop the code 
-        x=P[:,0]
-        y=P[:,1]
-        plt.scatter(x,y,.01)
-        plt.show()
+        # x=P[:,0]
+        # y=P[:,1]
+        # plt.scatter(x,y,.01)
+        # plt.show()
         
         print(f"{np.shape(P)=}") # want Nx3 array
 

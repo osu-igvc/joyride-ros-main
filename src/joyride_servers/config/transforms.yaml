@@ -24,6 +24,7 @@
       rotation.y: 0.0
       rotation.z: 0.0
       rotation.w: 0.0
+      
     map_odom:
       frame_id: "map"
       child_frame_id: "odom"
