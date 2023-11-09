@@ -42,6 +42,7 @@ class AutoModeManagerServerNode(Node):
         self.dbw_sub = self.create_subscription(DriveByWireSystemInfo, self.dbw_system_topic, self.handleDBWSystem_Callback, 10)
         
         # ROS Service Server
+        self.get_logger().warn('recieved request'.center(100,'-'))
         self.request_auto_enable_disable_srv = self.create_service(RequestAutoEnableDisable, self.auto_enable_disable_topic, self.requestAutoEnableDisable_Callback)
 
         # State Management
@@ -114,6 +115,11 @@ class AutoModeManagerServerNode(Node):
 
     def requestAutoEnableDisable_Callback(self, request, response):
         # Ensure last status isn't out of date
+        # run_count =0
+        # print(f'Current Count: {run_count}')
+        self.get_logger().warn('Auto mode request: {}'.format(request.set_auto_enabled))
+        self.get_logger().warn('Auto mode state: {}'.format(self.SYSTEM_STATUS.auto_software_enabled))
+
 
         if self.get_clock().now().nanoseconds - self.get_clock().now().from_msg(self.SYSTEM_STATUS.stamp).nanoseconds > self.status_valid_timeout * 1E9: # time in nano
             self.get_logger().warn('Request set enable: {}, received by {}. Ignoring - system status is out of date.'.format(request.set_auto_enabled, request.sender_name))
@@ -169,9 +175,8 @@ class AutoModeManagerServerNode(Node):
 # --------------------- Node Startup --------------------- #
 
 def main():
-
+    
     rclpy.init()
-
     automodeManagerServerNode = AutoModeManagerServerNode()
     # updater = diagnostic_updater.Updater(automodeManagerServerNode)
     # updater.add('status', automodeManagerServerNode.diagnosticUpdate)
