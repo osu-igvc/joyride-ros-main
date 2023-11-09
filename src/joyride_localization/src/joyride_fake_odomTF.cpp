@@ -1,9 +1,11 @@
 #include "joyride_localization/joyride_fake_odom.hpp"
 
-
+//needs to be added for the transform call tf2_ros::TransformBroadcaster odom_broadcaster_; to the header file
+//maybe also needs the rest of the TF2 stuff such as the buffer and listener in both the .cpp and .hpp files
 namespace joyride_odometry
 {
-JoyrideFakeOdom::JoyrideFakeOdom(const rclcpp::NodeOptions &options) : Node("joyride_fake_odom", options)
+JoyrideFakeOdom::JoyrideFakeOdom(const rclcpp::NodeOptions &options) : Node("joyride_fake_odom", options),
+    odom_broadcaster_(*this) //Appears this is used to call the transform
 {
     initializeParameters();
     initializeROS();
@@ -65,8 +67,6 @@ void JoyrideFakeOdom::newCmdAckCallback(const ackermann_msgs::msg::AckermannDriv
 
 void JoyrideFakeOdom::publishOdomCallback()
 {
-    
-    geometry_msgs::msg::TransformStamped odomTF;
     nav_msgs::msg::Odometry odom_msg;
 
     odom_msg.header.stamp = this->now();
@@ -77,6 +77,8 @@ void JoyrideFakeOdom::publishOdomCallback()
     odom_msg.pose.pose.position.y = position_y_;
     odom_msg.pose.pose.position.z = position_z_;
 
+    //NOTE: Might want to initiallize in the same structure as odom to improve readability
+    // 
     odom_msg.pose.pose.orientation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0, 0, 1), yaw_));
 
     odom_msg.twist.twist.linear.x = velocity_x_;
@@ -90,7 +92,7 @@ void JoyrideFakeOdom::publishOdomCallback()
     odom_pub_->publish(odom_msg);
 
 
-    geometry_msgs::msg::TransformStamped NavSatOdom::buildOdometryTransform(const geometry_msgs::msg::Point::SharedPtr position, const geometry_msgs::msg::Quaternion::SharedPtr orientation, const std::string frame_id, const std::string child_frame_id){
+    
     geometry_msgs::msg::TransformStamped odomTF;
     odomTF.header.stamp = this->get_clock()->now(); 
     odomTF.header.frame_id = odom_frame;
@@ -100,9 +102,8 @@ void JoyrideFakeOdom::publishOdomCallback()
     odomTF.transform.translation.z = position->z;
     odomTF.transform.rotation = *orientation;
 
-    return odomTF;
-    }
-    }
+    odom_broadcaster_.sendTransform(odomTF);
+}
 
 void JoyrideFakeOdom::computeOdom(const ackermann_msgs::msg::AckermannDrive::SharedPtr msg)
 {
