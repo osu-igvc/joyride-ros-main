@@ -119,15 +119,36 @@ class PointCloudPublisher(Node):
 
     def extract_uv_points(self, image:np.ndarray) -> np.ndarray:
         # This section is used for color images. Comment out if feeding a black and white image
+
         # image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         # hsv_mask = cv2.inRange(image_hsv, self.hsv_bounds[0], self.hsv_bounds[1])
         # image_masked = cv2.bitwise_and(image,image, mask=hsv_mask)
 
+
+        #These 2 lines are used to show an image of the black and white processed image that this node is subscribed to 
         cv2.imshow("Image",image)
         cv2.waitKey(1)
 
+
+        #output is VU coordinates, need to flip them to UV, swap the columns
+        #VU coordinates are all spots where image values are not 0,(Looking for coordinates wehre pixels are white)
         vu = np.argwhere(image != 0)
-        uv = vu[:, ::-1]
+        #Flipping the columns to make uv coordinates 
+        uv_unfiltered= vu[:, ::-1]
+        
+        #Input bounds for LLsq curve fitting measurements in fall2023 csv
+        u_min=120
+        u_max=904
+        v_min=400
+        v_max=700
+
+        #filtering out all rows from retrieved uv Nx2 matrix that are outside our bounds
+        masku=(uv_unfiltered[:,0]>=u_min )&(uv_unfiltered[:,0]<=u_max)
+        maskv=(uv_unfiltered[:,1]>=v_min )&(uv_unfiltered[:,1]<=v_max)
+        maskcombo=masku&maskv
+        uv=uv_unfiltered[maskcombo]
+
+        #return all filtered uv points for further processing
         return uv
 
 
@@ -136,15 +157,11 @@ class PointCloudPublisher(Node):
         Φ = np.transpose([np.ones_like(uv[:,0]), uv[:,0], uv[:,0]**2, uv[:,0]**3, uv[:,1], uv[:,1]**2, uv[:,1]**3, uv[:,0]*uv[:,1], uv[:,0]*uv[:,1]**2, uv[:,0]**2 *uv[:,1]])
         P = Φ @ self.Θ
 
-
-
-        # This commented block will plot all extracted uv points that are converted into xyz. It will stop the code 
+        # This commented block will plot all extracted uv points that are converted into xyz. It will stop the code on plot.show()
         # x=P[:,0]
         # y=P[:,1]
         # plt.scatter(x,y,.01)
         # plt.show()
-        
-        print(f"{np.shape(P)=}") # want Nx3 array
 
         msg = PointCloud2()
         msg.header.stamp = self.get_clock().now().to_msg()

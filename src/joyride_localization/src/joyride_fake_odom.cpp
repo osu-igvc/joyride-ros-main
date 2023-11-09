@@ -1,10 +1,11 @@
-
 #include "joyride_localization/joyride_fake_odom.hpp"
 
-
+//needs to be added for the transform call tf2_ros::TransformBroadcaster odom_broadcaster_; to the header file
+//maybe also needs the rest of the TF2 stuff such as the buffer and listener in both the .cpp and .hpp files
 namespace joyride_odometry
 {
-JoyrideFakeOdom::JoyrideFakeOdom(const rclcpp::NodeOptions &options) : Node("joyride_fake_odom", options)
+JoyrideFakeOdom::JoyrideFakeOdom(const rclcpp::NodeOptions &options) : Node("joyride_fake_odom", options),
+    odom_broadcaster_(*this) //Appears this is used to call the transform
 {
     initializeParameters();
     initializeROS();
@@ -46,6 +47,9 @@ void JoyrideFakeOdom::initializeROS()
 
     pub_odom_timer_ = this->create_wall_timer(std::chrono::milliseconds((int)(1000.0 / pub_odom_rate_)), std::bind(&joyride_odometry::JoyrideFakeOdom::publishOdomCallback, this));
 
+    //TF2 init
+    this->tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
+    this->tf_listener_ = std::make_unique<tf2_ros::TransformListener>(*tf_buffer_);
    
     position_x_ = 0.0;
     position_y_ = 0.0;
@@ -57,6 +61,7 @@ void JoyrideFakeOdom::initializeROS()
     velocity_z_ = 0.0;
     yaw_rate_ = 0.0;
 
+    RCLCPP_INFO(this->get_logger(), "Indoor GPS Fix Obtained");
 }
 
 void JoyrideFakeOdom::newCmdAckCallback(const ackermann_msgs::msg::AckermannDrive::SharedPtr msg)
@@ -66,7 +71,6 @@ void JoyrideFakeOdom::newCmdAckCallback(const ackermann_msgs::msg::AckermannDriv
 
 void JoyrideFakeOdom::publishOdomCallback()
 {
-
     nav_msgs::msg::Odometry odom_msg;
 
     odom_msg.header.stamp = this->now();
@@ -77,6 +81,8 @@ void JoyrideFakeOdom::publishOdomCallback()
     odom_msg.pose.pose.position.y = position_y_;
     odom_msg.pose.pose.position.z = position_z_;
 
+    //NOTE: Might want to initiallize in the same structure as odom to improve readability
+    // 
     odom_msg.pose.pose.orientation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0, 0, 1), yaw_));
 
     odom_msg.twist.twist.linear.x = velocity_x_;
@@ -88,6 +94,18 @@ void JoyrideFakeOdom::publishOdomCallback()
     odom_msg.twist.twist.angular.z = yaw_rate_;
 
     odom_pub_->publish(odom_msg);
+
+    
+    geometry_msgs::msg::TransformStamped odomTF;
+    odomTF.header.stamp = this->get_clock()->now(); 
+    odomTF.header.frame_id = odom_frame_;
+    odomTF.child_frame_id = base_frame_;
+    odomTF.transform.translation.x = position_x_;
+    odomTF.transform.translation.y = position_y_;
+    odomTF.transform.translation.z = position_z_;
+    odomTF.transform.rotation = tf2::toMsg(tf2::Quaternion(tf2::Vector3(0, 0, 1), yaw_));
+
+    odom_broadcaster_.sendTransform(odomTF);
 
 }
 
