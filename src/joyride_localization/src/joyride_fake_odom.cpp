@@ -61,7 +61,9 @@ void JoyrideFakeOdom::initializeROS()
     velocity_z_ = 0.0;
     yaw_rate_ = 0.0;
 
-    RCLCPP_INFO(this->get_logger(), "Indoor GPS Fix Obtained");
+    //Spoofing GPS in Gui
+    rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared("NavSatOdom");
+    RCLCPP_INFO(node.get_logger(), "Indoor GPS Fix Obtained");
 }
 
 void JoyrideFakeOdom::newCmdAckCallback(const ackermann_msgs::msg::AckermannDrive::SharedPtr msg)
