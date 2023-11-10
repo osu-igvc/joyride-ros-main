@@ -23,6 +23,8 @@ class PointCloudPublisher(Node):
         self.calibration_type = self.declare_parameter("calibration_type","correlated").get_parameter_value().string_value
         self.calibration_file = self.declare_parameter('calibration_file', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/joyride_perception/calibration_center_tm.csv').get_parameter_value().string_value
         self.image_sub_topic = self.declare_parameter("subscriber_topic", "/perception/lane/white").get_parameter_value().string_value
+        #self.image_sub_topic = self.declare_parameter("subscriber_topic", "/perception/object_to_point_cloud").get_parameter_value().string_value
+
 
         self.compressed = True if self.image_sub_topic.split("/")[-1] == "compressed" else False
 

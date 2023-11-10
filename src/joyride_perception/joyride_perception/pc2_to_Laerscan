@@ -26,9 +26,9 @@ class PointCloudToLaserScanNode(Node):
 
         # Set the laser scan parameters
         scan_msg.header = pointcloud_msg.header
-        scan_msg.angle_min = -1 * math.pi
-        scan_msg.angle_max = 1 * math.pi
-        scan_msg.angle_increment = 0.1
+        scan_msg.angle_min = -1.0
+        scan_msg.angle_max = 1.0
+        scan_msg.angle_increment = 1/3000
         scan_msg.range_min = 0.0
         scan_msg.range_max = 10.0  
 
@@ -36,6 +36,7 @@ class PointCloudToLaserScanNode(Node):
         ranges = []
         for point in pc2.read_points(pointcloud_msg, field_names=("x", "y", "z"), skip_nans=True):
             distance = math.sqrt(point[0]**2 + point[1]**2)
+            print(distance)
             ranges.append(distance)
 
         scan_msg.ranges = ranges
