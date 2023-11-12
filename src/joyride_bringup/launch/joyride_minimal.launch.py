@@ -45,7 +45,7 @@ def generate_launch_description():
         #     PythonLaunchDescriptionSource([os.path.join(
         #          get_package_share_directory('joyride_bringup'), 'launch'),
         #          '/rosbag_recorder.launch.py']),
-        #      launch_arguments={'bag_name':'outdoor_navtest'}.items()
+        #      launch_arguments={'bag_name':'F23_Nav2'}.items()
         # ),
 
         # Static transforms

@@ -136,8 +136,10 @@ class AutoModeManagerServerNode(Node):
         
         # Check new status is different
         if self.SYSTEM_STATUS.auto_software_enabled == request.set_auto_enabled:
-            self.get_logger().warn('Request set enable: {}, received by {}. Ignoring - system is already in that state.'.format(request.set_auto_enabled, request.sender_name))
+            # self.get_logger().warn('System Status {}'.format(self.SYSTEM_STATUS))
+            self.get_logger().warn(f'Requested: {request.set_auto_enabled = }, received by {request.sender_name}. Ignoring - system is already {self.SYSTEM_STATUS.auto_software_enabled = }.')
             response.response = RequestAutoEnableDisable.Response.ALREADY_IN_STATE
+
             return response
 
         # Checks are passed, make request
@@ -145,6 +147,7 @@ class AutoModeManagerServerNode(Node):
         self.get_logger().warn('Request set enable: {}, received by {}. Obeying.'.format(request.set_auto_enabled, request.sender_name))
         response.response = RequestAutoEnableDisable.Response.REQUEST_MADE
         self.SYSTEM_STATUS.auto_software_enabled = request.set_auto_enabled
+
         if request.set_auto_enabled:
             self.last_request_time = self.get_clock().now().nanoseconds
         return response
