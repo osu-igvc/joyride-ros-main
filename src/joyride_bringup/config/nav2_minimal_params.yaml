@@ -1,42 +1,4 @@
 
-# bt_navigator:
-#   ros__parameters:
-#     use_sim_time: False
-#     global_frame: map
-#     robot_base_frame: base_link
-#     odom_topic: /odom
-#     enable_groot_monitoring: True
-#     groot_zmq_publisher_port: 1666
-#     groot_zmq_server_port: 1667
-#     #default_bt_xml_filename: "navigate_w_replanning_and_recovery.xml"
-#     plugin_lib_names:
-#     - nav2_compute_path_to_pose_action_bt_node
-#     - nav2_follow_path_action_bt_node
-#     - nav2_back_up_action_bt_node
-#     - nav2_spin_action_bt_node
-#     - nav2_wait_action_bt_node
-#     - nav2_clear_costmap_service_bt_node
-#     - nav2_is_stuck_condition_bt_node
-#     - nav2_goal_reached_condition_bt_node
-#     - nav2_goal_updated_condition_bt_node
-#     - nav2_initial_pose_received_condition_bt_node
-#     - nav2_reinitialize_global_localization_service_bt_node
-#     - nav2_rate_controller_bt_node
-#     - nav2_distance_controller_bt_node
-#     - nav2_speed_controller_bt_node
-#     - nav2_truncate_path_action_bt_node
-#     - nav2_goal_updater_node_bt_node
-#     - nav2_recovery_node_bt_node
-#     - nav2_pipeline_sequence_bt_node
-#     - nav2_round_robin_node_bt_node
-#     - nav2_transform_available_condition_bt_node
-#     - nav2_time_expired_condition_bt_node
-#     - nav2_distance_traveled_condition_bt_node
-
-
-# bt_navigator_rclcpp_node:
-#   ros__parameters:
-#     use_sim_time: False
 
 bt_navigator:
   ros__parameters:
@@ -96,129 +58,90 @@ bt_navigator:
     - nav2_drive_on_heading_cancel_bt_node
     - nav2_clear_costmap_service_bt_node
 
-# controller_server:
-#   ros__parameters:
-#     use_sim_time: False
-#     controller_frequency: 1.0
-#     min_x_velocity_threshold: 0.001
-#     min_y_velocity_threshold: 0.5
-#     min_theta_velocity_threshold: 0.001
-#     progress_checker_plugin: "progress_checker"
-#     goal_checker_plugin: "goal_checker"
-#     controller_plugins: ["FollowPath"]
+bt_navigator_navigate_through_poses_rclcpp_node:
+  ros__parameters:
+    use_sim_time: False
 
-#     # Progress checker parameters
-#     progress_checker:
-#       plugin: "nav2_controller::SimpleProgressChecker"
-#       required_movement_radius: 0.5
-#       movement_time_allowance: 10.0
-#     # Goal checker parameters
-#     goal_checker:
-#       plugin: "nav2_controller::SimpleGoalChecker"
-#       xy_goal_tolerance: 0.25
-#       yaw_goal_tolerance: 0.25
-#       stateful: false
-  
-#     # DWB parameters - may replace later
-#     FollowPath:
-#       plugin: "dwb_core::DWBLocalPlanner"
-#       debug_trajectory_details: True
-#       min_vel_x: 0.0
-#       min_vel_y: 0.0
-#       max_vel_x: 0.26
-#       max_vel_y: 0.0
-#       max_vel_theta: 1.0
-#       min_speed_xy: 0.0
-#       max_speed_xy: 0.26
-#       min_speed_theta: 0.0
-#       # Add high threshold velocity for turtlebot 3 issue.
-#       # https://github.com/ROBOTIS-GIT/turtlebot3_simulations/issues/75
-#       acc_lim_x: 2.5
-#       acc_lim_y: 0.0
-#       acc_lim_theta: 3.2
-#       decel_lim_x: -2.5
-#       decel_lim_y: 0.0
-#       decel_lim_theta: -3.2
-#       vx_samples: 20
-#       vy_samples: 5
-#       vtheta_samples: 20
-#       sim_time: 1.7
-#       linear_granularity: 0.05
-#       angular_granularity: 0.025
-#       transform_tolerance: 0.2
-#       xy_goal_tolerance: 0.25
-#       trans_stopped_velocity: 0.25
-#       short_circuit_trajectory_evaluation: True
-#       stateful: True
-#       critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
-#       BaseObstacle.scale: 0.02
-#       PathAlign.scale: 32.0
-#       PathAlign.forward_point_distance: 0.1
-#       GoalAlign.scale: 24.0
-#       GoalAlign.forward_point_distance: 0.1
-#       PathDist.scale: 32.0
-#       GoalDist.scale: 24.0
-#       RotateToGoal.scale: 32.0
-#       RotateToGoal.slowing_factor: 5.0
-#       RotateToGoal.lookahead_time: -1.0
+bt_navigator_navigate_to_pose_rclcpp_node:
+  ros__parameters:
+    use_sim_time: False
 
-# controller_server_rclcpp_node:
-#   ros__parameters:
-#     use_sim_time: False
 
 controller_server:
   ros__parameters:
-    use_sim_time: false
-    controller_frequency: 1.0
+    use_sim_time: False
+    controller_frequency: 20.0
     min_x_velocity_threshold: 0.001
     min_y_velocity_threshold: 0.5
     min_theta_velocity_threshold: 0.001
+    failure_tolerance: 0.3
     progress_checker_plugin: "progress_checker"
-    goal_checker_plugins: ["goal_checker"]
+    goal_checker_plugins: ["general_goal_checker"] # "precise_goal_checker"
     controller_plugins: ["FollowPath"]
 
+    # Progress checker parameters
     progress_checker:
       plugin: "nav2_controller::SimpleProgressChecker"
       required_movement_radius: 0.5
       movement_time_allowance: 10.0
-    goal_checker:
+    # Goal checker parameters
+    #precise_goal_checker:
+    #  plugin: "nav2_controller::SimpleGoalChecker"
+    #  xy_goal_tolerance: 0.25
+    #  yaw_goal_tolerance: 0.25
+    #  stateful: True
+    general_goal_checker:
+      stateful: True
       plugin: "nav2_controller::SimpleGoalChecker"
       xy_goal_tolerance: 0.25
       yaw_goal_tolerance: 0.25
-      stateful: false
+    # DWB parameters
     FollowPath:
-      plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 1.5
-      lookahead_dist: 15.0
-      min_lookahead_dist: 5.0
-      max_lookahead_dist: 15.0
-      lookahead_time: 10.0
-      rotate_to_heading_angular_vel: 0.2
-      transform_tolerance: 0.1
-      use_velocity_scaled_lookahead_dist: true
-      min_approach_linear_velocity: 0.5
-      approach_velocity_scaling_dist: 1.0
-      use_collision_detection: false
-      max_allowed_time_to_collision_up_to_carrot: 1.0
-      use_regulated_linear_velocity_scaling: false
-      use_cost_regulated_linear_velocity_scaling: false
-      regulated_linear_scaling_min_radius: 0.9
-      regulated_linear_scaling_min_speed: 3.0
-      use_fixed_curvature_lookahead: false
-      curvature_lookahead_dist: 0.5
-      use_rotate_to_heading: false        # Don't use for ackermann! Can't rotate in place!
-      rotate_to_heading_min_angle: 0.785
-      max_angular_accel: 0.1
-      max_robot_pose_search_dist: 10.0
-      use_interpolation: false
-      cost_scaling_dist: 0.3
-      cost_scaling_gain: 1.0
-      inflation_cost_scaling_factor: 3.0
+      plugin: "dwb_core::DWBLocalPlanner"
+      debug_trajectory_details: True
+      min_vel_x: 0.0
+      min_vel_y: 0.0
+      max_vel_x: 0.26
+      max_vel_y: 0.0
+      max_vel_theta: 1.0
+      min_speed_xy: 0.0
+      max_speed_xy: 0.26
+      min_speed_theta: 0.0
+      # Add high threshold velocity for turtlebot 3 issue.
+      # https://github.com/ROBOTIS-GIT/turtlebot3_simulations/issues/75
+      acc_lim_x: 2.5
+      acc_lim_y: 0.0
+      acc_lim_theta: 3.2
+      decel_lim_x: -2.5
+      decel_lim_y: 0.0
+      decel_lim_theta: -3.2
+      vx_samples: 20
+      vy_samples: 5
+      vtheta_samples: 20
+      sim_time: 1.7
+      linear_granularity: 0.05
+      angular_granularity: 0.025
+      transform_tolerance: 0.2
+      xy_goal_tolerance: 0.25
+      trans_stopped_velocity: 0.25
+      short_circuit_trajectory_evaluation: True
+      stateful: True
+      critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
+      BaseObstacle.scale: 0.02
+      PathAlign.scale: 32.0
+      PathAlign.forward_point_distance: 0.1
+      GoalAlign.scale: 24.0
+      GoalAlign.forward_point_distance: 0.1
+      PathDist.scale: 32.0
+      GoalDist.scale: 24.0
+      RotateToGoal.scale: 32.0
+      RotateToGoal.slowing_factor: 5.0
+      RotateToGoal.lookahead_time: -1.0
 
 local_costmap:
   local_costmap:
     ros__parameters:
-      update_frequency: 15.0
+      update_frequency:  15.0
       publish_frequency: 20.0
       global_frame: map                  
       robot_base_frame: base_link
@@ -229,47 +152,44 @@ local_costmap:
       height: 20
       resolution: 0.05
       robot_radius: 3.46
-      plugins: ["inflation_layer"] #, "voxel layer]"
+      plugins: ["obstacle_layer"] #, "inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 2.0
-        inflation_radius: 1.5
-        enabled: true
-      voxel_layer:
-        plugin: "nav2_costmap_2d::VoxelLayer"
-        enabled: false
-        publish_voxel_map: false
-        origin_z: 0.0
-        z_resolution: 0.05
-        z_voxels: 16
-        max_obstacle_height: 2.0
-        mark_threshold: 0
-        observation_sources: scan
-        scan:
-          topic: /scan
+        inflation_radius: 0.5
+        enabled: True
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: True
+        observation_sources: hokuyo_front_scan
+        hokuyo_front_scan:
+          topic: /sensors/lidar/front_lidar/scan
+          inf_is_valid: False
           max_obstacle_height: 2.0
+          min_obstacle_height: 0.0
+          raytrace_max_range: 16.0     # Default is 3 meters
+          raytrace_min_range: 0.0
+          obstacle_max_range: 15.0    # Default is 2.5 meters, adjust as needed
+          obstacle_min_range: 0.0 
           clearing: True
           marking: True
-          data_type: "LaserScan"
-          raytrace_max_range: 3.0
-          raytrace_min_range: 0.0
-          obstacle_max_range: 2.5
-          obstacle_min_range: 0.0
+          data_type: "LaserScan" 
       static_layer:
+        plugin: "nav2_costmap_2d::StaticLayer"
         map_subscribe_transient_local: True
       always_send_full_costmap: True
-  local_costmap_client:
-    ros__parameters:
-      use_sim_time: False
-  local_costmap_rclcpp_node:
-    ros__parameters:
-      use_sim_time: False
+  # local_costmap_client:
+  #   ros__parameters:
+  #     use_sim_time: False
+  # local_costmap_rclcpp_node:
+  #   ros__parameters:
+  #     use_sim_time: False
 
 global_costmap:
   global_costmap:
     ros__parameters:
-      update_frequency: 15.0
-      publish_frequency: 15.0
+      update_frequency: 20.0
+      publish_frequency: 20.0
       global_frame: map
       robot_base_frame: base_link
       width: 50
@@ -280,27 +200,27 @@ global_costmap:
       robot_radius: 3.46
       resolution: 0.1
       track_unknown_space: False
-      plugins: ["static_layer", "inflation_layer", "obstacle_layer"]
+      plugins: ["static_layer", "inflation_layer"] #, "obstacle_layer"]
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: True
-        observation_sources: hokuyo_front_scan
-        hokuyo_front_scan:
-          topic: /sensors/lidar/front_lidar/scan
+        observation_sources: PointCloud2
+        PointCloud2:
+          topic: /perception/center/lanes_point_cloud
           max_obstacle_height: 2.0
           min_obstacle_height: 0.0
-          raytrace_max_range: 3.0
+          raytrace_max_range: 15.0     # Default is 3 
           raytrace_min_range: 0.0
-          obstacle_max_range: 15.0    # default is 2.5 meters, adjust as needed
+          obstacle_max_range: 9.0    # Default is 2.5 meters, adjust as needed
           obstacle_min_range: 0.0 
           clearing: True
           marking: True
-          data_type: "LaserScan" 
+          data_type: "PointCloud2" 
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: true
         cost_scaling_factor: 2.0
-        inflation_radius: 1.0
+        inflation_radius: 0.5
         inflate_unknown: False
         inflate_around_unknown: false
       static_layer:
@@ -309,14 +229,14 @@ global_costmap:
         enabled: True
         map_topic: /global_costmap/costmap
         subscribe_to_updates: true
-        transform_tolerance: 0.1
+        transform_tolerance: 0.0
       always_send_full_costmap: True
-  global_costmap_client:
-    ros__parameters:
-      use_sim_time: False
-  global_costmap_rclcpp_node:
-    ros__parameters:
-      use_sim_time: False
+  # global_costmap_client:
+  #   ros__parameters:
+  #     use_sim_time: False
+  # global_costmap_rclcpp_node:
+  #   ros__parameters:
+  #     use_sim_time: False
 
 
 map_server:
