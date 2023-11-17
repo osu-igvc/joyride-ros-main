@@ -30,7 +30,8 @@ def generate_launch_description():
 
     final_nav_params_path = DeclareLaunchArgument(
         'nav2_params',
-        default_value=[get_package_share_directory('joyride_bringup'), '/config/','nav2_minimal_params.yaml'])
+        default_value=[get_package_share_directory('joyride_bringup'), '/config/','nav2_navigation_params.yaml'])
+        #default_value=[get_package_share_directory('joyride_bringup'), '/config/','booboo_params.yaml'])
 
     return LaunchDescription([
         declare_controller_type_cmd,

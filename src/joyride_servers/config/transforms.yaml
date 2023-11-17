@@ -17,7 +17,7 @@
     hokuyo_front:
       frame_id: "base_link"
       child_frame_id: "hokuyo_front"
-      translation.x: 2.134
+      translation.x: 2.134  # meters from back axle
       translation.y: 0.0
       translation.z: 0.0
       rotation.x: 1.0

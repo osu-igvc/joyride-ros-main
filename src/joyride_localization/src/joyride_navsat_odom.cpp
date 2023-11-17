@@ -167,7 +167,7 @@ void NavSatOdom::gpsCommonCallback(const vectornav_msgs::msg::CommonGroup::Share
 
         if(distance <= this->initial_ll_radius_)
         {
-            RCLCPP_INFO(this->get_logger(), "Valid GPS Fix Obtained");
+            RCLCPP_INFO(this->get_logger(), "Valid GPS Fix Obtained", this->get_clock()->now());
 
             // Accept initial pose.
             this->initialLLA_fix_ = msg;
@@ -177,6 +177,7 @@ void NavSatOdom::gpsCommonCallback(const vectornav_msgs::msg::CommonGroup::Share
         }
     }
     else {
+        // RCLCPP_INFO(this->get_logger(), "GPS Update", this->get_clock()->now());
         this->updateTransform(msg);
     }
 

@@ -1,5 +1,4 @@
 
-
 bt_navigator:
   ros__parameters:
     use_sim_time: False
@@ -8,8 +7,8 @@ bt_navigator:
     odom_topic: /odom
     bt_loop_duration: 10
     default_server_timeout: 20
-    default_nav_to_pose_bt_xml: /home/joyride-obc/joyride-ros-main/src/third_party/navigation2/nav2_bt_navigator/behavior_trees/navigate_w_replanning_only_if_path_becomes_invalid.xml
-    default_nav_through_poses_bt_xml: /home/joyride-obc/joyride-ros-main/src/third_party/navigation2/nav2_bt_navigator/behavior_trees/navigate_w_replanning_only_if_path_becomes_invalid.xml
+    # default_nav_to_pose_bt_xml: /home/joyride-obc/joyride-ros-main/src/third_party/navigation2/nav2_bt_navigator/behavior_trees/navigate_w_replanning_only_if_path_becomes_invalid.xml
+    # default_nav_through_poses_bt_xml: /home/joyride-obc/joyride-ros-main/src/third_party/navigation2/nav2_bt_navigator/behavior_trees/navigate_w_replanning_only_if_path_becomes_invalid.xml
     plugin_lib_names:
     - nav2_compute_path_to_pose_action_bt_node
     - nav2_compute_path_through_poses_action_bt_node
@@ -127,8 +126,9 @@ controller_server:
 local_costmap:
   local_costmap:
     ros__parameters:
-      update_frequency:  15.0
-      publish_frequency: 20.0
+      update_frequency:  20.0
+      publish_frequency: 16.0
+      lethal_cost_threshold: 80 #default is 100 
       global_frame: map                  
       robot_base_frame: base_link
       trinary_costmap: True
@@ -138,12 +138,12 @@ local_costmap:
       height: 20
       resolution: 0.05
       robot_radius: 3.46
-      plugins: ["obstacle_layer"] #, "inflation_layer"]
-      # inflation_layer:
-      #   plugin: "nav2_costmap_2d::InflationLayer"
-      #   cost_scaling_factor: 2.0
-      #   inflation_radius: 0.5
-      #   enabled: True
+      plugins: ["obstacle_layer","denoise_layer", "inflation_layer"]
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 2.0
+        inflation_radius: 0.5
+        enabled: True
       # obstacle_layer:
       #   plugin: "nav2_costmap_2d::ObstacleLayer"
       #   enabled: True
@@ -161,23 +161,30 @@ local_costmap:
       #     clearing: True
       #     marking: True
       #     data_type: "PointCloud2" 
+
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: True
-        observation_persistence: 1.0
+        observation_persistence: 10.0     # Number of seconds before objects are cleared once they move 
         observation_sources: hokuyo_front_scan
         hokuyo_front_scan:
           topic: /sensors/lidar/front_lidar/scan
           max_obstacle_height: 2.0
           min_obstacle_height: 0.0
-          raytrace_max_range: 15.0     # Default is 3 meters
+          raytrace_max_range: 15.0     # Default is 3 meters; the range of clearing objects
           raytrace_min_range: 0.0
-          obstacle_max_range: 10.0    # Default is 2.5 meters, adjust as needed
+          obstacle_max_range: 6.0    # Default is 2.5 meters; the range of objects added into map
           obstacle_min_range: 0.0
           marking: True
           clearing: True
-          data_type: "LaserScan" 
-          inf_is_valid: True
+          data_type: "LaserScan"      # LaserScan, PointCloud, PointCloud2
+          inf_is_valid: False          # Validity of infite laserscan data; True/False
+      denoise_layer:
+        plugin: "nav2_costmap_2d::DenoiseLayer"
+        enabled: true
+        minimal_group_size: 2       # If 1 or less, all obstacles will be kept. If 2, standalone obstacles (without neighbors in adjacent cells) will be removed.If 2, standalone obstacles (without neighbors in adjacent cells) will be removed.
+        group_connectivity_type: 4  #4 - adjacent obstacles are connected horizontally and vertically. 8 - adjacent obstacles are connected horizontally, vertically and diagonally.
+
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_subscribe_transient_local: True
@@ -219,6 +226,23 @@ global_costmap:
       #     clearing: True
       #     marking: True
       #     data_type: "PointCloud2" 
+      # obstacle_layer:
+      #   plugin: "nav2_costmap_2d::ObstacleLayer"
+      #   enabled: True
+      #   observation_persistence: 1.0     # Number of seconds before objects are cleared once they move 
+      #   observation_sources: hokuyo_front_scan
+      #   hokuyo_front_scan:
+      #     topic: /sensors/lidar/front_lidar/scan
+      #     max_obstacle_height: 2.0
+      #     min_obstacle_height: 0.0
+      #     raytrace_max_range: 15.0     # Default is 3 meters; the range of clearing objects
+      #     raytrace_min_range: 0.0
+      #     obstacle_max_range: 10.0    # Default is 2.5 meters; the range of objects added into map
+      #     obstacle_min_range: 0.0
+      #     marking: True
+      #     clearing: True
+      #     data_type: "LaserScan"      # LaserScan, PointCloud, PointCloud2
+      #     inf_is_valid: False          # Validity of infite laserscan data; True/False
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: true
@@ -231,8 +255,9 @@ global_costmap:
         map_subscribe_transient_local: True
         enabled: True
         map_topic: /global_costmap/costmap
+        # map_topic: /map
         subscribe_to_updates: true
-        transform_tolerance: 0.0
+        transform_tolerance: 0.3
       always_send_full_costmap: True
 
 
@@ -317,35 +342,35 @@ behavior_server:
     min_rotational_vel: 0.1
     rotational_acc_lim: 0.2
 
-robot_state_publisher:
-  ros__parameters:
-    use_sim_time: False
-
-# waypoint_follower:
+# robot_state_publisher:
 #   ros__parameters:
 #     use_sim_time: False
-#     loop_rate: 20
-#     stop_on_failure: True
-#     waypoint_task_executor_plugin: "wait_at_waypoint"
-#     wait_at_waypoint:
-#       plugin: "nav2_waypoint_follower::WaitAtWaypoint"
-#       enabled: True
-#       waypoint_pause_duration: 200
 
-velocity_smoother:
+waypoint_follower:
   ros__parameters:
     use_sim_time: False
-    smoothing_frequency: 20.0
-    scale_velocities: False
-    feedback: "OPEN_LOOP"
-    max_velocity: [2.0, 0.0, 0.1]
-    min_velocity: [-0.5, 0.0, -0.1]
-    max_accel: [3.0, 0.0, 0.03]
-    max_decel: [-3.0, 0.0, -0.03]
-    odom_topic: "odom"
-    odom_duration: 0.1
-    deadband_velocity: [0.0, 0.0, 0.0]
-    velocity_timeout: 1.0
+    loop_rate: 20
+    stop_on_failure: True
+    waypoint_task_executor_plugin: "wait_at_waypoint"
+    wait_at_waypoint:
+      plugin: "nav2_waypoint_follower::WaitAtWaypoint"
+      enabled: True
+      waypoint_pause_duration: 200
+
+# velocity_smoother:
+#   ros__parameters:
+#     use_sim_time: False
+#     smoothing_frequency: 20.0
+#     scale_velocities: False
+#     feedback: "OPEN_LOOP"
+#     max_velocity: [2.0, 0.0, 0.1]
+#     min_velocity: [-0.5, 0.0, -0.1]
+#     max_accel: [3.0, 0.0, 0.03]
+#     max_decel: [-3.0, 0.0, -0.03]
+#     odom_topic: "odom"
+#     odom_duration: 0.1
+#     deadband_velocity: [0.0, 0.0, 0.0]
+#     velocity_timeout: 1.0
   
 # simple_go_to_pose:
 #   ros__parameters:
