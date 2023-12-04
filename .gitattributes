@@ -1,3 +1,5 @@
 /src/igvc_competition/resource/igvc_competition filter=lfs diff=lfs merge=lfs -text
 *.mbtiles filter=lfs diff=lfs merge=lfs -text
 rosbagger filter=lfs diff=lfs merge=lfs -text
+bag_data filter=lfs diff=lfs merge=lfs -text
+*.mcap filter=lfs diff=lfs merge=lfs -text
