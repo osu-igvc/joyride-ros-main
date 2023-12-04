@@ -138,13 +138,13 @@ class PointCloudPublisher(Node):
         #Flipping the columns to make uv coordinates 
         uv_unfiltered= vu[:, ::-1]
         
-        #Input bounds for LLsq curve fitting measurements in fall2023 csv
+        # #Input bounds for LLsq curve fitting measurements in fall2023 csv
         u_min=120
         u_max=904
         v_min=400
         v_max=700
 
-        # #filtering out all rows from retrieved uv Nx2 matrix that are outside our bounds
+        # # #filtering out all rows from retrieved uv Nx2 matrix that are outside our bounds
         masku=(uv_unfiltered[:,0]>=u_min )&(uv_unfiltered[:,0]<=u_max)
         maskv=(uv_unfiltered[:,1]>=v_min )&(uv_unfiltered[:,1]<=v_max)
         maskcombo=masku&maskv

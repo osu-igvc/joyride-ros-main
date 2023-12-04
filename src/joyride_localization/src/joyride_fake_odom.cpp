@@ -24,8 +24,10 @@ void JoyrideFakeOdom::initializeParameters()
     this->declare_parameter("odom_topic", "/odom");
     this->declare_parameter("cmd_ack_topic", "cmd_ack");
     this->declare_parameter("odom_frame", "odom");
+    // this->declare_parameter("local_cartesian", "local_enu");
     this->declare_parameter("base_frame", "base_link");
     this->declare_parameter("wheelbase", 1.75);
+    
 
     this->linear_lag_ = this->get_parameter("linear_lag").as_double();
     this->angular_lag_ = this->get_parameter("angular_lag").as_double();

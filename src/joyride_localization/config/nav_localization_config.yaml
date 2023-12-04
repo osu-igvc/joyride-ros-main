@@ -3,7 +3,8 @@ navsat_transform:
   ros__parameters:
     frequency: 60.0
     delay: 0.0
-    magnetic_declination_radians: 0.0514872  # For lat/long 55.944831, -3.186998
+    # magnetic_declination_radians: 0.0514872  # For lat/long 55.944831, -3.186998
+    magnetic_declination_radians: 0.05026548 # For lat/long [Stillwater OK] 36.1156, 97.0584
     yaw_offset: 0.0 #1.570796327  # IMU reads 0 facing magnetic north, not east
     zero_altitude: true
     broadcast_cartesian_transform: true

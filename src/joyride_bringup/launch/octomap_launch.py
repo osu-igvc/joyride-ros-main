@@ -12,8 +12,8 @@ def generate_launch_description():
             name='octomap_server',
             parameters=[
                 {'resolution': 0.05},
-                {'frame_id': 'map'},
-                {'sensor_model/max_range': '10.0'}
+                {'frame_id': 'local_enu'},
+                {'sensor_model/max_range': '15.0'}
             ],
             remappings=[
                 ('cloud_in', '/perception/center/lanes_point_cloud')

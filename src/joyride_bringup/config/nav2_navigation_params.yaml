@@ -1,4 +1,4 @@
-
+    
 bt_navigator:
   ros__parameters:
     use_sim_time: False
@@ -7,8 +7,8 @@ bt_navigator:
     odom_topic: /odom
     bt_loop_duration: 10
     default_server_timeout: 20
-    # default_nav_to_pose_bt_xml: /home/joyride-obc/joyride-ros-main/src/third_party/navigation2/nav2_bt_navigator/behavior_trees/navigate_w_replanning_only_if_path_becomes_invalid.xml
-    # default_nav_through_poses_bt_xml: /home/joyride-obc/joyride-ros-main/src/third_party/navigation2/nav2_bt_navigator/behavior_trees/navigate_w_replanning_only_if_path_becomes_invalid.xml
+    default_nav_to_pose_bt_xml: /home/joyride-obc/joyride-ros-main/src/third_party/navigation2/nav2_bt_navigator/behavior_trees/navigate_w_replanning_only_if_path_becomes_invalid.xml
+    default_nav_through_poses_bt_xml: /home/joyride-obc/joyride-ros-main/src/third_party/navigation2/nav2_bt_navigator/behavior_trees/navigate_w_replanning_only_if_path_becomes_invalid.xml
     plugin_lib_names:
     - nav2_compute_path_to_pose_action_bt_node
     - nav2_compute_path_through_poses_action_bt_node
@@ -65,35 +65,26 @@ bt_navigator_navigate_to_pose_rclcpp_node:
   ros__parameters:
     use_sim_time: False
 
-
 controller_server:
   ros__parameters:
-    use_sim_time: False
-    controller_frequency: 10.0
+    use_sim_time: false
+    controller_frequency: 1.0
     min_x_velocity_threshold: 0.001
     min_y_velocity_threshold: 0.5
     min_theta_velocity_threshold: 0.001
-    failure_tolerance: 0.3
     progress_checker_plugin: "progress_checker"
-    goal_checker_plugins: ["goal_checker"] 
+    goal_checker_plugins: ["goal_checker"]
     controller_plugins: ["FollowPath"]
 
-    # Progress checker parameters
     progress_checker:
       plugin: "nav2_controller::SimpleProgressChecker"
       required_movement_radius: 0.5
       movement_time_allowance: 10.0
-    # Goal checker parameters
     goal_checker:
-     plugin: "nav2_controller::SimpleGoalChecker"
-     xy_goal_tolerance: 0.25
-     yaw_goal_tolerance: 0.25
-     stateful: False
-    # general_goal_checker:
-    #   stateful: True
-    #   plugin: "nav2_controller::SimpleGoalChecker"
-    #   xy_goal_tolerance: 0.25
-    #   yaw_goal_tolerance: 0.25
+      plugin: "nav2_controller::SimpleGoalChecker"
+      xy_goal_tolerance: 0.25
+      yaw_goal_tolerance: 0.25
+      stateful: false
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
       desired_linear_vel: 1.5
@@ -126,87 +117,40 @@ controller_server:
 local_costmap:
   local_costmap:
     ros__parameters:
-      update_frequency:  20.0
-      publish_frequency: 16.0
-      lethal_cost_threshold: 80 #default is 100 
-      global_frame: map                  
+      update_frequency: 20.0
+      publish_frequency: 20.0
+      global_frame: local_enu           # Not sure if this will work :( 
       robot_base_frame: base_link
       trinary_costmap: True
       use_sim_time: False
-      rolling_window: True
+      rolling_window: true
       width: 20
       height: 20
-      resolution: 0.05
+      resolution: 0.1
       robot_radius: 3.46
-      plugins: ["obstacle_layer","denoise_layer", "inflation_layer"]
+      plugins: ["obstacle_layer", "inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 2.0
-        inflation_radius: 0.5
         enabled: True
-      # obstacle_layer:
-      #   plugin: "nav2_costmap_2d::ObstacleLayer"
-      #   enabled: True
-      #   observation_sources: UVPC
-      #   observation_persistence: 1.0
-      #   UVPC:
-      #     topic: /perception/center/lanes_point_cloud
-      #     inf_is_valid: False
-      #     max_obstacle_height: 2.0
-      #     min_obstacle_height: 0.0
-      #     raytrace_max_range: 15.0     # Default is 3 meters
-      #     raytrace_min_range: 0.0
-      #     obstacle_max_range: 10.0    # Default is 2.5 meters, adjust as needed
-      #     obstacle_min_range: 0.0 
-      #     clearing: True
-      #     marking: True
-      #     data_type: "PointCloud2" 
-
+        cost_scaling_factor: 3.0
+        inflation_radius: 0.5
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: True
-        observation_persistence: 10.0     # Number of seconds before objects are cleared once they move 
+        observation_persistence: 1.0     # Number of seconds before objects are cleared once they move 
         observation_sources: hokuyo_front_scan
         hokuyo_front_scan:
           topic: /sensors/lidar/front_lidar/scan
           max_obstacle_height: 2.0
           min_obstacle_height: 0.0
-          raytrace_max_range: 15.0     # Default is 3 meters; the range of clearing objects
+          raytrace_max_range: 16.0     # Default is 3 meters; the range of clearing objects
           raytrace_min_range: 0.0
-          obstacle_max_range: 6.0    # Default is 2.5 meters; the range of objects added into map
+          obstacle_max_range: 15.0    # Default is 2.5 meters; the range of objects added into map
           obstacle_min_range: 0.0
           marking: True
           clearing: True
           data_type: "LaserScan"      # LaserScan, PointCloud, PointCloud2
           inf_is_valid: False          # Validity of infite laserscan data; True/False
-      denoise_layer:
-        plugin: "nav2_costmap_2d::DenoiseLayer"
-        enabled: true
-        minimal_group_size: 2       # If 1 or less, all obstacles will be kept. If 2, standalone obstacles (without neighbors in adjacent cells) will be removed.If 2, standalone obstacles (without neighbors in adjacent cells) will be removed.
-        group_connectivity_type: 4  #4 - adjacent obstacles are connected horizontally and vertically. 8 - adjacent obstacles are connected horizontally, vertically and diagonally.
-
-      static_layer:
-        plugin: "nav2_costmap_2d::StaticLayer"
-        map_subscribe_transient_local: True
-      always_send_full_costmap: True
-  
-
-global_costmap:
-  global_costmap:
-    ros__parameters:
-      update_frequency: 15.0
-      publish_frequency: 15.0
-      global_frame: map
-      robot_base_frame: base_link
-      width: 50
-      height: 50
-      origin_x: -25.0
-      origin_y: -25.0
-      use_sim_time: False
-      robot_radius: 3.46
-      resolution: 0.1
-      track_unknown_space: False
-      plugins: ["static_layer", "inflation_layer"] #, "voxel_layer"]
       # voxel_layer:
       #   plugin: "nav2_costmap_2d::VoxelLayer"
       #   enabled: True
@@ -216,55 +160,67 @@ global_costmap:
       #   z_voxels: 16
       #   max_obstacle_height: 2.0
       #   mark_threshold: 0
-      #   observation_sources: PointCloud2
-      #   PointCloud2:
-      #     topic: /perception/center/lanes_point_cloud
-      #     raytrace_max_range: 6.0     # Default is 3 
-      #     raytrace_min_range: 0.0
-      #     obstacle_max_range: 5.0    # Default is 2.5 meters, adjust as needed
-      #     obstacle_min_range: 0.0 
-      #     clearing: True
-      #     marking: True
-      #     data_type: "PointCloud2" 
-      # obstacle_layer:
-      #   plugin: "nav2_costmap_2d::ObstacleLayer"
-      #   enabled: True
-      #   observation_persistence: 1.0     # Number of seconds before objects are cleared once they move 
       #   observation_sources: hokuyo_front_scan
       #   hokuyo_front_scan:
       #     topic: /sensors/lidar/front_lidar/scan
       #     max_obstacle_height: 2.0
-      #     min_obstacle_height: 0.0
-      #     raytrace_max_range: 15.0     # Default is 3 meters; the range of clearing objects
-      #     raytrace_min_range: 0.0
-      #     obstacle_max_range: 10.0    # Default is 2.5 meters; the range of objects added into map
-      #     obstacle_min_range: 0.0
-      #     marking: True
       #     clearing: True
-      #     data_type: "LaserScan"      # LaserScan, PointCloud, PointCloud2
-      #     inf_is_valid: False          # Validity of infite laserscan data; True/False
+      #     marking: True
+      #     data_type: "LaserScan"
+
+          
+          
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      update_frequency: 10.0
+      publish_frequency: 10.0
+      global_frame: local_enu         # Not sure if this will work :( 
+      robot_base_frame: base_link
+      width: 50
+      height: 50
+      origin_x: -25.0
+      origin_y: -25.0
+      use_sim_time: False
+      robot_radius: 3.46
+      resolution: 0.1
+      track_unknown_space: False
+      plugins: ["static_layer" , "inflation_layer"] #  "voxel_layer",
       inflation_layer:
+        enabled: True 
         plugin: "nav2_costmap_2d::InflationLayer"
-        enabled: true
         cost_scaling_factor: 2.0
         inflation_radius: 0.5
-        inflate_unknown: False
-        inflate_around_unknown: false
+      # voxel_layer:
+      #   plugin: "nav2_costmap_2d::VoxelLayer"
+      #   enabled: True
+      #   publish_voxel_map: True
+      #   origin_z: 0.0
+      #   z_resolution: 0.05
+      #   z_voxels: 16
+      #   max_obstacle_height: 2.0
+      #   mark_threshold: 0
+      #   observation_sources: hokuyo_front_scan
+      #   hokuyo_front_scan:
+      #     topic: /sensors/lidar/front_lidar/scan
+      #     max_obstacle_height: 2.0
+      #     clearing: True
+      #     marking: True
+      #     data_type: "LaserScan"
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_subscribe_transient_local: True
         enabled: True
-        map_topic: /global_costmap/costmap
-        # map_topic: /map
+        map_topic: /map
         subscribe_to_updates: true
-        transform_tolerance: 0.3
       always_send_full_costmap: True
-
 
 map_server:
   ros__parameters:
     use_sim_time: False
-    yaml_filename: /home/joyride-obc/joyride-ros-main/src/joyride_bringup/maps/empty_map.yaml
+    # Overridden in launch by the "map" launch configuration or provided default value.
+    # To use in yaml, remove the default "map" value in the tb3_simulation_launch.py file & provide full path to map below.
+    yaml_filename: "/home/joyride-obc/joyride-ros-main/src/joyride_bringup/maps/empty_map.yaml"
 
 map_saver:
   ros__parameters:
@@ -272,7 +228,7 @@ map_saver:
     save_map_timeout: 5.0
     free_thresh_default: 0.25
     occupied_thresh_default: 0.65
-    map_subscribe_transient_local: False
+    map_subscribe_transient_local: True
 
 planner_server:
   ros__parameters:
@@ -316,7 +272,6 @@ smoother_server:
       max_its: 1000
       do_refinement: True
 
-
 behavior_server:
   ros__parameters:
     costmap_topic: local_costmap/costmap_raw
@@ -342,9 +297,9 @@ behavior_server:
     min_rotational_vel: 0.1
     rotational_acc_lim: 0.2
 
-# robot_state_publisher:
-#   ros__parameters:
-#     use_sim_time: False
+robot_state_publisher:
+  ros__parameters:
+    use_sim_time: False
 
 waypoint_follower:
   ros__parameters:
@@ -357,29 +312,29 @@ waypoint_follower:
       enabled: True
       waypoint_pause_duration: 200
 
-# velocity_smoother:
-#   ros__parameters:
-#     use_sim_time: False
-#     smoothing_frequency: 20.0
-#     scale_velocities: False
-#     feedback: "OPEN_LOOP"
-#     max_velocity: [2.0, 0.0, 0.1]
-#     min_velocity: [-0.5, 0.0, -0.1]
-#     max_accel: [3.0, 0.0, 0.03]
-#     max_decel: [-3.0, 0.0, -0.03]
-#     odom_topic: "odom"
-#     odom_duration: 0.1
-#     deadband_velocity: [0.0, 0.0, 0.0]
-#     velocity_timeout: 1.0
+velocity_smoother:
+  ros__parameters:
+    use_sim_time: False
+    smoothing_frequency: 20.0
+    scale_velocities: False
+    feedback: "OPEN_LOOP"
+    max_velocity: [2.0, 0.0, 0.1]
+    min_velocity: [-0.5, 0.0, -0.1]
+    max_accel: [3.0, 0.0, 0.03]
+    max_decel: [-3.0, 0.0, -0.03]
+    odom_topic: "odom"
+    odom_duration: 0.1
+    deadband_velocity: [0.0, 0.0, 0.0]
+    velocity_timeout: 1.0
   
-# simple_go_to_pose:
-#   ros__parameters:
-#     control_gains: [1.0, 0.75, 0.0]
-#     proximity: 1.5
-#     wheelbase: 1.75
-#     maximum_forward_speed: 2.0
-#     maximum_reverse_speed: 0.5
-#     maximum_angular_speed: 1.57
-#     odom_topic: "odom"
-#     plan_topic: "plan"
-#     cmd_topic:  "cmd_vel"
+simple_go_to_pose:
+  ros__parameters:
+    control_gains: [1.0, 0.75, 0.0]
+    proximity: 1.5
+    wheelbase: 1.75
+    maximum_forward_speed: 2.0
+    maximum_reverse_speed: 0.5
+    maximum_angular_speed: 1.57
+    odom_topic: "odom"
+    plan_topic: "plan"
+    cmd_topic:  "cmd_vel"

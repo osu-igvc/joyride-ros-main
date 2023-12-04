@@ -38,13 +38,13 @@ def generate_launch_description():
         final_nav_params_path,
 
         # Minimal fake 
-        IncludeLaunchDescription(
+        # IncludeLaunchDescription(
             
-            PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('joyride_bringup'), 'launch'),
-            '/joyride_minimal_fake.launch.py'
-            ])
-        ),
+        #     PythonLaunchDescriptionSource([os.path.join(
+        #     get_package_share_directory('joyride_bringup'), 'launch'),
+        #     '/joyride_minimal_fake.launch.py'
+        #     ])
+        # ),
         
         # Minimal 
         # IncludeLaunchDescription(
