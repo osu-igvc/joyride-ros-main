@@ -37,23 +37,6 @@ def generate_launch_description():
         declare_controller_type_cmd,
         final_nav_params_path,
 
-        # Minimal fake 
-        # IncludeLaunchDescription(
-            
-        #     PythonLaunchDescriptionSource([os.path.join(
-        #     get_package_share_directory('joyride_bringup'), 'launch'),
-        #     '/joyride_minimal_fake.launch.py'
-        #     ])
-        # ),
-        
-        # Minimal 
-        # IncludeLaunchDescription(
-            
-        #     PythonLaunchDescriptionSource([os.path.join(
-        #     get_package_share_directory('joyride_bringup'), 'launch'),
-        #     '/joyride_minimal.launch.py'
-        #     ])
-        # ),
 
         # Navstack
         IncludeLaunchDescription(

@@ -66,7 +66,7 @@ void NavSatOdom::initializeParameters()
 {
     //RCLCPP_INFO(this->get_logger(), "Init params");
     this->declare_parameter("use_fake_odom", false);
-    this->declare_parameter("tf_frequency", 50.0);
+    this->declare_parameter("tf_frequency", 100.0); // original value 50
     this->declare_parameter("expected_lat", 36.115);
     this->declare_parameter("expected_lon", -97.0584);
     this->declare_parameter("initial_ll_radius", 10000.0);
@@ -116,31 +116,45 @@ void NavSatOdom::initializeROS()
     this->tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
     this->tf_listener_ = std::make_unique<tf2_ros::TransformListener>(*tf_buffer_);
 
-    // Setup odom publisher
-    this->odomPub_ = this->create_publisher<nav_msgs::msg::Odometry>(this->odom_pub_topic_, 10);
-    this->publishOdometryTimer_ = this->create_wall_timer(std::chrono::milliseconds(int(1000 * tf_period_)), std::bind(&NavSatOdom::publishOdometryCallback, this));
-
-    this->getOdomOriginLLService_ = this->create_service<joyride_interfaces::srv::GetOdomOriginLL>("getInitialLL", std::bind(&NavSatOdom::getInitialLLCallback, this, std::placeholders::_1, std::placeholders::_2));
-    this->resetOdomService_ = this->create_service<std_srvs::srv::Trigger>("resetOdom", std::bind(&NavSatOdom::resetOdomCallback, this, std::placeholders::_1, std::placeholders::_2));
-    
     // Initialize pointers
     this->last_position_ = std::make_shared<geometry_msgs::msg::Point>();
     this->last_velocity_ = std::make_shared<geometry_msgs::msg::Twist>();
     this->last_orientation_ = std::make_shared<geometry_msgs::msg::Quaternion>();
-    
 
 
-
+    // Reset Odom service
+    this->getOdomOriginLLService_ = this->create_service<joyride_interfaces::srv::GetOdomOriginLL>("getInitialLL", std::bind(&NavSatOdom::getInitialLLCallback, this, std::placeholders::_1, std::placeholders::_2));
+    this->resetOdomService_ = this->create_service<std_srvs::srv::Trigger>("resetOdom", std::bind(&NavSatOdom::resetOdomCallback, this, std::placeholders::_1, std::placeholders::_2));
 
 
     if(!this->use_fake_odom_) {
         //RCLCPP_INFO(this->get_logger(), "No fake ROS");
 
         // Setup GPS Common subscriber
-        this->gpsCommonSub_ = this->create_subscription<vectornav_msgs::msg::CommonGroup>(this->gps_common_topic_, 10,
+        this->gpsCommonSub_ = this->create_subscription<vectornav_msgs::msg::CommonGroup>(this->gps_common_topic_, 50,
             std::bind(&NavSatOdom::gpsCommonCallback, this, std::placeholders::_1));
 
     }
+
+    // Setup odom publisher
+    this->odomPub_ = this->create_publisher<nav_msgs::msg::Odometry>(this->odom_pub_topic_, 10);
+    this->publishOdometryTimer_ = this->create_wall_timer(std::chrono::milliseconds(int(1000 * tf_period_)), std::bind(&NavSatOdom::publishOdometryCallback, this));
+    
+
+    
+
+
+
+
+    // 12/07/2023 rearanging for testing
+    // if(!this->use_fake_odom_) {
+    //     //RCLCPP_INFO(this->get_logger(), "No fake ROS");
+
+    //     // Setup GPS Common subscriber
+    //     this->gpsCommonSub_ = this->create_subscription<vectornav_msgs::msg::CommonGroup>(this->gps_common_topic_, 10,
+    //         std::bind(&NavSatOdom::gpsCommonCallback, this, std::placeholders::_1));
+
+    // }
 
 }
 
