@@ -1,4 +1,12 @@
 
+"""
+ROS Blob Detector Node
+
+This module contains the BlobDetector class, which is a ROS node that processes
+images and detects blobs based on color. It uses the OpenCV library for image
+processing and communicates with other ROS nodes through publishers and subscribers.
+
+"""
 # ROS Imports
 import rclpy
 from rclpy.node import Node
@@ -17,8 +25,29 @@ import joyride_perception.submodules.vision_utility as vis
 
 
 class BlobDetector(Node):
-    
+    """
+    BlobDetector class for detecting blobs in images and publishing the results.
+
+    Attributes:
+        bridge (CvBridge): OpenCV to ROS Image message converter.
+        topic_name (str): Image source topic name.
+        output_topic_name (str): Blob detection output topic name.
+        MASK_HUE_LOWER (int): Lower bound for hue in color filtering.
+        MASK_HUE_UPPER (int): Upper bound for hue in color filtering.
+        MASK_SAT_LOWER (int): Lower bound for saturation in color filtering.
+        MASK_SAT_UPPER (int): Upper bound for saturation in color filtering.
+        MASK_VAL_LOWER (int): Lower bound for value in color filtering.
+        MASK_VAL_UPPER (int): Upper bound for value in color filtering.
+        HIT_THRESHOLD (float): Threshold for HOG detector confidence.
+        image_sub (Subscriber): ROS subscriber for the image source topic.
+        contour_pub (Publisher): ROS publisher for the blob detection output.
+
+    """
     def __init__(self):
+        """
+        Initialize BlobDetector node.
+
+        """
         # Boilerplate setup
         super().__init__('blob_detector')
         #self.heartbeat = HeartbeatManager(self, HeartbeatManager.Type.publisher)
@@ -63,6 +92,16 @@ class BlobDetector(Node):
         
 
     def imageCallback(self, img_msg):
+        """
+        Process incoming image messages and trigger blob detection.
+
+        Args:
+            img_msg (Image): ROS Image message containing the input image.
+
+        Returns:
+            None
+
+        """
         #self.get_logger().info('Blob detector received image')
         frame = self.bridge.imgmsg_to_cv2(img_msg)
         self.locateBlob(frame)
@@ -99,6 +138,16 @@ class BlobDetector(Node):
     # Kalman Filter
     # Find the center point of a bounding box around a detected pedestrian
     def center(points):
+        """
+        Calculate the center point of a bounding box.
+
+        Args:
+            points (List[List[int]]): List of four corner points of the bounding box.
+
+        Returns:
+            np.ndarray: Array representing the center point.
+
+        """
         x = np.float32(
                (points[0][0] +
                 points[1][0] +
@@ -112,7 +161,16 @@ class BlobDetector(Node):
         return np.array([np.float32(x), np.float32(y)], np.float32)
 
     def locateBlob(self, frame):
+        """
+        Locate blobs in the input frame and publish the results.
 
+        Args:
+            frame (np.ndarray): Input image frame.
+
+        Returns:
+            None
+
+        """
         #hog = cv2.HOGDescriptor()
         #hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
         hog = cv2.HOGDescriptor((48,96),(16,16),(8,8),(8,8),9)
@@ -151,6 +209,10 @@ class BlobDetector(Node):
 
 
 def main():
+    """
+    Main function to initialize and run the BlobDetector node.
+
+    """
     rclpy.init()
     detector = BlobDetector()
     rclpy.spin(detector)
