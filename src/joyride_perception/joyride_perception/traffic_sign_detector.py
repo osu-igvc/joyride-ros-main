@@ -18,8 +18,27 @@ import torch, requests
 # https://github.com/open-shade/yolov5/blob/main/yolov5/interface.py
 
 class TrafficSignDetector(Node):
+    """
+    ROS node for detecting traffic signs using YOLO.
+
+    Attributes:
+    - image_source_topic (str): ROS topic for the input image.
+    - image_output_topic (str): ROS topic for the output image with classifications.
+    - detections_output_topic (str): ROS topic for the output detection array.
+    - weights (str): Path to the YOLO model weights.
+    - path_hubconfig (str): Absolute path to yolov5.
+    - path_trained_model (str): Absolute path to the trained YOLO model.
+    - model (torch.nn.Module): YOLO model loaded using PyTorch Hub.
+    - detection_pub (Publisher): ROS publisher for the detection array.
+    - classification_pub (Publisher): ROS publisher for the image with classifications.
+    - bridge (CvBridge): ROS-CV bridge for image conversion.
+    - image_sub (Subscription): ROS subscription for the input image.
+    """
     def __init__(self):
-        super().__init__('traffic_sign_detector')
+        """
+        Initialize the TrafficSignDetector node.
+        """
+        super().__init__('traffic_sign_detector') 
 
         # ROS Parameters
         self.image_source_topic = self.declare_parameter('image_source', '/sensors/cameras/lane/image_raw').get_parameter_value().string_value
@@ -49,7 +68,12 @@ class TrafficSignDetector(Node):
 
     
     def new_raw_image_cb(self, msg:Image):
+        """
+        Callback function for processing new image messages.
 
+        Parameters:
+            msg (Image): Input image message.
+        """
         cvImg = self.bridge.imgmsg_to_cv2(msg, desired_encoding='rgb8')
         results = self.model(cvImg)
         print(results)
@@ -68,6 +92,9 @@ class TrafficSignDetector(Node):
 
 
 def main():
+    """
+    Main function to initiate and run the TrafficSignDetector node.
+    """
     rclpy.init()
     tDetector = TrafficSignDetector()
     rclpy.spin(tDetector)
