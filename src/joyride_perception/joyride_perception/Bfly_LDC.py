@@ -19,6 +19,7 @@ class Bfly_LDC():
         """
         Description:
         Initializes the Bfly_LDC (BlackFly Lens Distortion Calibration) class, checking for the initial pathway needed for calibration.
+        Welcome to my shitpit that was rushed and told we aint using it right now. If your reading this it works but needs to be optimized
 
         args:
             None  
