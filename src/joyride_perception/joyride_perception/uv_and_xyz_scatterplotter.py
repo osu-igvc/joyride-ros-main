@@ -218,7 +218,7 @@ def main(args=None):
     # A try statment in main to control shutdown.
     # I like who wrote this portion
     # ples len fom dis.
-    try:s
+    try:
         while rclpy.ok():
             rclpy.spin_once(point_cloud_publisher, timeout_sec=1.0)
     finally:
