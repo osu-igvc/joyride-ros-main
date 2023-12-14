@@ -1,11 +1,16 @@
-
+# Created: Spring 2023, comments added 12/13/23 by Josephine Wade
+# This file creates the diagnostics nodes for:
+#   - Automode manager
+#   - Diagnostic aggregator
+#   - Computer monitor service (GUI screen ROS connection)
+# Requires:
+#   - YAML configuration file: default is 'diagnostic_minimal.yaml'
 
 import launch
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch.substitutions import LaunchConfiguration
 from launch.actions import DeclareLaunchArgument
-
 from launch_ros.actions import Node
 
 def generate_launch_description():

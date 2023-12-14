@@ -1,3 +1,8 @@
+
+# Created: Spring 2023, comments added 12/13/23 by Josephine Wade
+# This file creates the nodes for each Nav2 server for the lifecycle manager
+# This file is called when Nav2 is launched in other test launch files
+
 # Copyright (c) 2018 Intel Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

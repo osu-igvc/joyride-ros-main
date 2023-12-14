@@ -1,8 +1,13 @@
-# Python
+# Created: Spring 2023, comments added 12/13/23 by Josephine Wade
+# 
+# This file creates a lifecycle node for the 2D Hokuyo Lidar and nodes to handle events
+# This file is typically called in sensors and requires the Lidar to be configured
+# 
+# Python imports
 import os
 from ament_index_python.packages import get_package_share_directory
 
-# ROS
+# ROS imports
 from launch import LaunchDescription
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration

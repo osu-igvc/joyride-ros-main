@@ -1,3 +1,10 @@
+# Created: Spring 2023, comments added 12/13/23 by Josephine Wade
+# A cleaned up launch file for testing out the Regulated Pure Pursuit controller for Nav2
+# Launches:
+#   - Minimal (static Tfs, Diagnostics, sensors, localization, and velocity preprocessor)
+#   - NavStack 
+# Requires:
+#   - Configured parameter file for Regulated Pure Pursuit controller
 
 import os
 
@@ -43,7 +50,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory('joyride_bringup'), 'launch'),
-                '/navstack.launch.py']),
+                '/joyride_navstack.launch.py']),
             launch_arguments={'params_file':nav_params}.items()
         )
 

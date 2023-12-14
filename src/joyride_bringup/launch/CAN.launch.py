@@ -1,9 +1,16 @@
-# Python
+# Created: Spring 2023, comments added 12/13/23 by Josephine Wade
+# This file creates and launches nodes for the Drive-By-Wire system 
+# This file should be launched when the computer starts up (linux autostart program)
+# If the GUI does not show feedback (steering angle is easiest to check by turning the wheel)
+# Then relaunch the GUI application (the app labeled "joyride gui" with a settings wheel icon)
+# If it still does not connect then relaunch the CAN connection by launching this file in a terminal; it will have to remain open to keep the connection
+
+# Python imports
 from http.server import executable
 import os
 from ament_index_python.packages import get_package_share_directory
 
-# ROS
+# ROS imports
 from launch import LaunchDescription
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
@@ -17,8 +24,6 @@ from lifecycle_msgs.msg import Transition
 from launch.event_handlers import OnProcessStart
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-#from launch.action import DeclareLaunchArgument
-#from launch.substitutions import TextSubstitution
 
 
 def generate_launch_description():

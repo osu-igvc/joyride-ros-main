@@ -1,3 +1,11 @@
+# Created: Spring 2023, comments added 12/13/23 by Josephine Wade
+# A launch file for testing out the Nav2 Outdoor Mapping configuration parameters 
+# This file was based on the SimpleGoToPose parameter config that was configured correctly
+# Launches:
+#   - NavStack 
+# Requires:
+#   - Minimal to be ran independently and GPS fix to be found before launching
+#   - Configured parameter file for all of Nav2 
 
 import os
 
@@ -11,11 +19,6 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from nav2_common.launch import RewrittenYaml
 
-# Sets params file and controller type and its config
-# Finds path of files needed
-# Launches minimal - CAN, Diagnostics, Static Tfs, Sensors, Faked Localization for indoors
-# Launches Navstack with params file. Possibly add in map file directory later. For now when launching this file you have to specify the map yaml path: 
-# ros2 launch joyride_bringup navigation.launch.py map:=/home/joyride-obc/joyride-ros-main/src/joyride_bringup/maps/empty_map.yaml
 
 
 def generate_launch_description():
@@ -31,7 +34,6 @@ def generate_launch_description():
     final_nav_params_path = DeclareLaunchArgument(
         'nav2_params',
         default_value=[get_package_share_directory('joyride_bringup'), '/config/','nav2_navigation_params.yaml'])
-        #default_value=[get_package_share_directory('joyride_bringup'), '/config/','booboo_params.yaml'])
 
     return LaunchDescription([
         declare_controller_type_cmd,
@@ -42,7 +44,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('joyride_bringup'), 'launch'),
-            '/navstack.launch.py']),
+            '/joyride_navstack.launch.py']),
             launch_arguments={'params_file':nav_params}.items()
         ),
         

@@ -1,3 +1,4 @@
+# Created: Spring 2023, comments added 12/13/23 by Josephine Wade
 # A minimal launch file for the Joyride project
 # Includes the following nodes:
 # - CAN Server
@@ -9,14 +10,14 @@
 
 # The intention is that all of these should be launched regardless of intended use.
 # This is for indoor usage, so the GPS-based localization is not inclued.
-# For indoor usage, the minimal_fake launch file should be used instead, which uses our fake_odometry node instead of the GPS-based localization.
+# For outdoor usage, the minimal launch file should be used instead, which uses GPS-based localization.
 
 
-# Python
+# Python imports
 import os
 from ament_index_python.packages import get_package_share_directory
 
-# ROS
+# ROS imports
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument

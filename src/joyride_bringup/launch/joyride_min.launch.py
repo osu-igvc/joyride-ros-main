@@ -1,3 +1,17 @@
+# Created: Fall 2023, comments added 12/13/23 by Josephine Wade
+
+# This was a test file to try to condense the minimal and minimal_fake file by having a launch argument to decide which localization to use
+# Not finished - once it is done this method could be used to condense a lot of launch files 
+
+# A minimal launch file for the Joyride project
+# Includes the following nodes:
+# - CAN Server
+# - Transforms
+# - Diagnostics (aggregator, automode manager, computer monitor)
+# - Vectornav INS
+# - GPS-based Localization
+# - Navsat Transform
+
 # A minimal launch file for the Joyride project
 # Includes the following nodes:
 # - CAN Server

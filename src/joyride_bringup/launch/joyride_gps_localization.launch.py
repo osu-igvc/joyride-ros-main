@@ -1,3 +1,20 @@
+# Created: Spring 2023, comments added 12/13/23 by Josephine Wade
+# Provides:
+#   - NavSat Odom (GPS odom published, TFs published: odom->base_link)
+#   - Nav2 transforms data to GPS coordinates and world frame
+# Requires:
+#   - nav localization configuration file
+# SUBSCRIBED TOPICS:
+#   - /imu
+#   - /gps/fix
+#   - /odometry/gps
+# NODES:
+#   - navsat_odom_node
+# PUBLISHED TOPICS
+#   - /gps/filtered
+#   - /odometry/filtered
+#   - /odom      (published by navsat_odom)
+#   - /local_enu (published by navsat_odom)
 
 from launch import LaunchDescription
 import launch_ros.actions
@@ -31,7 +48,7 @@ def generate_launch_description():
                         ('gps/fix', 'vectornav/gnss'),      # Input. From sensor.
                         ('gps/filtered', 'gps/filtered'),   # Output (optional). Convert to GPS coords.
                         ('odometry/gps', 'odometry/gps'),   # Output. coords transformed into world frame.
-                        ('odometry/filtered', 'odom')]      # Input. From odom EKF
+                        ('odometry/filtered', 'odom')]      # Input. From odom EKF built into VectorNav
         ),
     
 ])

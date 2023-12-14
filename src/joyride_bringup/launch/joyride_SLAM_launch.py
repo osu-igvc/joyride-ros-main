@@ -1,4 +1,7 @@
-
+# Created Fall 2023, comments added 12/14/23
+# This file launches SLAM toolbox, takes LaserScan data, and creates an occupancy grid 
+# This file could be used to generate an inital global map but UV to Pointcloud does not generate laserscan data
+# Most of the config has been left to default
 import os
 
 from launch import LaunchDescription

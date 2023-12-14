@@ -1,3 +1,10 @@
+# Created: Spring 2023, comments added 12/13/23 by Josephine Wade
+# 
+# File launches:
+#   - minimal (static Tfs, Diagnostics, sensors, localization, and velocity preprocessor)
+#   - joystick control software
+# Once launched, Car needs to go into AutoMode through the request button on the GUI 
+# After car has entered Autonomy Mode the joystick will be able to control the car 
 
 import os
 

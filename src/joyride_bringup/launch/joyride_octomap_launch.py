@@ -1,3 +1,8 @@
+# Created Fall 2023, comments added 12/14/23
+# This is a launch file to run OctoMap; most of the config has been left to default values
+# Octomap takes in pointcloud data only and creates a occupancy grid from the sensor data; does not clear out objects yet
+# Could be used to generate the inital global map with lanes 
+
 import launch
 from launch_ros.actions import Node
 from launch import LaunchDescription

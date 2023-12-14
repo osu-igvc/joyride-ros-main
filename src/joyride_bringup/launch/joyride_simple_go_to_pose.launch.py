@@ -1,3 +1,12 @@
+# Created: Spring 2023, comments added 12/13/23 by Josephine Wade
+# This file launches everything needed for simple go to pose controller to be tested
+# This controller has not been tested since Summer 2023 and some of the config parameters may need to be reverted 
+# Launches:
+#   - Minimal (static Tfs, Diagnostics, sensors, localization, and velocity preprocessor)
+#   - NavStack
+#   - Simple go to pose controller 
+# Requires:
+#   - Configured parameter file for Nav2 and simple go to pose controller (one file with both params configured)
 
 import os
 

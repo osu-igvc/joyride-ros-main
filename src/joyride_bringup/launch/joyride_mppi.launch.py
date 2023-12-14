@@ -1,3 +1,10 @@
+# Created: Spring 2023, comments added 12/13/23 by Josephine Wade
+# A launch file for testing out the Model Predictive Path Integral (MPPI) controller for Nav2
+# Launches:
+#   - Minimal (static Tfs, Diagnostics, sensors, localization, and velocity preprocessor)
+#   - NavStack 
+# Requires:
+#   - Configured parameter file for MPPI controller
 
 import os
 
@@ -40,19 +47,11 @@ def generate_launch_description():
             '/joyride_minimal.launch.py'
             ])
         ),
-
-        # Vel Preprocess
-        Node(
-            package='joyride_control_py',
-            executable='vel_preprocessor',
-            name='vel_node',
-        ),
-
-                # Navstack
+        # Navstack
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('joyride_bringup'), 'launch'),
-            '/navstack.launch.py']),
+            '/joyride_navstack.launch.py']),
             launch_arguments={'params_file':nav_params}.items()
         )
     ])

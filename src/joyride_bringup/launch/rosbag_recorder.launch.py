@@ -1,4 +1,9 @@
-
+# Created: Spring 2023, comments added 12/14/23 by Josephine Wade
+# This file records rosbags in a folder with a .db3 and YAML file that can be played back
+# Another way of recording bags is to use "ros2 bag record -s mcap --all" or another variant
+# MCAP bags are able to be played back through Foxglove quicker than .db3 files
+# LAUNCH CONFIG:
+#   - "final_bag_name" can be specified when called to name the bag whatever you want
 import launch
 from datetime import datetime
 

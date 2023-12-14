@@ -1,3 +1,4 @@
+# Created: Spring 2023, comments added 12/13/23 by Josephine Wade
 # A minimal launch file for the Joyride project
 # Includes the following nodes:
 # - CAN Server
@@ -22,7 +23,7 @@ from launch_ros.actions import Node
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
-
+from launch.conditions import IfCondition
 
 
 def generate_launch_description():
@@ -74,7 +75,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory('joyride_bringup'), 'launch'),
-                '/gps_localization.launch.py'])
+                '/joyride_gps_localization.launch.py'])
         ),
 
         # Velocity preprocessor
@@ -83,4 +84,4 @@ def generate_launch_description():
             executable='vel_preprocessor',
             name='vel_node',
         ),
-])
+    ])
