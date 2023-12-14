@@ -16,7 +16,21 @@ from joyride_perception.submodules.lane import Lane
 
 
 class LaneDetector(Node):
+    """
+    Node for detecting lane lines in camera images and publishing the result.
+
+    Attributes:
+        output_topic (str): Output topic for publishing lane markings.
+        topic_name (str): Input topic for subscribing to camera images.
+        video_subscriber: ROS subscription to camera images.
+        publisher: ROS publisher for publishing lane markings.
+        bridge (CvBridge): ROS OpenCV bridge for image conversion.
+        scale_ratio (float): Scaling ratio for resizing the input image.
+    """
     def __init__(self) -> None:
+        """
+        Initializes the LaneDetector node.
+        """
         super().__init__('lane_detector')
 
         
@@ -37,6 +51,15 @@ class LaneDetector(Node):
         
 
     def imageCallback(self, msg):
+        """
+        Callback for processing camera images.
+
+        Args:
+            msg (sensor_msgs.msg.Image): The received image message.
+
+        Returns:
+            None
+        """
         self.get_logger().info('Received image from: ' + self.topic_name)
         
         new_frame = self.bridge.imgmsg_to_cv2(msg)
@@ -45,6 +68,16 @@ class LaneDetector(Node):
 
 
     def detectLanes(self, frame):
+        """
+        Detects lane lines in the input frame and publishes the result. 
+        NOTE: Multiple functions created but not used
+
+        Args:
+            frame (numpy.ndarray): The input image frame.
+
+        Returns:
+            None
+        """
         # lane_obj = Lane(frame)
 
         # lane_line_markings = lane_obj.get_line_markings()

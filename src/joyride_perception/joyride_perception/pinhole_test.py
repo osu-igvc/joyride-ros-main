@@ -10,8 +10,19 @@ import yaml
 from image_geometry.cameramodels import PinholeCameraModel
 
 class ImageSubscriber(Node):
-
+    """
+    ROS node for subscribing to image messages and processing them.
+    """
     def parseCalib(self, filename):
+        """
+        Parse calibration data from a YAML file.
+
+        Parameters:
+            filename (str): Path to the YAML file.
+
+        Returns:
+            CameraInfo: Parsed CameraInfo object.
+        """
         stream = open(filename, 'r')
         calib_data = yaml.load(stream)
         cam_info = CameraInfo()
@@ -26,7 +37,10 @@ class ImageSubscriber(Node):
 
 
 
-    def __init__(self):
+    def __init__(self): # Dont ask me why the put the initialize file afterwards but hey not my code GL
+        """
+        Initialize the ImageSubscriber node.
+        """
         super().__init__('image_subscriber')
         self.subscription = self.create_subscription(
             Image,
@@ -40,6 +54,16 @@ class ImageSubscriber(Node):
         self.pinholeCam.fromCameraInfo(self.camInfo)
 
     def rayToGround(self, ray, camera_position):
+        """
+        Calculate the intersection of a ray with the ground.
+
+        Parameters:
+            ray (tuple): Ray coordinates (x, y, z).
+            camera_position (tuple): Camera position coordinates (x, y, z).
+
+        Returns:
+            tuple: Intersection coordinates (x, y, 0.0).
+        """
         # calculate ray intersection with ground (z = 0)
         print('ray:{}'.format(ray))
 
@@ -49,10 +73,16 @@ class ImageSubscriber(Node):
         real_x = cZ*t + camera_position[0]
         real_y = cX*t + camera_position[1]
 
-        return (real_x, real_y, 0.0)
+        return (real_x, real_y, 0.0) # Dont get why me send a hardcoded 0.0 as one of the returns but -_(-_-)_-
     
 
-    def image_callback(self, msg):
+    def image_callback(self, msg): # OOHHHHH more image callback functions in another python file that we copied over I swear to God why dont we just make this into a damn import
+        """
+        Callback function for processing image messages.
+
+        Parameters:
+            msg (Image): Input image message.
+        """
         bridge = CvBridge()
         image = bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
         hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -88,6 +118,9 @@ class ImageSubscriber(Node):
         cv2.waitKey(1)
 
 def main(args=None):
+    """
+    Main function to initiate and run the ImageSubscriber node.
+    """
     rclpy.init(args=args)
     image_subscriber = ImageSubscriber()
     rclpy.spin(image_subscriber)

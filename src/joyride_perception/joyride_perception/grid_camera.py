@@ -7,8 +7,16 @@ from cv_bridge import CvBridge
 
 
 class ImageSubscriber(Node):
-    def __init__(self):
+    """
+    Subscribes to an image topic and processes the images.
 
+    Attributes:
+        bridge (CvBridge): ROS OpenCV bridge for image conversion.
+    """
+    def __init__(self):
+        """
+        Initializes the ImageSubscriber node.
+        """
 
         filePath = "/home/joyride-obc/joyride-ros-main/CurveFitParams_center.csv"
 
@@ -26,10 +34,32 @@ class ImageSubscriber(Node):
         cv2.setMouseCallback('image',self.get_coordinates)
 
     def get_coordinates(self,event, x, y, flags, param):
+        """
+        Callback for mouse events to display coordinates on mouse move.
+
+        Args:
+            event (int): The type of mouse event.
+            x (int): The x-coordinate of the mouse event.
+            y (int): The y-coordinate of the mouse event.
+            flags (int): Additional flags for the mouse event.
+            param: Additional parameters.
+
+        Returns:
+            None
+        """
         if event == cv2.EVENT_MOUSEMOVE:
             print('({}, {})'.format(x, y))
 
     def maskYellow(self, frame):
+        """
+        Applies a yellow color mask to the input frame.
+
+        Args:
+            frame (numpy.ndarray): The input image frame.
+
+        Returns:
+            numpy.ndarray: The masked image.
+        """
         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         lower_yellow = np.array([41, 38, 143])
         upper_yellow = np.array([80, 255, 255])
@@ -37,6 +67,15 @@ class ImageSubscriber(Node):
         return yellow_mask
 
     def detectYellowPoints(self, masked_image):
+        """
+        Detects yellow points in the masked image.
+
+        Args:
+            masked_image (numpy.ndarray): The masked image.
+
+        Returns:
+            list: List of detected yellow point coordinates.
+        """
         centers = []
         contours, _ = cv2.findContours(masked_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -54,6 +93,15 @@ class ImageSubscriber(Node):
         return centers
 
     def image_callback(self, msg):
+        """
+        Callback for processing the image received from the topic.
+
+        Args:
+            msg (sensor_msgs.msg.Image): The received image message.
+
+        Returns:
+            None
+        """
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
             cv_image = cv2.flip(cv_image, 0)
@@ -105,6 +153,9 @@ class ImageSubscriber(Node):
         cv2.waitKey(1)
 
 def main(args=None):
+    """
+    Main function to initialize and run the ImageSubscriber node.
+    """
     rclpy.init(args=args)
     image_subscriber = ImageSubscriber()
     rclpy.spin(image_subscriber)

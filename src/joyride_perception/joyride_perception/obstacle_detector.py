@@ -17,8 +17,27 @@ import joyride_perception.submodules.vision_utility as vis
 
 
 class ObstacleDetector(Node):
-    
+    """
+    Node for detecting obstacles in camera images and publishing the result.
+
+    Attributes:
+        bridge (CvBridge): ROS OpenCV bridge for image conversion.
+        topic_name (str): Input topic for subscribing to camera images.
+        output_topic_name (str): Output topic for publishing obstacle detections.
+        MASK_EDGE_THRESHOLD1 (int): Edge detection threshold 1.
+        MASK_EDGE_THRESHOLD2 (int): Edge detection threshold 2.
+        MASK_AREA_LOWER (int): Lower threshold for object area.
+        MASK_AREA_UPPER (int): Upper threshold for object area.
+        MASK_ERODE_ITERATIONS (int): Number of iterations for erosion.
+        MASK_DILATE_ITERATIONS (int): Number of iterations for dilation.
+        MASK_BLUR_KERNEL_SIZE (int): Size of the Gaussian blur kernel.
+        image_sub (Subscription): ROS subscription to camera images.
+        contour_pub (Publisher): ROS publisher for publishing obstacle detections.
+    """
     def __init__(self):
+        """
+        Initializes the ObstacleDetector node.
+        """
         # Boilerplate setup
         super().__init__('obstacle_detector')
         #self.heartbeat = HeartbeatManager(self, HeartbeatManager.Type.publisher)
@@ -54,12 +73,31 @@ class ObstacleDetector(Node):
 
 
     def imageCallback(self, img_msg):
+        """
+        Callback for processing camera images.
+
+        Args:
+            img_msg (sensor_msgs.msg.Image): The received image message.
+
+        Returns:
+            None
+        """
         #self.get_logger().info('Blob detector received image')
         frame = self.bridge.imgmsg_to_cv2(img_msg)
         self.locateBlob(frame)
 
 
     def detectContours(self, frame, mask):
+        """
+        Detects contours in the frame and extracts objects based on area thresholds.
+
+        Args:
+            frame (numpy.ndarray): The input image frame.
+            mask (numpy.ndarray): The mask to apply to the frame.
+
+        Returns:
+            int: The number of detected objects.
+        """
         cont, hierarchy = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         count = 0
         for cnts in cont:
@@ -75,6 +113,17 @@ class ObstacleDetector(Node):
     # For future Kalman Filter integration
     # Find the center point of a bounding box around a detected obstacle
     def center(points):
+        """
+        Calculate the center point of a bounding box.
+
+        Args:
+            points (numpy.ndarray): Array of shape (4, 2) representing the four corners
+                                    of the bounding box.
+
+        Returns:
+            numpy.ndarray: Array of shape (2,) representing the (x, y) coordinates of
+                           the center point.
+        """
         x = np.float32(
                (points[0][0] +
                 points[1][0] +
@@ -89,7 +138,15 @@ class ObstacleDetector(Node):
 
 
     def locateBlob(self, frame):
+        """
+        Locates blobs in the input frame and publishes the result.
 
+        Args:
+            frame (numpy.ndarray): The input image frame.
+
+        Returns:
+            None
+        """
         frame_resize = cv2.resize(frame, (600, 400))
         
         im_blurred = cv2.GaussianBlur(frame_resize, (self.MASK_BLUR_KERNEL_SIZE, self.MASK_BLUR_KERNEL_SIZE), 0) # Parameterize
@@ -123,6 +180,9 @@ class ObstacleDetector(Node):
 
 
 def main():
+    """
+    Main function to initialize and run the ObstacleDetector node.
+    """
     rclpy.init()
 
     detector = ObstacleDetector()

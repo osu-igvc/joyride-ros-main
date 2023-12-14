@@ -17,7 +17,19 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 
 class PointCorresponder():
+    """
+    Class for handling point clustering and correlation in polar coordinates.
+    """
     def __init__(self, θ_err:float, n_clusters: float, R: float, clustering_threshold: float = 0.1):
+        """
+        Initialize the PointCorresponder.
+
+        Parameters:
+            θ_err (float): Angular error.
+            n_clusters (float): Number of clusters.
+            R (float): Radius.
+            clustering_threshold (float): Clustering threshold.
+        """
         self.km = KMeans(n_clusters = n_clusters, n_init = 10, random_state = 170)
         self.θ_err = np.pi/6
         self.R = R
@@ -25,6 +37,16 @@ class PointCorresponder():
         self.angular_tol = 0.1
 
     def window_data(self, data:np.ndarray, window: np.ndarray) -> np.ndarray:
+        """
+        Extract windowed data based on angular tolerance and clustering window.
+
+        Parameters:
+            data (np.ndarray): Input data.
+            window (np.ndarray): Window specifications.
+
+        Returns:
+            np.ndarray: Windowed data.
+        """
         try:
             x, y = data[:,0], data[:,1]
             bounds = [np.argwhere(np.isclose(x, w, atol = self.angular_tol))[0][0] for w in window[0]]
@@ -35,6 +57,16 @@ class PointCorresponder():
             return None
 
     def points_polar(self, θ_obs: float, scan: np.ndarray) -> np.array:
+        """
+        Convert points to polar coordinates.
+
+        Parameters:
+            θ_obs (float): Observed angle.
+            scan (np.ndarray): Input scan data.
+
+        Returns:
+            np.array: Points in polar coordinates.
+        """
         obs = []
         for i, θ in enumerate(θ_obs):
             θ_min = max(θ - self.θ_err, np.deg2rad(-60))
@@ -50,17 +82,41 @@ class PointCorresponder():
         return np.array(obs)
     
     def polar_cartesian_convert(self, polar:np.array) -> np.array:
+        """
+        Convert polar coordinates to cartesian coordinates.
+
+        Parameters:
+            polar (np.array): Points in polar coordinates.
+
+        Returns:
+            np.array: Points in cartesian coordinates.
+        """
         if polar is None or len(polar) == 0:
             return None
         return np.array([polar[:,1]*np.cos(polar[:,0]), polar[:,1]*np.sin(polar[:,0]), 0*polar[:,1]]).T
     
     def points_cart(self, θ_obs: float, scan: np.ndarray) -> np.array:
+        """
+        Convert points to cartesian coordinates.
+
+        Parameters:
+            θ_obs (float): Observed angle.
+            scan (np.ndarray): Input scan data.
+
+        Returns:
+            np.array: Points in cartesian coordinates.
+        """
         obs = self.points_polar(θ_obs, scan)
         return self.polar_cartesian_convert(obs)
 
 class BlobDetector(Node):
-    
+    """
+    Class for detecting blobs and publishing results.
+    """
     def __init__(self):
+        """
+        Initialize the BlobDetector.
+        """
         # Boilerplate setup
         super().__init__('blob_detector')
         self.bridge = CvBridge()
@@ -94,6 +150,12 @@ class BlobDetector(Node):
         self.point_corresponder = PointCorresponder(θ_err = θ_tilde, n_clusters = n_clusters, R = R)
 
     def imageCallback(self, img_msg: CompressedImage) -> None:
+        """
+        Callback function for image messages.
+
+        Parameters:
+            img_msg (CompressedImage): Input image message.
+        """
         #frame = self.bridge.imgmsg_to_cv2(img_msg)
         frame = self.bridge.compressed_imgmsg_to_cv2(img_msg)
         θ_obs, image_obs = self.detect_obstacles(frame)
@@ -118,6 +180,12 @@ class BlobDetector(Node):
         #self.contour_pub.publish(self.bridge.cv2_to_imgmsg(image_obs, 'bgr8')) #bgr8 8UC1
 
     def laser_scan_cb(self, msg: LaserScan) -> None:
+        """
+        Callback function for laser scan messages.
+
+        Parameters:
+            msg (LaserScan): Input laser scan message.
+        """
         θ_bounds = np.array([msg.angle_min, msg.angle_max])
         ranges = np.array(msg.ranges)
         self.scan = np.array([np.linspace(θ_bounds[0], θ_bounds[1],len(ranges),endpoint=True), ranges]).T
@@ -125,7 +193,16 @@ class BlobDetector(Node):
 
     
     def detect_obstacles(self, frame) -> np.ndarray:
-        hog = cv2.HOGDescriptor((48,96),(16,16),(8,8),(8,8),9)
+        """
+        Detect obstacles in the input frame.
+
+        Parameters:
+            frame: Input frame.
+
+        Returns:
+            Tuple: Tuple containing detected angles and processed frame.
+        """
+        hog = cv2.HOGDescriptor((48,96),(16,16),(8,8),(8,8),9) # God what the hell are these values coming from
         hog.setSVMDetector(cv2.HOGDescriptor_getDaimlerPeopleDetector())
         
         im_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -146,6 +223,7 @@ class BlobDetector(Node):
         cv2.drawContours(frame, cont, -1, (0,255,0), cv2.LINE_AA)
         θ = [ self.heading(np.average(c, axis =0)[0], frame.shape[1]) for c in cont]
 
+        # If you want to know why this is commented out please contact me as I want to know too.
         # for i, c in enumerate(contours):
             
         #     C = np.average(c, axis = 0)[0]
@@ -168,7 +246,18 @@ class BlobDetector(Node):
         # θ = []
         return θ, frame
 
-    def heading(self,keypoint:np.ndarray, width: int) -> float:        
+    def heading(self,keypoint:np.ndarray, width: int) -> float
+        """
+        Calculate heading angle based on keypoint and image width.
+
+        Parameters:
+            keypoint (np.ndarray): Keypoint coordinates.
+            width (int): Image width.
+
+        Returns:
+            float: Heading angle.
+        """    
+        # At least this methods simple 
         # Distance between centroid and origin
         distance_u = (width / 2) - keypoint[0]
         # Get theta
@@ -176,6 +265,9 @@ class BlobDetector(Node):
         return theta
 
 def main():
+    """
+    Main function to initiate and run the BlobDetector.
+    """
     rclpy.init()
     detector = BlobDetector()
     rclpy.spin(detector)
