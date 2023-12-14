@@ -1,19 +1,23 @@
+# This file configures the front 2D hokuyo lidar parameters
+# The documentation for the parameters can be found:
+# https://github.com/Hokuyo-aut/urg_node2 
 /sensors/lidar/front_lidar:
   ros__parameters:
-    ip_address: "192.168.0.10"
-    ip_port: 10940
-    frame_id : 'hokuyo_front'
-    calibrate_time : True
-    synchronize_time : True
-    publish_intensity : false
-    publish_multiecho : false
-    error_limit : 100
-    error_reset_period : 5.0
-    diagnostics_tolerance : 0.05
-    diagnostics_window_time : 5.0
-    time_offset : 0.0
-    angle_min : -1.22
-    angle_max : 1.22
-    skip : 0
-    cluster : 1
-    use_sim_time : False
+    ip_address: "192.168.0.10"   # Manufacturer IP; not the one set manually for IP connection through Linux
+    ip_port: 10940               # Manufacturer port
+    frame_id : 'hokuyo_front'    # Sensor frame name; used by Static transforms
+    calibrate_time : True        # Automatically calibrates time recorded with sensor data
+    synchronize_time : True      # Automatically syncs time recorded with sensor data
+    publish_intensity : false    # Publishes intensity of laserbeam that is returned; could be used to gauge how far away objects are 
+                                 # might result in errors with glass or metal
+    publish_multiecho : false    # Publishes echo from objects; not needed 
+    error_limit : 100            # Number of errors before performing reonnection
+    error_reset_period : 5.0     # Periodically resets number of errors during data collection; in seconds
+    diagnostics_tolerance : 0.05   # Allowable percentage of diagnostic info on freq of scan data delivery relative to target delivery freq
+    diagnostics_window_time : 5.0  # Number of seconds to measure frequency of output delivery of diagnostic info 
+    time_offset : 0.0              # Number of seconds to delay timestamp of scan data
+    angle_min : -1.22            # Radian minimum to collect data; about -69.9 deg
+    angle_max : 1.22             # Radian maximum to collect data; about 69.9 deg
+    skip : 0                     # value 0-9, output thinning of scanned data
+    cluster : 1                  # value 1-99, Groups data scans
+    use_sim_time : False         # Use simulation time or not

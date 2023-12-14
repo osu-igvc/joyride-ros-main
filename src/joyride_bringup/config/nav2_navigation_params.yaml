@@ -1,4 +1,7 @@
-    
+# This param file is meant to be used for outdoor testing; 
+# Odom is dynamic, map drifts slightly
+# Last tested: 12/7/23; generates costmap but has issues clearing objects 
+
 bt_navigator:
   ros__parameters:
     use_sim_time: False

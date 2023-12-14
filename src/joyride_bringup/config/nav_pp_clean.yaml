@@ -1,6 +1,7 @@
+# Uses Hybrid A* Path Planner
 
-# Use Hybrid A* Path Planner
-# Navigator
+# Navigator: pure pursuit
+
 bt_navigator:
   ros__parameters:
     use_sim_time: False

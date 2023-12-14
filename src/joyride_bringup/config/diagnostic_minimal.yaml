@@ -1,3 +1,4 @@
+# Configures the diagnostics software; sets what nodes are required and what nodes to keep track of
 automode_manager_server:
   ros__parameters:
 
@@ -89,6 +90,7 @@ diagnostic_analyzers:
       path: sensors
       contains: ['/sensors']
 
+    # Not yet added since perception algorithms are not fully finished 
     # algorithms:
     #   type: diagnostic_aggregator/GenericAnalyzer
     #   path: algorithms
