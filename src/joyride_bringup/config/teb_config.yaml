@@ -1,3 +1,5 @@
+# Precursor to MPPI controller
+# Not currently maintained so MPPI controller should be considered before testing TEB for use
 
 bt_navigator:
   ros__parameters:

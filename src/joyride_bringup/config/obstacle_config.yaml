@@ -1,3 +1,7 @@
+# Created Spring 2023, comments added 12/15/23
+# Configures the image sources for the perception algorithms
+# Could be expanded to configure more perception algorithms
+
 /perception/pedestrian_detector:
   ros__parameters:
     image_source_topic: '/sensors/cameras/center/image'

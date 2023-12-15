@@ -1,3 +1,6 @@
+# Created Spring 2023
+# Uses Hybrid A* Path Planner and pure-pursuit motion controller
+# Testing not completed to see if it is fully configured; there is also a "cleaned up" version of this config file
 
 bt_navigator:
   ros__parameters:

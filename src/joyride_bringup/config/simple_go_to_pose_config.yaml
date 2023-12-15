@@ -1,3 +1,5 @@
+# Created Spring 2023, edits made during fall 2023
+# The map configuration has been changed since the controller was tested; may need to validate that controller still works
 
 bt_navigator:
   ros__parameters:

@@ -3,7 +3,7 @@
 # Copied from navigation2/nav2_bringup/params/nav2_params.yaml 
 # https://github.com/ros-planning/navigation2/tree/humble 
 
-amcl:
+amcl:     # Not used for our project; GPS localization is used instead
   ros__parameters:
     use_sim_time: True
     alpha1: 0.2

@@ -1,3 +1,5 @@
+# Basic config file used to test mapping with UV to PointCloud but requires LaserScan data
+# Could be used to create inital occupancy grid and provide it to global costmap
 slam_toolbox:
   ros__parameters:
 
