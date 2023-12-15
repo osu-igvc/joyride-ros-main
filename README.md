@@ -9,15 +9,15 @@ The repository is organized in the following manner:
 **joyride-ros-main/src**
 - joyride
 - joyride_bringup
-- joyride_control [TODO]
+- joyride_control 
 - joyride_interfaces
 - joyride_hmi
 - joyride_interfaces
 - joyride_localization
 - joyride_perception
-- joyride_ros2_socketscan [TODO]
+- joyride_ros2_socketscan 
 - joyride_servers
-- joyride_test [TODO]
+- joyride_test 
 - joyride_vectornav
 - mbtiles holder
 - old
@@ -31,7 +31,7 @@ A metapackage describing the overall system's dependencies.
 A package that contains launch files used for launching various different funtions of the car
 
 ## joyride_control
-TODO
+Holds the velocity preprocessor and simple_go_to_pose test controller. Once more "controllers" are tested they will be added here once finished.
 
 ## Joyride_Interfaces
 Holds ROS message and action definitions. Used to maintain consistency across packages.
@@ -46,13 +46,13 @@ Holds ros message publisher for gps localization and transform.
 Perception systems - computer vision, SLAM nodes, estimation, etc.
 
 ## joyride_ros2_socketscan
-TODO
+Holds Drive-By-Wire system diagnostics, CAN communication, and control software. 
 
 ## Joyride_servers
 Holds "servers" that manage system-wide operation. For example, the *usb-link-node* is here, which converts and transmits messages over USB to the drive by wire system.
 
-## joyride_tests
-TODO
+## joyride_test
+A package that was made for a structured outdoor test; can be repurposed for future testing instead of working out of joyride_bringup
 
 ## joyride_vectornav
 #### Vectornav VN300 GPS/IMU
@@ -88,7 +88,7 @@ To launch minimal functionality of joyride for indoors
 
 For visual of cameras and other ros data
 ```bash
-  rviz
+  rviz2
 ```
 
 For ROS2 message debugging and message filtering
