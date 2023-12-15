@@ -187,12 +187,13 @@ controller_server:
 local_costmap:
   local_costmap:
     ros__parameters:
-      update_frequency: 5.0
+      update_frequency: 5.0       
       publish_frequency: 2.0
-      global_frame: odom
-      robot_base_frame: base_link
+      enabled: True
+      global_frame: odom          # Reference frame for map
+      robot_base_frame: base_link # Frame of robot's base
       use_sim_time: False
-      rolling_window: true
+      rolling_window: true        # Whether map moves with robot 
       width: 5                    # Width of map, in meters
       height: 5                   # Height of map, in meters
       resolution: 0.05            # Resolution of map, in meters per pixel
@@ -200,27 +201,27 @@ local_costmap:
       plugins: ["voxel_layer", "inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 3.0
-        inflation_radius: 0.55
+        cost_scaling_factor: 3.0    # Exponential decay factor accross inflation radius
+        inflation_radius: 0.55      # Radius to inflate costmap around lethal objects
+        enabled: True
       voxel_layer:
         plugin: "nav2_costmap_2d::VoxelLayer"
         enabled: True
-        publish_voxel_map: True
-        origin_z: 0.0
-        z_resolution: 0.05
-        z_voxels: 16
-        max_obstacle_height: 2.0
-        mark_threshold: 0
-        observation_sources: scan
+        publish_voxel_map: True     # Whether to publish 3D voxel grid, computationally expensive
+        origin_z: 0.0               # Where to start marking voxels (in meters)
+        z_resolution: 0.05          # Resolution of voxels in height (meters)
+        z_voxels: 16                # 0-16, number of voxels high to mark
+        mark_threshold: 0           # Minimum number of voxels in a column to mark as occupided in 2D occupancy grid
+        observation_sources: scan   # Topic name of data from sensor
         scan:
           topic: /scan
-          max_obstacle_height: 2.0
-          clearing: True
-          marking: True
-          data_type: "LaserScan"
-          raytrace_max_range: 3.0
+          max_obstacle_height: 2.0  # Max height to add return to occupancy grid 
+          clearing: True            # Whether to clear the objects from map 
+          marking: True             # Whether to mark objects into map
+          data_type: "LaserScan"    # Data type; can be "LaserScan", "PointCloud", "PointCloud2"
+          raytrace_max_range: 3.0   # Range to clear obstacles, in meters
           raytrace_min_range: 0.0
-          obstacle_max_range: 2.5
+          obstacle_max_range: 2.5   # Range to map obstacles, in meters
           obstacle_min_range: 0.0
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
@@ -244,20 +245,23 @@ global_costmap:
         enabled: True
         observation_sources: scan
         scan:
-          topic: /scan          # Topic name of data from sensor
-          max_obstacle_height: 2.0
-          clearing: True
-          marking: True
+          topic: /scan                      # Topic name of data from sensor
+          enabled: True
+          max_obstacle_height: 2.0          # Max height of laserscan 
+          clearing: True                    # Whether to clear objects from the map 
+          marking: True                     # Whether to mark objects into map
           data_type: "LaserScan"            # Data type; can be "LaserScan", "PointCloud", "PointCloud2"
           raytrace_max_range: 3.0           # Range to clear obstacles, in meters
           raytrace_min_range: 0.0
           obstacle_max_range: 2.5           # Range to map obstacles, in meters
           obstacle_min_range: 0.0
       static_layer:
-        plugin: "nav2_costmap_2d::StaticLayer"
+        plugin: "nav2_costmap_2d::StaticLayer"  # Takes in 
         map_subscribe_transient_local: True
+        enabled: True
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
+        enabled: True
         cost_scaling_factor: 3.0
         inflation_radius: 0.55
       always_send_full_costmap: True          # Whether to send full costmap every update
@@ -272,10 +276,10 @@ map_server:
 map_saver:
   ros__parameters:
     use_sim_time: False
-    save_map_timeout: 5.0
-    free_thresh_default: 0.25
-    occupied_thresh_default: 0.65
-    map_subscribe_transient_local: True
+    save_map_timeout: 5.0           # Timout in seconds to attempt to save map
+    free_thresh_default: 0.25       # Free space max probability threshold value for occupancy grid
+    occupied_thresh_default: 0.65    # Occupied space min probability threshold value for occupancy grid
+    map_subscribe_transient_local: True   
 
 planner_server:
   ros__parameters:
