@@ -1,6 +1,6 @@
 # This param file is meant to be used for indoor testing; 
 # Since odom is static the config of params might need to be different for inside testing
-# Last tested: 
+# Last tested: Not yet tested indoors; it is a copy of the outdoor map configuration and needs to be changed to work indoors
 
 bt_navigator:
   ros__parameters:
