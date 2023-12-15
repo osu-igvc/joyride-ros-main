@@ -1,7 +1,6 @@
 # Created: Spring 2023, comments added 12/13/23 by Josephine Wade
 # A minimal launch file for the Joyride project
 # Includes the following nodes:
-# - CAN Server
 # - Transforms
 # - Diagnostics (aggregator, automode manager, computer monitor)
 # - Vectornav INS
