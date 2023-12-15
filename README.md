@@ -46,7 +46,7 @@ Holds ros message publisher for gps localization and transform.
 Perception systems - computer vision, SLAM nodes, estimation, etc.
 
 ## joyride_ros2_socketscan
-Holds Drive-By-Wire system diagnostics, CAN communication, and control software. 
+Holds Drive-By-Wire system diagnostics, CAN communication, and control software. Repository is Private since Allied Motions requires a signed NDA to access Electronic Power Steering software information.
 
 ## Joyride_servers
 Holds "servers" that manage system-wide operation. For example, the *usb-link-node* is here, which converts and transmits messages over USB to the drive by wire system.
