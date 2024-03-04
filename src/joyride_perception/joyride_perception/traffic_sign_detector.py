@@ -101,6 +101,7 @@ class TrafficSignDetector(Node):
         self.declare_parameter('pub_image', True)
         self.declare_parameter('pub_json', False)
         self.declare_parameter('pub_boxes', True)
+        self.declare_parameter('pub_proc_image', True) # ADDED
         self.declare_parameter('weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best.pt')
         self.subscription = self.create_subscription(
             Image,
@@ -113,6 +114,7 @@ class TrafficSignDetector(Node):
         self.image_publisher = self.create_publisher(Image, 'yolov5/image', 10)
         self.json_publisher = self.create_publisher(String, 'yolov5/json', 10)
         self.detection_publisher = self.create_publisher(Detection2DArray, 'yolov5/detection_boxes', 10)
+        self.proc_image_publisher = self.create_publisher(Image, 'yolov5/procd_image') # ADDED
 
         self.counter = 0
         self.br = CvBridge()
@@ -181,6 +183,17 @@ class TrafficSignDetector(Node):
         dda.header.stamp = self.get_clock().now().to_msg()
         dda.header.frame_id = str(self.counter)
         return dda
+    
+    def add_bounding_box(self, image, results):
+        for result in results.xyxy[0]:
+            label = int(result[5])
+            confidence = result[4]
+            xmin, ymin, xmax, ymax = map(int, result[:4])
+
+            cv2.rectangle(image, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
+            cv2.putText(image, f"{label} {confidence:.2f}", (xmin, ymin - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        
+        return image
 
     def listener_callback(self, data):
         self.get_logger().info('Got Image')
@@ -199,6 +212,13 @@ class TrafficSignDetector(Node):
         if self.get_parameter('pub_boxes').value:
             detections = self.getDetectionArray(results.pandas().xyxy[0])
             self.detection_publisher.publish(detections)
+
+        if self.get_parameter('pub_proc_image').value:
+            image_with_bboxes = self.add_bounding_box(current_frame, results)
+            image_with_bboxes_msg = self.br.cv2_to_imgmsg(image_with_bboxes)
+            self.proc_image_publisher(image_with_bboxes_msg)
+            #ros2 run rqt_image_view rqt_image_view
+
 
 
 def main(args=None):
