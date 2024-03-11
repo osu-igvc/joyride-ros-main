@@ -28,7 +28,7 @@
 
 
 #         self.weights = self.declare_parameter('weights_path', 'best.pt')
-        
+       
 #         # YOLO Model using PyTorch Hub
 
 #         # - absolute path to yolov5
@@ -49,7 +49,7 @@
 #         print("before load")
 #         self.get_logger().info('Traffic Detector loaded')
 #         print("after loaded")
-    
+   
 #     def new_raw_image_cb(self, msg:Image):
 #         print("begin")
 #         cvImg = self.bridge.imgmsg_to_cv2(msg, desired_encoding='rgb8')
@@ -108,7 +108,7 @@ class TrafficSignDetector(Node):
             # '/sensors/cameras/lane/image_raw',
             '/sensors/cameras/center/image',
             self.listener_callback,
-            100 
+            100
         ) # may want to mess with the queue size of 1
 
         self.image_publisher = self.create_publisher(Image, 'yolov5/image', 10)
@@ -127,7 +127,7 @@ class TrafficSignDetector(Node):
         self.path_hubconfig = self.declare_parameter('model_repo_path', '/home/joyride-obc/joyride-ros-main/src/third_party/yolov5').get_parameter_value().string_value
 
        # - absolute path to best.pt
-        self.path_trained_model = self.declare_parameter('model_weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best.pt').get_parameter_value().string_value
+        self.path_trained_model = self.declare_parameter('model_weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best_bestdataset_YOLOV5.pt').get_parameter_value().string_value
         self.model = torch.hub.load(self.path_hubconfig, 'custom', path=self.path_trained_model, source='local', force_reload=False)
         self.get_logger().info("YOLOv5 Initialized")
 
@@ -141,8 +141,8 @@ class TrafficSignDetector(Node):
         self.counter += 1
 
         for row in df.itertuples():
-            
-            self.get_logger().info(f"Detected {row.name}")
+           
+            # self.get_logger().info(f"Detected {row.name}")
 
             detection = Detection2D()
 
@@ -185,8 +185,12 @@ class TrafficSignDetector(Node):
         dda.detections = detections
         dda.header.stamp = self.get_clock().now().to_msg()
         dda.header.frame_id = str(self.counter)
+
+        # print("row")
+        # print(row)
+
         return dda
-    
+       
     def add_bounding_box(self, image, results):
         for result in results.xyxy[0]:
             label = int(result[5])
@@ -195,11 +199,12 @@ class TrafficSignDetector(Node):
 
             cv2.rectangle(image, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
             cv2.putText(image, f"{label} {confidence:.2f}", (xmin, ymin - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-        
+       
         return image
 
-    def listener_callback(self, data):
-        self.get_logger().info('Got Image')
+    def listener_callback(self, data): 
+        #deleted row
+        #self.get_logger().info('Got Image')
         current_frame = self.br.imgmsg_to_cv2(data)
         results = self.inference(current_frame)
 
@@ -211,7 +216,12 @@ class TrafficSignDetector(Node):
                 xmin, ymin, xmax, ymax = map(int, result[:4])
 
                 cv2.rectangle(current_frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
-                cv2.putText(current_frame, f"{label} {confidence:.2f}", (xmin, ymin - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                cv2.putText(current_frame, f"{label} {confidence:.2f}", (xmin, ymin - 5), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+                #cv2.putText(current_frame, f"{result.name} {confidence:.2f}", (xmin, ymin - 5), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+                #self.get_logger().info(f"Detected {result.name}")
+                # Font size changed to 2 above
+            #printing array for troubleshooting
+           
             current_frame = self.br.cv2_to_imgmsg(current_frame)
             self.image_publisher.publish(current_frame)
             #self.image_publisher.publish(processed_image)
