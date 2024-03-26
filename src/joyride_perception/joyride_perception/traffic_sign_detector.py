@@ -102,13 +102,14 @@ class TrafficSignDetector(Node):
         self.declare_parameter('pub_json', False)
         self.declare_parameter('pub_boxes', True)
         self.declare_parameter('pub_proc_image', True) # ADDED
-        self.declare_parameter('weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best.pt')
+        # self.declare_parameter('weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best.pt')
+        self.declare_parameter('weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/last.pt')
         self.subscription = self.create_subscription(
             Image,
             # '/sensors/cameras/lane/image_raw',
             '/sensors/cameras/center/image',
             self.listener_callback,
-            100
+            1
         ) # may want to mess with the queue size of 1
 
         self.image_publisher = self.create_publisher(Image, 'yolov5/image', 10)
@@ -217,13 +218,18 @@ class TrafficSignDetector(Node):
 
                 cv2.rectangle(current_frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
                 cv2.putText(current_frame, f"{label} {confidence:.2f}", (xmin, ymin - 5), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+               
                 #cv2.putText(current_frame, f"{result.name} {confidence:.2f}", (xmin, ymin - 5), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                 #self.get_logger().info(f"Detected {result.name}")
                 # Font size changed to 2 above
             #printing array for troubleshooting
-           
+            cv2.imshow('Processed Image', current_frame)
+            cv2.waitKey(1)
+            cv2.imwrite('/home/joyride-obc/joyride-ros-main/src/joyride_perception/first_frame4meter.jpg', current_frame)
+
             current_frame = self.br.cv2_to_imgmsg(current_frame)
             self.image_publisher.publish(current_frame)
+            
             #self.image_publisher.publish(processed_image)
 
         if self.get_parameter('pub_json').value:
