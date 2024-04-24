@@ -274,13 +274,15 @@ class TrafficSignDetector(Node):
             frame_skip_counter = 0
             frame_skip_threshold = 100000
             last_detected_texts = {}
+            red_sign = False
+
             for result in results.xyxy[0]:
                 # reader = easyocr.Reader(['en'], gpu=True)
                 frame_skip_counter += 1
                 label = int(result[5])
                 confidence = result[4]
                 xmin, ymin, xmax, ymax = map(int, result[:4])
-                pos_det_threshold = 0.74
+                pos_det_threshold = 0.01
                 img_verify_color = current_frame[ymin:ymax, xmin:xmax]
                 hsv_img = cv2.cvtColor(img_verify_color, cv2.COLOR_BGR2HSV)
                 img_height_hsv, img_width_hsv, channels_hsv = hsv_img.shape
@@ -290,13 +292,16 @@ class TrafficSignDetector(Node):
                 mask_not_red = cv2.inRange(hsv_img[:, :, 0], bad_hue_range_min, bad_hue_range_max)
                 num_pix_not_red = np.count_nonzero(mask_not_red)
                 num_pix_red = num_pix_hsv_img - num_pix_not_red
-                red_sign = False
                 tune_red_ver = 1
                 if (num_pix_red > (tune_red_ver * num_pix_not_red)):
                     red_sign = True
-                    #print('RED')
+                    # print('RED')
+                    cv2.putText(current_frame, 'RED', (10, 600), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                 else:
                     red_sign = False
+                    # print("Not RED")
+                    cv2.putText(current_frame, 'NOT RED', (10, 750), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+
                 if (label == 1):
                     label = 'Stop'
                 frame_skip_counter = 0
@@ -304,6 +309,8 @@ class TrafficSignDetector(Node):
                 detected_text = " ".join(res[1] for res in ocr_results)
                 last_detected_texts[label] = detected_text
                 print('OCR Running', detected_text)
+                cv2.rectangle(current_frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
+
                 # Only process for distance if sign is red and confidence > threshold
                 if (confidence > pos_det_threshold) and red_sign:
                     height = ymax - ymin 
