@@ -90,7 +90,7 @@ import rclpy
 from rclpy.node import Node
 import cv2
 from cv_bridge import CvBridge
-from std_msgs.msg import String, Int32MultiArray
+from std_msgs.msg import String, Float32, Int32MultiArray
 from sensor_msgs.msg import Image
 from vision_msgs.msg import Detection2DArray, Detection2D, ObjectHypothesisWithPose, ObjectHypothesis, BoundingBox2D, Point2D, Pose2D
 from geometry_msgs.msg import PoseWithCovariance, Point
@@ -130,6 +130,7 @@ class TrafficSignDetector(Node):
         self.json_publisher = self.create_publisher(String, 'yolov5/json', 10)
         self.detection_publisher = self.create_publisher(Detection2DArray, 'yolov5/detection_boxes', 10)
         self.proc_image_publisher = self.create_publisher(Image, 'yolov5/proc_image',10) # ADDED
+        # self.stop_sign_range_publisher = self.create_publisher(Float32, 'StopSign_Detection/Range',10)
         #self.sign_det_range_publisher = self.create_publisher(Int32MultiArray, 'yolov5/det_range_info', 10)
 
         #self.imageProcessTimer = self.create_timer(0.05, self.processImageCB)
@@ -276,6 +277,7 @@ class TrafficSignDetector(Node):
             last_detected_texts = {}
             red_sign = False
             stop_sign_detected = False
+            d_pred_meter = Float32()
 
             for result in results.xyxy[0]:
                 # reader = easyocr.Reader(['en'], gpu=True)
@@ -283,7 +285,7 @@ class TrafficSignDetector(Node):
                 label = int(result[5])
                 confidence = result[4]
                 xmin, ymin, xmax, ymax = map(int, result[:4])
-                pos_det_threshold = 0.4
+                pos_det_threshold = 0.55
                 img_verify_color = current_frame[ymin:ymax, xmin:xmax]
                 hsv_img = cv2.cvtColor(img_verify_color, cv2.COLOR_BGR2HSV)
                 img_height_hsv, img_width_hsv, channels_hsv = hsv_img.shape
@@ -321,6 +323,11 @@ class TrafficSignDetector(Node):
                     sign_read_stop = True
                 else:
                     sign_read_stop = False
+                cv2.putText(current_frame, 'Read Stop', (600, 600,), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+                if sign_read_stop:
+                    cv2.putText(current_frame, f'{sign_read_stop}', (600, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+                else:
+                    cv2.putText(current_frame, f'{sign_read_stop}', (600, 700), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                 # Only process for distance if sign is red and confidence > threshold
                 if (confidence > pos_det_threshold) and red_sign and sign_read_stop: 
                     stop_sign_detected = True
@@ -335,6 +342,7 @@ class TrafficSignDetector(Node):
                     if width > 270: #tuning for closer signs
                         d_pred = d_pred + tune_d_pred - 10
                     d_pred_ft = float(d_pred) / 12.0
+                    d_pred_meter = float(d_pred)*0.0254
                     d_pred_ft_str = '{:.2f}'.format(d_pred_ft)
                 #     ocr_results = reader.readtext(np.array(cropped_img))
                 #     detected_text = " ".join(res[1] for res in ocr_results)
@@ -355,11 +363,11 @@ class TrafficSignDetector(Node):
                     cv2.putText(current_frame, f"{d_pred_ft_str} ft.", (xmax, ymax - 5), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                     # cv2.putText(current_frame, 'Read', (300, 600), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                     # cv2.putText(current_frame, f'{detected_text}', (300, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    cv2.putText(current_frame, 'Read Stop', (600, 600,), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    if sign_read_stop:
-                        cv2.putText(current_frame, f'{sign_read_stop}', (600, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    else:
-                        cv2.putText(current_frame, f'{sign_read_stop}', (600, 700), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+                    # cv2.putText(current_frame, 'Read Stop', (600, 600,), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+                    # if sign_read_stop:
+                    #     cv2.putText(current_frame, f'{sign_read_stop}', (600, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+                    # else:
+                    #     cv2.putText(current_frame, f'{sign_read_stop}', (600, 700), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                     
 
 
@@ -421,6 +429,7 @@ class TrafficSignDetector(Node):
 
             current_frame = self.br.cv2_to_imgmsg(current_frame)
             self.image_publisher.publish(current_frame)
+            # self.stop_sign_range_publisher.publish(d_pred_meter)
             #self.sign_det_range_publisher.publish(output_info)
             
             #self.image_publisher.publish(processed_image)
