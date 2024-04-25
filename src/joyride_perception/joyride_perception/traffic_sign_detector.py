@@ -283,17 +283,17 @@ class TrafficSignDetector(Node):
                 label = int(result[5])
                 confidence = result[4]
                 xmin, ymin, xmax, ymax = map(int, result[:4])
-                pos_det_threshold = 0.01
+                pos_det_threshold = 0.4
                 img_verify_color = current_frame[ymin:ymax, xmin:xmax]
                 hsv_img = cv2.cvtColor(img_verify_color, cv2.COLOR_BGR2HSV)
                 img_height_hsv, img_width_hsv, channels_hsv = hsv_img.shape
                 num_pix_hsv_img = img_height_hsv * img_width_hsv
-                bad_hue_range_min = 40
+                bad_hue_range_min = 70
                 bad_hue_range_max = 153
                 mask_not_red = cv2.inRange(hsv_img[:, :, 0], bad_hue_range_min, bad_hue_range_max)
                 num_pix_not_red = np.count_nonzero(mask_not_red)
                 num_pix_red = num_pix_hsv_img - num_pix_not_red
-                tune_red_ver = 1
+                tune_red_ver = 1.35
                 if (num_pix_red > (tune_red_ver * num_pix_not_red)):
                     red_sign = True
                     # print('RED')
@@ -313,17 +313,16 @@ class TrafficSignDetector(Node):
                 # cv2.putText(current_frame, f'{detected_text}', (300, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                 print('OCR Running', detected_text)
                 cv2.rectangle(current_frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
-                # sign_read_stop = False
-                # possible_stop = ['STOP', 'STO', 'TOP', 'ST', 'TO', 'OP']
-                # ocr_upper = detected_text.upper()
-                # if any(word in possible_stop for word in ocr_upper):
-                #     sign_read_stop = True
-                # if sign_read_stop:
-                #     cv2.putText(current_frame, 'Read STOP', (100, 600), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                # else:
-                #     cv2.putText(current_frame, 'Read NOT STOP', (100, 750), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+
+                filtered_text = ''.join(char for char in detected_text if char.isalnum())
+                filtered_text_up = filtered_text.upper()
+                possible_stop = ['STOP', 'STO', 'TOP', 'ST', 'TO', 'OP']
+                if any(word in filtered_text_up for word in possible_stop):
+                    sign_read_stop = True
+                else:
+                    sign_read_stop = False
                 # Only process for distance if sign is red and confidence > threshold
-                if (confidence > pos_det_threshold) and red_sign:
+                if (confidence > pos_det_threshold) and red_sign and sign_read_stop: 
                     stop_sign_detected = True
                     height = ymax - ymin 
                     width = xmax - xmin
@@ -356,11 +355,12 @@ class TrafficSignDetector(Node):
                     cv2.putText(current_frame, f"{d_pred_ft_str} ft.", (xmax, ymax - 5), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                     # cv2.putText(current_frame, 'Read', (300, 600), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                     # cv2.putText(current_frame, f'{detected_text}', (300, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    cv2.putText(current_frame, 'Sign Detected', (600, 600,), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    if stop_sign_detected:
-                        cv2.putText(current_frame, f'{stop_sign_detected}', (600, 650,), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+                    cv2.putText(current_frame, 'Read Stop', (600, 600,), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+                    if sign_read_stop:
+                        cv2.putText(current_frame, f'{sign_read_stop}', (600, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                     else:
-                        cv2.putText(current_frame, f'{stop_sign_detected}', (600, 700,), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+                        cv2.putText(current_frame, f'{sign_read_stop}', (600, 700), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+                    
 
 
 
