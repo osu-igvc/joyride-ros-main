@@ -1,88 +1,5 @@
-# import rclpy
-# from rclpy.node import Node
-
-# from sensor_msgs.msg import Image
-# from vision_msgs.msg import Detection2DArray
-
-# import cv2
-# from cv_bridge import CvBridge
-# import torch, requests
-
-# # Object classifier that uses YOLO to detect traffic signs and other objects
-# # Runs as fast as new images are received, as YOLO is faster than our cameras. Runs on GPU.
-
-# # - Outputs an image showing classifications
-# # - Outputs a 2D detection array with bounding boxes, classification IDs, confidence, etc.
-
 # # Much of the code is sourced from:
 # # https://github.com/open-shade/yolov5/blob/main/yolov5/interface.py
-
-# class TrafficSignDetector(Node):
-#     def __init__(self):
-#         super().__init__('traffic_sign_detector')
-
-#         # ROS Parameters
-#         self.image_source_topic = self.declare_parameter('image_source', '/sensors/cameras/lane/image_raw').get_parameter_value().string_value
-#         self.image_output_topic = self.declare_parameter('image_output', '/perception/signs_detected').get_parameter_value().string_value
-#         self.detections_output_topic = self.declare_parameter('detection_output','/perception/sign_predictions').get_parameter_value().string_value
-
-
-#         self.weights = self.declare_parameter('weights_path', 'best.pt')
-       
-#         # YOLO Model using PyTorch Hub
-
-#         # - absolute path to yolov5
-#         #self.path_hubconfig = self.declare_parameter('model_repo_path', '/home/joyride-obc/joyride-ros-main/src/yolov5').get_parameter_value().string_value
-#         self.path_hubconfig = self.declare_parameter('model_repo_path', '/home/joyride-obc/joyride-ros-main/src/third_party/yolov5').get_parameter_value().string_value
-
-#         # - absolute path to best.pt
-#         self.path_trained_model = self.declare_parameter('model_weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best.pt').get_parameter_value().string_value
-#         self.model = torch.hub.load(self.path_hubconfig, 'custom', path=self.path_trained_model, source='local', force_reload=False)
-
-#         # ROS pubs
-#         self.detection_pub = self.create_publisher(Detection2DArray, self.detections_output_topic, 10)
-#         self.classification_pub = self.create_publisher(Image, self.image_output_topic, 10)
-
-#         self.bridge = CvBridge()
-#         # ROS subs
-#         self.image_sub = self.create_subscription(Image, self.image_source_topic, self.new_raw_image_cb, 1)
-#         print("before load")
-#         self.get_logger().info('Traffic Detector loaded')
-#         print("after loaded")
-   
-#     def new_raw_image_cb(self, msg:Image):
-#         print("begin")
-#         cvImg = self.bridge.imgmsg_to_cv2(msg, desired_encoding='rgb8')
-#         results = self.model(cvImg)
-#         print("before results")
-#         print(results)
-#         print("running 1")
-#         results.render()
-#         processed_img = self.bridge.cv2_to_imgmsg(results.ims[0], encoding='rgb8')
-#         # print(processed_img)
-#         self.classification_pub.publish(processed_img)
-#         print("Running 2")
-
-#         #results.print()
-#         # Run classifier
-#         # Annotate image
-#         # publish annotated
-#         # Build detection array
-#         # publish detection array
-
-
-# def main():
-#     rclpy.init()
-#     tDetector = TrafficSignDetector()
-#     rclpy.spin(tDetector)
-
-#     tDetector.destroy_node()
-#     rclpy.shutdown()
-
-
-
-# if __name__ == '__main__':
-#     main()
 
 import torch
 import requests
@@ -112,7 +29,7 @@ class TrafficSignDetector(Node):
 
         self.declare_parameter('pub_image', True) # Keep True
         self.declare_parameter('pub_json', False)
-        self.declare_parameter('pub_boxes', True)
+        self.declare_parameter('pub_boxes', False)
         self.declare_parameter('pub_proc_image', True) # ADDED
         # self.declare_parameter('weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best.pt')
         self.declare_parameter('weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best_bestdataset_YOLOV5.pt')
@@ -153,62 +70,6 @@ class TrafficSignDetector(Node):
     def inference(self, image: Image):
         return self.model(image)
 
-    def getDetectionArray(self, df):
-        dda = Detection2DArray()
-
-        detections = []
-        self.counter += 1
-
-        for row in df.itertuples():
-           
-            # self.get_logger().info(f"Detected {row.name}")
-
-            detection = Detection2D()
-
-            detection.header.stamp = self.get_clock().now().to_msg()
-            detection.header.frame_id = str(self.counter)
-
-            hypothesises = []
-            hypothesis = ObjectHypothesisWithPose()
-            hypothesis.hypothesis.class_id = str(row[6])
-            hypothesis.hypothesis.score = float(row[5])
-
-            pwc = PoseWithCovariance()
-            pwc.pose.position = Point()
-            pwc.pose.position.x = (int(row.xmin) + int(row.xmax)) / 2
-            pwc.pose.position.y = (int(row.ymin) + int(row.ymax)) / 2
-
-            hypothesis.pose = pwc
-
-            hypothesises.append(hypothesis)
-            detection.results = hypothesises
-
-            bbox = BoundingBox2D()
-            bbox.size_x = (int(row.xmax) - int(row.xmin)) / 2
-            bbox.size_y = (int(row.ymax) - int(row.ymin)) / 2
-
-            point = Point2D()
-            point.x = (int(row.xmin) + int(row.xmax)) / 2
-            point.y = (int(row.ymin) + int(row.ymax)) / 2
-
-            center = Pose2D()
-            center.position = point
-            center.theta = 0.0
-
-            detection.bbox = bbox
-
-            detections.append(detection)
-
-
-
-        dda.detections = detections
-        dda.header.stamp = self.get_clock().now().to_msg()
-        dda.header.frame_id = str(self.counter)
-
-        # print("row")
-        # print(row)
-
-        return dda
        
     # def add_bounding_box(self, image, results):
     #     for result in results.xyxy[0]:
@@ -255,184 +116,118 @@ class TrafficSignDetector(Node):
     # def stopSignDetection(self, img: np.ndarray) -> list[DetectedItem]:
     #     raise NotImplemented
 
+
+    def verify_color_red(self, xmin, ymin, xmax, ymax, img): # img is current_frame in callback
+        red_sign = False
+        img_crop = img[ymin:ymax, xmin:xmax]
+        hsv_img = cv2.cvtColor(img_crop, cv2.COLOR_BGR2HSV)
+        img_height_hsv, img_width_hsv, channels_hsv = hsv_img.shape
+        num_pix_hsv_img = img_height_hsv * img_width_hsv
+        bad_hue_range_min = 70
+        bad_hue_range_max = 153
+        mask_not_red = cv2.inRange(hsv_img[:, :, 0], bad_hue_range_min, bad_hue_range_max)
+        num_pix_not_red = np.count_nonzero(mask_not_red)
+        num_pix_red = num_pix_hsv_img - num_pix_not_red
+        tune_red_ver = 1.35
+        if (num_pix_red > (tune_red_ver * num_pix_not_red)):
+            red_sign = True
+            # print('RED')
+            # cv2.putText(img, 'RED', (10, 600), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+        else:
+            red_sign = False
+            # print("Not RED")
+            # cv2.putText(img, 'NOT RED', (10, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+        return red_sign, img_crop
+
+    def check_read_stop(self, ocr_text_up):
+        read_stop = False
+        possible_stop = ['STOP', 'STO', 'TOP', 'ST', 'TO', 'OP']
+        if any(word in ocr_text_up for word in possible_stop):
+            read_stop = True
+        else:
+            read_stop = False
+        return read_stop
+    
+    def pred_dist(self, xmin, ymin, xmax, ymax):
+        height = ymax - ymin 
+        width = xmax - xmin
+        d_pred_in = 0.0
+        d_pred_val = width # Default with width measurement
+        if height > 1.1*width: #monitor for stop sign rotation (edge case)
+            d_pred_val = height
+        tune_d_pred = 10
+        d_pred_in = (d_pred_val / 8045) ** (1/-0.754) + tune_d_pred # distance in INCHES
+        if width > 270: #tuning for closer signs
+            d_pred_in = d_pred_in + tune_d_pred - 10
+        return d_pred_in
+
+
     def listener_callback(self, data): 
         self.image = self.br.imgmsg_to_cv2(data)
-
-        #deleted row
-        #self.get_logger().info('Got Image')
         current_frame = self.br.imgmsg_to_cv2(data)
         results = self.inference(current_frame)
-        # reader = easyocr.Reader(['en'], gpu=True)
-
-        # reader = easyocr.Reader(['en'])
 
         if self.get_parameter('pub_image').value:
-            #processed_image = self.br.cv2_to_imgmsg(results.ims[0])
-            #print(results.xyxy[0])
-            # reader = easyocr.Reader(['en'])
-
-
-            frame_skip_counter = 0
-            frame_skip_threshold = 100000
+            # Initializing values
             last_detected_texts = {}
             red_sign = False
             stop_sign_detected = False
             d_pred_meter = Float32()
 
+            # Iterate through all bounding boxes from YOLOv5
             for result in results.xyxy[0]:
-                # reader = easyocr.Reader(['en'], gpu=True)
-                frame_skip_counter += 1
+                # Extract info of each bounding box
                 label = int(result[5])
                 confidence = result[4]
-                xmin, ymin, xmax, ymax = map(int, result[:4])
-                pos_det_threshold = 0.55
-                img_verify_color = current_frame[ymin:ymax, xmin:xmax]
-                hsv_img = cv2.cvtColor(img_verify_color, cv2.COLOR_BGR2HSV)
-                img_height_hsv, img_width_hsv, channels_hsv = hsv_img.shape
-                num_pix_hsv_img = img_height_hsv * img_width_hsv
-                bad_hue_range_min = 70
-                bad_hue_range_max = 153
-                mask_not_red = cv2.inRange(hsv_img[:, :, 0], bad_hue_range_min, bad_hue_range_max)
-                num_pix_not_red = np.count_nonzero(mask_not_red)
-                num_pix_red = num_pix_hsv_img - num_pix_not_red
-                tune_red_ver = 1.35
-                if (num_pix_red > (tune_red_ver * num_pix_not_red)):
-                    red_sign = True
-                    # print('RED')
-                    cv2.putText(current_frame, 'RED', (10, 600), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                else:
-                    red_sign = False
-                    # print("Not RED")
-                    cv2.putText(current_frame, 'NOT RED', (10, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                 if (label == 1):
                     label = 'Stop'
-                frame_skip_counter = 0
-                ocr_results = self.reader.readtext(np.array(img_verify_color)) # img_verify_color is cropped img
+                xmin, ymin, xmax, ymax = map(int, result[:4])
+
+                # Added for screenshots
+                #cv2.rectangle(current_frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
+                #cv2.putText(current_frame,f'Conf: {confidence*100:.1f}%', (xmax, ymax - 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+
+                # Check sign color
+                red_sign, img_cropped = self.verify_color_red(xmin, ymin, xmax, ymax, current_frame)
+                if red_sign:
+                    cv2.putText(current_frame, 'RED', (10, 600), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+                else:
+                    cv2.putText(current_frame, 'NOT RED', (10, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+
+                # Check word in sign
+                ocr_results = self.reader.readtext(np.array(img_cropped)) 
                 detected_text = " ".join(res[1] for res in ocr_results)
-
                 last_detected_texts[label] = detected_text
-                # cv2.putText(current_frame, 'Read', (300, 600), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                # cv2.putText(current_frame, f'{detected_text}', (300, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                print('OCR Running', detected_text)
-                cv2.rectangle(current_frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
-
+                #cv2.rectangle(current_frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
                 filtered_text = ''.join(char for char in detected_text if char.isalnum())
                 filtered_text_up = filtered_text.upper()
-                possible_stop = ['STOP', 'STO', 'TOP', 'ST', 'TO', 'OP']
-                if any(word in filtered_text_up for word in possible_stop):
-                    sign_read_stop = True
-                else:
-                    sign_read_stop = False
+                sign_read_stop = self.check_read_stop(filtered_text_up)
                 cv2.putText(current_frame, 'Read Stop', (600, 600,), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                 if sign_read_stop:
                     cv2.putText(current_frame, f'{sign_read_stop}', (600, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                 else:
                     cv2.putText(current_frame, f'{sign_read_stop}', (600, 700), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                # Only process for distance if sign is red and confidence > threshold
-                if (confidence > pos_det_threshold) and red_sign and sign_read_stop: 
-                    stop_sign_detected = True
-                    height = ymax - ymin 
-                    width = xmax - xmin
-                    centr_bbox = xmin + (width/2)
-                    d_pred_val = width # Default with width measurement
-                    if height > 1.1*width: #monitor for stop sign rotation (edge case)
-                        d_pred_val = height
-                    tune_d_pred = 10
-                    d_pred = (d_pred_val / 8045) ** (1/-0.754) + tune_d_pred
-                    if width > 270: #tuning for closer signs
-                        d_pred = d_pred + tune_d_pred - 10
-                    d_pred_ft = float(d_pred) / 12.0
-                    d_pred_meter = float(d_pred)*0.0254
-                    d_pred_ft_str = '{:.2f}'.format(d_pred_ft)
-                #     ocr_results = reader.readtext(np.array(cropped_img))
-                #     detected_text = " ".join(res[1] for res in ocr_results)
-                #     last_detected_texts[label] = detected_text
-                # else:
-                #     detected_text = last_detected_texts.get(label, "")
-                    print(d_pred_ft,'ft.', d_pred, 'in')
-                    cv2.rectangle(current_frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
-                    #cv2.putText(current_frame, f"{label} {confidence:.2f}", (xmin, ymin - 5), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    #cv2.putText(current_frame, f"{d_pred_ft_str}", (xmax, ymax + 5), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    # disp_img_height, disp_img_width, _ = current_frame.shape
-                    # xmin_flip = disp_img_width - xmin
-                    # xmax_flip = disp_img_width - xmax
-                    # ymin_flip = disp_img_height -  ymin
-                    # ymax_flip = disp_img_height - ymax
-                    cv2.putText(current_frame, f"{detected_text}", (xmax, ymax - 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    cv2.putText(current_frame,f'Conf: {confidence*100:.1f}%', (xmax, ymax - 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    cv2.putText(current_frame, f"{d_pred_ft_str} ft.", (xmax, ymax - 5), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    # cv2.putText(current_frame, 'Read', (300, 600), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    # cv2.putText(current_frame, f'{detected_text}', (300, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    # cv2.putText(current_frame, 'Read Stop', (600, 600,), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    # if sign_read_stop:
-                    #     cv2.putText(current_frame, f'{sign_read_stop}', (600, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    # else:
-                    #     cv2.putText(current_frame, f'{sign_read_stop}', (600, 700), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    
-
-
-
                 
-                    # Trying this - if it doesn't work switch to above
-                    # cv2.rectangle(current_frame, (xmax, ymax), (xmin, ymin), (0, 255, 0), 2)
-                    # cv2.putText(current_frame, f"{label} {confidence:.2f}", (xmax, ymax - 5), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    # cv2.putText(current_frame, f"{d_pred_ft_str}", (xmin, ymin + 5), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                    # Structure: Predicted Distance in Inches, Predicted Distance in Feet, Confidence, Color is Red (True for Red, False for Not Red)
-                    
-                    #output_info =np.array([d_pred, d_pred_ft, confidence, red_sign])
-
-
-
-
-                # Crop the detected stop sign
-                # cropped_img = current_frame[ymin:ymax, xmin:xmax]
-                # cropped_img = current_frame.crop()
-                # flipped_img = cv2.flip(cropped_img,0)
-                # flipped_img = cv2.flip(flipped_img,1)
-                # conver_image = cv2.cvtColor(flipped_img,cv2.COLOR_BGR2RGB)
-                # pil_image = Image.fromarray(conver_image)
-
-                # if frame_skip_counter % frame_skip_threshold == 0:
-                #     reader = easyocr.Reader(['en'])
-
-
-                #     ocr_results = reader.readtext(np.array(cropped_img))
-                #     detected_text = " ".join(res[1] for res in ocr_results)
-                #     last_detected_texts[label] = detected_text
-                # else:
-                #     detected_text = last_detected_texts.get(label, "")
-
-
-                # imgGray = cv2.cvtColor(flipped_img, cv2.COLOR_BGR2GRAY)
-                # cv2.imshow('flipped image',flipped_img)
-                # ocr_results = reader.readtext(flipped_img)
-                # ocr_results = reader.readtext(np.array(flipped_img))
-                # detected_text = " ".join(res[1] for res in ocr_results)
-                # print("printed ocr", detected_text)
-                #print(ymin)
-                #print(height)
-                #print('W:',width)
-                #print('U:', centr_bbox)
-                #print('H:', height)
-
-                #d_text = "Distance: {:.2f}".format(d_pred)
-                #cv2.putText(current_frame, d_pred, (xmin, ymax-5), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-               
-                #cv2.putText(current_frame, f"{result.name} {confidence:.2f}", (xmin, ymin - 5), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-                #self.get_logger().info(f"Detected {result.name}")
-                # Font size changed to 2 above
-            #printing array for troubleshooting
-            # frame_skip_counter += 1
+                # Only process for distance if: sign is red, sign says stop, YOLOv5 confidence > threshold
+                yolo_pos_det_threshold = 0.55
+                if (confidence > yolo_pos_det_threshold) and red_sign and sign_read_stop: 
+                    stop_sign_detected = True
+                    d_pred_in = self.pred_dist(xmin, ymin, xmax, ymax)
+                    d_pred_ft = d_pred_in / 12.0
+                    d_pred_meter = float(d_pred_in)*0.0254
+                    d_pred_ft_str = '{:.2f}'.format(d_pred_ft)
+                    # Draw bounding box around ranged stop sign
+                    cv2.rectangle(current_frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
+                    # Display detected text (not needed)
+                    cv2.putText(current_frame, f"{detected_text}", (xmax, ymax - 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+                    # Display confidence of YOLOv5 (not needed)
+                    cv2.putText(current_frame,f'Conf: {confidence*100:.1f}%', (xmax, ymax - 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
+                    # Display predicted distance in feet (not needed)
+                    cv2.putText(current_frame, f"{d_pred_ft_str} ft.", (xmax, ymax - 5), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
             cv2.imshow('Processed Image', current_frame)
             cv2.waitKey(1)
-            #cv2.imwrite('/home/joyride-obc/joyride-ros-main/src/joyride_perception/first_frame4meter.jpg', current_frame)
-
             current_frame = self.br.cv2_to_imgmsg(current_frame)
             self.image_publisher.publish(current_frame)
-            # self.stop_sign_range_publisher.publish(d_pred_meter)
-            #self.sign_det_range_publisher.publish(output_info)
-            
-            #self.image_publisher.publish(processed_image)
 
         if self.get_parameter('pub_json').value:
             json = String()
@@ -442,12 +237,6 @@ class TrafficSignDetector(Node):
         if self.get_parameter('pub_boxes').value:
             detections = self.getDetectionArray(results.pandas().xyxy[0])
             self.detection_publisher.publish(detections)
-
-        # if self.get_parameter('pub_proc_image').value:
-        #     image_with_bboxes = self.add_bounding_box(current_frame, results)
-        #     image_with_bboxes_msg = self.br.cv2_to_imgmsg(image_with_bboxes)
-        #     self.proc_image_publisher(image_with_bboxes_msg)
-            #ros2 run rqt_image_view rqt_image_view
 
 
 
