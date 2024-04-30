@@ -231,7 +231,7 @@ local_costmap:
           raytrace_min_range: 0.0
           obstacle_max_range: 25.0
           obstacle_min_range: 0.0
-          inflation_radius: 0.2
+          inflation_radius: 0.01
       obstacle1_layer:   
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: True
@@ -251,6 +251,7 @@ local_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 3.0    
+        use_external_inflation: true
       static_layer:
         enable: True
         plugin: "nav2_costmap_2d::StaticLayer"

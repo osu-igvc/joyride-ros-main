@@ -2,7 +2,7 @@
 import rclpy
 from rclpy.node import Node
 from cv_bridge import CvBridge
-from std_msgs.msg import Header, Float32MultiArray
+from std_msgs.msg import Header, String
 from sensor_msgs.msg import Image, LaserScan, PointCloud2, PointField, CompressedImage
 
 
@@ -94,7 +94,7 @@ class BlobDetector(Node):
         self.point_corresponder = PointCorresponder(θ_err = θ_tilde, n_clusters = n_clusters, R = R)
 
         # Subscribe to HSV thresholds topic
-        self.hsv_threshold_sub = self.create_subscription(Float32MultiArray, '/hsv_thresholds', self.hsv_threshold_callback, 10)
+        self.hsv_threshold_sub = self.create_subscription(String, '/hsv_thresholds', self.hsv_threshold_callback, 10)
 
         # Initialize lower and upper bounds for HSV thresholds
         self.hue_lower = 4 
@@ -106,17 +106,28 @@ class BlobDetector(Node):
 
 
 
-    def hsv_threshold_callback(self, msg):
+    def hsv_threshold_callback(self, msg: String):
         # Callback function to handle HSV threshold updates
+        print("Received HSV thresholds message: ", msg.data)
 
-        thresholds = msg.data
+        threshold_str = msg.data
+        threshold_values = threshold_str.split(',')
+        thresholds = []
+        #int_list = [int(x) for x in threshold_values]
+        for value in threshold_values:
+            try: 
+                num = int(value)
+                thresholds.append(num)
+            except ValueError:
+                print("Invalid value in threshold string: {value}")
+
         self.hue_lower = thresholds[0]
-        self.saturation_lower = thresholds[1]
-        self.value_lower = thresholds[2]
-        self.hue_upper = thresholds[3]
-        self.saturation_upper = thresholds[4]
+        self.saturation_lower = thresholds[2]
+        self.value_lower = thresholds[4]
+        self.hue_upper = thresholds[1]
+        self.saturation_upper = thresholds[3]
         self.value_upper = thresholds[5]
-        print(thresholds[0])
+        print("Received HSV thresholds:", thresholds)
 
 
     def imageCallback(self, img_msg: CompressedImage) -> None:

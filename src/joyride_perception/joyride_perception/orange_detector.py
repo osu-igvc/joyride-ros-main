@@ -1,10 +1,10 @@
-
 # ROS Imports
 import rclpy
 from rclpy.node import Node
 from cv_bridge import CvBridge
-from std_msgs.msg import Header
+from std_msgs.msg import Header, String
 from sensor_msgs.msg import Image, LaserScan, PointCloud2, PointField, CompressedImage
+
 
 # OpenCV Imports
 import cv2
@@ -93,6 +93,43 @@ class BlobDetector(Node):
         θ_tilde = np.arcsin(L/R * np.sin(self.FOV))
         self.point_corresponder = PointCorresponder(θ_err = θ_tilde, n_clusters = n_clusters, R = R)
 
+        # Subscribe to HSV thresholds topic
+        self.hsv_threshold_sub = self.create_subscription(String, '/hsv_thresholds', self.hsv_threshold_callback, 10)
+
+        # Initialize lower and upper bounds for HSV thresholds
+        self.hue_lower = 4 
+        self.saturation_lower = 50
+        self.value_lower = 50
+        self.hue_upper = 6
+        self.saturation_upper = 255
+        self.value_upper = 255
+
+
+
+    def hsv_threshold_callback(self, msg: String):
+        # Callback function to handle HSV threshold updates
+        print("Received HSV thresholds message: ", msg.data)
+
+        threshold_str = msg.data
+        threshold_values = threshold_str.split(',')
+        thresholds = []
+        #int_list = [int(x) for x in threshold_values]
+        for value in threshold_values:
+            try: 
+                num = int(value)
+                thresholds.append(num)
+            except ValueError:
+                print("Invalid value in threshold string: {value}")
+
+        self.hue_lower = thresholds[0]
+        self.saturation_lower = thresholds[2]
+        self.value_lower = thresholds[4]
+        self.hue_upper = thresholds[1]
+        self.saturation_upper = thresholds[3]
+        self.value_upper = thresholds[5]
+        print("Received HSV thresholds:", thresholds)
+
+
     def imageCallback(self, img_msg: CompressedImage) -> None:
         #frame = self.bridge.imgmsg_to_cv2(img_msg)
         frame = self.bridge.compressed_imgmsg_to_cv2(img_msg)
@@ -131,9 +168,10 @@ class BlobDetector(Node):
         im_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         im_blurred = cv2.GaussianBlur(im_hsv, (self.MASK_BLUR_KERNEL_SIZE, self.MASK_BLUR_KERNEL_SIZE), 0) # Parameterize
 
-        orange_lower = np.array([4, 50, 50])
-        orange_upper = np.array([6, 255, 255])
-        orange_mask = cv2.inRange(im_blurred, orange_lower, orange_upper)
+        # Apply HSV thresholding to extract regions of interest (e.g., orange objects)
+        lower_bound = np.array([self.hue_lower, self.saturation_lower, self.value_lower])
+        upper_bound = np.array([self.hue_upper, self.saturation_upper, self.value_upper])
+        orange_mask = cv2.inRange(im_hsv, lower_bound, upper_bound)
 
         masked_img = cv2.bitwise_and(frame, frame, mask=orange_mask)
         

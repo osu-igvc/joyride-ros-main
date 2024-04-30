@@ -1,0 +1,26 @@
+total 492
+drwxrwxr-x  8 joyride-obc joyride-obc   4096 Apr 25 14:53 .
+drwxr-xr-x 48 joyride-obc joyride-obc 258048 Apr 25 14:48 ..
+drwxrwxr-x 74 joyride-obc joyride-obc   4096 Apr 23 15:11 build
+-rwxrwxr-x  1 joyride-obc joyride-obc    122 Oct  9  2023 can_bringup.sh
+-rwxrwxr-x  1 joyride-obc joyride-obc    152 Dec  4 14:20 can.sh
+-rwxrwxr-x  1 joyride-obc joyride-obc    292 Oct  9  2023 check_connected_devices.sh
+-rw-rw-r--  1 joyride-obc joyride-obc    561 Dec  4 14:20 CurveFitParams_center.csv
+-rw-rw-r--  1 joyride-obc joyride-obc    560 Dec  4 14:20 CurveFitParams_left.csv
+-rw-rw-r--  1 joyride-obc joyride-obc    560 Dec  4 14:20 CurveFitParams_right.csv
+-rw-rw-r--  1 joyride-obc joyride-obc  25528 Dec  4 14:20 Default.perspective
+drwxrwxr-x 10 joyride-obc joyride-obc   4096 Apr 23 16:52 .git
+-rw-rw-r--  1 joyride-obc joyride-obc    264 Dec  4 14:20 .gitattributes
+-rw-rw-r--  1 joyride-obc joyride-obc    328 Dec  4 14:20 .gitignore
+-rw-rw-r--  1 joyride-obc joyride-obc    507 Oct  9  2023 .gitmodules
+-rwxrwxr-x  1 joyride-obc joyride-obc     76 Dec  4 14:20 gui.sh
+drwxrwxr-x 74 joyride-obc joyride-obc   4096 Apr 23 15:15 install
+-rw-rw-r--  1 joyride-obc joyride-obc   3547 Apr  5  2023 joyride-ros-main.code-workspace
+drwxrwxr-x 22 joyride-obc joyride-obc   4096 Apr 25 14:24 log
+-rw-rw-r--  1 joyride-obc joyride-obc   1738 Apr 12 17:19 README.md
+-rw-rw-r--  1 joyride-obc joyride-obc  95716 Apr 25 13:14 rosLogStuff.txt
+drwxrwxr-x 23 joyride-obc joyride-obc   4096 Apr 11 16:48 src
+-rw-rw-r--  1 joyride-obc joyride-obc      0 Apr 25 14:53 testout.txt
+-rw-rw-r--  1 joyride-obc joyride-obc  25610 Dec  4 14:20 Test.perspective
+-rw-rw-r--  1 joyride-obc joyride-obc    884 Oct  9  2023 test_xyz_data.csv
+drwxrwxr-x  2 joyride-obc joyride-obc   4096 Dec  4 14:20 .vscode

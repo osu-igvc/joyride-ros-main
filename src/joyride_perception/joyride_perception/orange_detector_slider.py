@@ -1,7 +1,7 @@
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import String
 
 # Tkinter import
 import tkinter as tk
@@ -10,8 +10,15 @@ from tkinter import ttk
 class SliderNode(Node):
     def __init__(self):
         super().__init__('slider_node')
-        self.threshold_pub = self.create_publisher(Float32MultiArray, '/hsv_thresholds', 10)
+        self.threshold_pub = self.create_publisher(String, '/hsv_thresholds', 10)
         self.sliders = [] #initialize sliders list
+        
+        # threshold_str = "4,6,50,255,50,255"
+        # print(threshold_str)
+        # threshold_msg = String()
+        # threshold_msg.data = threshold_str
+        # #print(threshold_msg.data)
+        # self.threshold_pub.publish(threshold_msg)
 
         # Initialize Tkinter root window
         self.root = tk.Tk()
@@ -36,10 +43,10 @@ class SliderNode(Node):
         label_upper.grid(row=0, column=2, padx=(10,0))
 
         #create labels to display current values
-        value_lower=ttk.Label(slider_frame, text=str(min_val))
+        value_lower=ttk.Label(slider_frame, text=str(int(default_low)))
         value_lower.grid(row=0, column=1, padx=(0,10))
 
-        value_upper=ttk.Label(slider_frame, text=str(max_val))
+        value_upper=ttk.Label(slider_frame, text=str(int(default_high)))
         value_upper.grid(row=0, column=3, padx=(10,0))
 
         # Create sliders for lower and upper bounds
@@ -56,16 +63,26 @@ class SliderNode(Node):
     def slider_changed(self, event):
         #Update the labels with the current slider values
         for slider_lower, slider_upper, value_lower, value_upper in self.sliders:
-            value_lower.config(text=str(slider_lower.get()))
-            value_upper.config(text=str(slider_upper.get()))
+            #lower_value = int(slider_lower.get())
+            
+            value_lower.config(text=str(int(slider_lower.get())))
+            value_upper.config(text=str(int(slider_upper.get())))
         # Publish updated threshold values when sliders are moved
         thresholds = []
         for slider_lower, slider_upper, value_lower, value_upper in self.sliders:
-            thresholds.append(slider_lower.get())
-            thresholds.append(slider_upper.get())
-        threshold_msg = Float32MultiArray()
-        threshold_msg.data = thresholds
-        self.threshold_pub.publish(threshold_msg)
+            lower_value = str(int(slider_lower.get()))
+            upper_value = str(int(slider_upper.get()))
+            thresholds.append(lower_value)
+            thresholds.append(upper_value)
+
+        threshold_str = ','.join(thresholds)
+        threshold_values = threshold_str.split(',')
+        if len(threshold_values) == 6:
+            print(threshold_str)
+            threshold_msg = String()
+            threshold_msg.data = threshold_str
+            #print(threshold_msg.data)
+            self.threshold_pub.publish(threshold_msg)
 
 def main():
     rclpy.init()
