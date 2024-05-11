@@ -31,8 +31,9 @@ class TrafficSignDetector(Node):
         self.declare_parameter('pub_json', False)
         self.declare_parameter('pub_boxes', False)
         self.declare_parameter('pub_proc_image', True) # ADDED
-        # self.declare_parameter('weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best.pt')
         self.declare_parameter('weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best_bestdataset_YOLOV5.pt')
+        # self.declare_parameter('weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best_end_semester.pt')
+
         self.subscription = self.create_subscription(
             Image,
             # '/sensors/cameras/lane/image_raw',
@@ -45,12 +46,12 @@ class TrafficSignDetector(Node):
 
         self.image_publisher = self.create_publisher(Image, 'yolov5/image', 10)
         self.json_publisher = self.create_publisher(String, 'yolov5/json', 10)
+
+        #self.imageProcessTimer = self.create_timer(0.05, self.processImageCB)
         self.detection_publisher = self.create_publisher(Detection2DArray, 'yolov5/detection_boxes', 10)
         self.proc_image_publisher = self.create_publisher(Image, 'yolov5/proc_image',10) # ADDED
         # self.stop_sign_range_publisher = self.create_publisher(Float32, 'StopSign_Detection/Range',10)
-        #self.sign_det_range_publisher = self.create_publisher(Int32MultiArray, 'yolov5/det_range_info', 10)
-
-        #self.imageProcessTimer = self.create_timer(0.05, self.processImageCB)
+        #self.sign_det_range_publisher = self.create_publisher(Int32MultiArray, 'yolov5/det_range_info',
 
         self.counter = 0
         self.br = CvBridge()
@@ -60,11 +61,15 @@ class TrafficSignDetector(Node):
         #self.model = torch.hub.load('ultralytics/yolov5', 'custom', path='./data.pt')
 
         # self.model = torch.hub.load('/home/joyride-obc/joyride-ros-main/src/yolov5', 'custom', path='/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best.pt')
+        # absolute path to cloned yolov5 model
         self.path_hubconfig = self.declare_parameter('model_repo_path', '/home/joyride-obc/joyride-ros-main/src/third_party/yolov5').get_parameter_value().string_value
 
        # - absolute path to best.pt
         self.path_trained_model = self.declare_parameter('model_weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best_bestdataset_YOLOV5.pt').get_parameter_value().string_value
+        # self.path_trained_model = self.declare_parameter('model_weights_path', '/home/joyride-obc/joyride-ros-main/src/joyride_perception/config/best_end_semester.pt').get_parameter_value().string_value
+        # self.model = torch.hub.load(self.path_hubconfig, 'custom', path=self.path_trained_model, source='local', force_reload=False, device='cpu')
         self.model = torch.hub.load(self.path_hubconfig, 'custom', path=self.path_trained_model, source='local', force_reload=False)
+        # Used as an identifier that YOLOv5 is sucessfully running
         self.get_logger().info("YOLOv5 Initialized")
 
     def inference(self, image: Image):
@@ -116,7 +121,7 @@ class TrafficSignDetector(Node):
     # def stopSignDetection(self, img: np.ndarray) -> list[DetectedItem]:
     #     raise NotImplemented
 
-
+    # Color verification utlizing HSV values with opencv
     def verify_color_red(self, xmin, ymin, xmax, ymax, img): # img is current_frame in callback
         red_sign = False
         img_crop = img[ymin:ymax, xmin:xmax]
@@ -138,7 +143,7 @@ class TrafficSignDetector(Node):
             # print("Not RED")
             # cv2.putText(img, 'NOT RED', (10, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
         return red_sign, img_crop
-
+    # Checks to see if detected text ioncludes different alterations of the word stop
     def check_read_stop(self, ocr_text_up):
         read_stop = False
         possible_stop = ['STOP', 'STO', 'TOP', 'ST', 'TO', 'OP']
@@ -147,7 +152,7 @@ class TrafficSignDetector(Node):
         else:
             read_stop = False
         return read_stop
-    
+    # Predicted distance calculation
     def pred_dist(self, xmin, ymin, xmax, ymax):
         height = ymax - ymin 
         width = xmax - xmin
@@ -161,7 +166,7 @@ class TrafficSignDetector(Node):
             d_pred_in = d_pred_in + tune_d_pred - 10
         return d_pred_in
 
-
+    # Callback for all of the required opperations for yolov5 prediction, color detection, text recoginition, and distance estimation
     def listener_callback(self, data): 
         self.image = self.br.imgmsg_to_cv2(data)
         current_frame = self.br.imgmsg_to_cv2(data)
@@ -202,6 +207,8 @@ class TrafficSignDetector(Node):
                 filtered_text = ''.join(char for char in detected_text if char.isalnum())
                 filtered_text_up = filtered_text.upper()
                 sign_read_stop = self.check_read_stop(filtered_text_up)
+                # Added for screenshot below
+                # cv2.putText(current_frame, f"{detected_text}", (xmax, ymax - 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                 cv2.putText(current_frame, 'Read Stop', (600, 600,), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
                 if sign_read_stop:
                     cv2.putText(current_frame, f'{sign_read_stop}', (600, 650), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
